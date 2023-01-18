@@ -31,7 +31,7 @@ export default defineConfig({
     tailwind(),
   ],
   site: 'https://<your-username>.github.io',
-  base: '/strudel'
+  base: '/strudel',
 });
 
 /*
