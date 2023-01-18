@@ -1,3 +1,4 @@
+// title: doozy dub detective
 await samples('github:felixroos/samples/main/')
 
 addVoicings('triads', {
