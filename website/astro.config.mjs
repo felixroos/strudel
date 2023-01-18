@@ -30,7 +30,7 @@ export default defineConfig({
     mdx(options),
     tailwind(),
   ],
-  site: 'https://<your-username>.github.io',
+  site: 'https://felixroos.github.io',
   base: '/strudel',
 });
 
