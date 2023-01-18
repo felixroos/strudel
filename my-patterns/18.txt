@@ -1,0 +1,34 @@
+// title: slow tide
+await samples('github:felixroos/samples/main')
+
+addVoicings('triads', {
+  '': ['1P 3M 5P 8P', '3M 5P 8P 10M', '5P 8P 10M 12P'],
+  M: ['1P 3M 5P 8P', '3M 5P 8P 10M', '5P 8P 10M 12P'],
+  m: ['1P 3m 5P 8P', '3m 5P 8P 10m', '5P 8P 10m 12P'],
+  o: ['1P 3m 5d 8P', '3m 5d 8P 10m', '5d 8P 10m 12d'],
+  aug: ['1P 3m 5A 8P', '3m 5A 8P 10M', '5A 8P 10m 12A'],
+}, ['C3', 'C5'])
+
+note("<D Daug G Gm>/2".voicings('triads'))
+  .layer(
+    x=>x.arp("[0,3] 2 [1,3] 2").legato(2)
+      .pan(cosine.range(.2,.8).slow(3)).piano().clip(1)
+      .lpf(sine.range(200,4000).slow(31)).lpq(12),
+    x=>x.arp("{0 1 3 2}%3").add(note(12))
+      .echo("<2 4>","<.2 .1>",.6)
+      .off(1/6, x=>x.add(12).gain(.5))
+      .pan(sine.range(.2,.8).slow(3))
+      .hpf(cosine.range(500,8000).slow(32)).lpq(12).s("kalimba,pluck").clip(1),
+    x=>x.arp("0 2".euclidLegato(5,8)).sub(note(12))
+      .cutoff(sine.range(500,4000).slow(8)).lpq(12).s('jazzbass').clip(1)
+      .decay(saw.range(.15,.2).slow(16)).sustain(0.5).attack(.05).gain(.8),
+    x=>x.arp("{0 1 2 3 2 1}%2".slow(8).ply("<16>/32").late(0))
+      .attack(.01).gain(.3).add(note("0,12.1")).pan(sine.range(.2,.8).slow(14))
+      .s('sawtooth').lpf(tri.range(200,4000).slow(32)).lpq(16)
+  ).mul(gain(.6)).stack(
+    s("bd*2").bank('YamahaRM50').gain("[1 .5]*2"),
+    s("hh*3").bank('YamahaRM50').gain(.7).delay(.2).delaytime(.5).end(0).release(rand.range(.4,.05)),
+    s("~ <sd:0 sd:3>").bank('YamahaRM50').orbit(2).delay("<0 .25>").delaytime(.1)
+  )
+  .slow(2).mul(gain(.75)).room(.4)
+  //.mul(gain(timeCat([10,saw], [1000,1],[10,isaw]).slow(1020)))
