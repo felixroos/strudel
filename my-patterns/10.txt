@@ -1,0 +1,21 @@
+// trying out another steve reich technique..
+// vocal from "Jack Kerouac - American Haiku"
+await samples({
+  diedofoldage:'./diedofoldage.mp3',
+  medicinecabinet: './medicinecabinet.mp3',
+},'github:felixroos/samples/main/vocals/')
+
+
+function arrange(...sections) {
+  let total = sections.reduce((sum, [cycles]) => sum + cycles, 0)
+  sections = sections.map(([cycles, section]) => [cycles, section.fast(cycles)])
+  return timeCat(...sections).slow(total)
+}
+
+arrange(
+  [10, s("medicinecabinet/5")], 
+  [205, s("diedofoldage").layer(
+    x=>x.loopAt(1.4).pan(0).color('#ff00ee50'),
+    x=>x.loopAt(1.39).pan(1).color('#00eeff50'),
+  )]
+).pianoroll({fold:1,vertical:1})

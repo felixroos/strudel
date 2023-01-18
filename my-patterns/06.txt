@@ -1,0 +1,9 @@
+// back to another classic
+// Steve Reich - Clapping Music 
+s("RolandTR808_cp").struct("x!3 ~ x!2 ~ x ~ x!2 ~").speed(.8).color('#aaaaff50')
+  .jux(
+    x=>x.speed(1.2).late("<0 1 2 3 4 5 6 7 8 9 10 11>/8".div(12)).color('#aaffaa50').n(0)
+  )
+  .room(.5)
+  .slow(2)
+  .pianoroll({fold:1,vertical:1})

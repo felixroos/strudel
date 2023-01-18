@@ -1,0 +1,33 @@
+/*
+this time a little auditory illusion:
+not sure if this is a textbook example of a shepard scale, but hypnotizing nonetheless :)
+*/
+// this function overlaps a pattern with itself by n/steps
+let entangle = register('entangle', (n, steps, pat) => {
+  if(n===0) return pat;
+  const len = steps - n;
+  const loop = len / steps;
+  if(n<0) return pat.compress(0, steps/len);
+  return stack(
+    pat.zoom(0, loop),
+    pat.zoom(loop, 1).compress(0, n/len)
+  )
+})
+
+const run = function (n) {
+  const numbers = Array(n).fill().map((_,i) => i);
+  return seq(...numbers)
+};
+
+let div = 48 // per octave
+run(div)
+  .add(60)
+  .note().s('sine').attack(.1).release(.5)
+  .layer(
+    x=>x.velocity(isaw), // upper part goes down
+    x=>x.sub(note(div)).velocity(saw) // lower part goes up
+  ).entangle(1,2)
+  .legato(4)
+  .slow("<8 4 2 1 2 4>/16")
+  .gain(.6)
+  .punchcard({vertical:1})

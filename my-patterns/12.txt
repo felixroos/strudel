@@ -1,0 +1,20 @@
+// title: reliefpfeiler
+s("<perc misc rim(3,8) oh>").bank('YamahaTG33').end("<1@3 .02>")
+.n("<0 1 2 3>".outside(4, palindrome))
+.off("<1 2 3 4>".div("<2 3 4 6>/4"), x=>x.speed("<2 3 4>"))
+  
+.chunk(4, ply("<2 3 4>"))
+.lastOf(8, segment("<3 6 8>"))
+  
+.layer(
+  x=>x.cutoff(perlin.range(1000,20000)),
+  x=>x.bank('').slow(2).s('piano').gain(.6).degrade().mul(speed(-1))
+    .bandf(sine.range(2000,10000).slow(7)).resonance(12).attack(.8)
+    .pan(rand),
+)
+  
+.lastOf(6, x=>x.crush("8"))
+.gain(saw.range(.4,.9))
+.outside(4, juxBy(.5, rev))
+.note("0 5 4 [2,7]".scale('G1 minor'))
+.room(.4).fast(2/3)

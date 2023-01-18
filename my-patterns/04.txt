@@ -1,0 +1,57 @@
+//continuing the transcription of one of my favorite tracks in electronic music history
+
+let drums = stack(
+  s("~@3 hh ~ hh ~ ~").late(.02).speed(.8).gain(.2).room(.4).hcutoff(4000),
+  s("bd"),
+  s("~ sd").room("<0 .6>"),
+  s("~ perc:1*2 ~ perc:1").speed("2 3").room(.2).gain(.25)
+).bank('RolandCompurhythm1000')
+
+let whistle = x=>x.note().s('sine')
+  .decay(.1).sustain(.2).gain(.2)
+  .pan(.2).room(.8)
+
+let bass = x=>x.add("0,12,11.92").note()
+  .s("sawtooth,square").cutoff(800)
+  .decay(.1).sustain(.1).gain(.4)
+
+let blips = x=>x.note().jux(rev)
+  .s('sawtooth').cutoff(500).gain(sine.range(.2,.8).slow(4))
+  .decay(.08).sustain(0)
+
+let grooveA = "2 ~ 3 ~ 4 ~ ~ -1 ~ -1 0 ~ -1 ~ 0 ~".layer(
+  x=>x.scale('e7 minor').layer(whistle),
+  x=>x.scale('e1 minor').layer(bass)
+).stack(
+  "2*16".degradeBy("1 .2@7").scale('e3 minor').layer(blips)
+).slow(2)
+  .stack(drums)
+
+let melodyA = cat(
+  "6 [7 6] 4 3 2 0 -1 0",
+  "[9 10] [9 7] 6 4 3 4 6 7".sub(7),
+  "{6 7 6 4 3 ~}%16".sub(7).restart("x"),
+  "3*2 4*2 6*2 7*2".sub(7)
+).slow(2).add("0").scale('e4 minor').note()
+.layer(
+    x=>x.s("xylophone_hard_ff").gain(1.2),
+    x=>x.s("sawtooth").gain(.4).decay(.1).sustain(0.2).add(note("12,12.05"))
+  ).mul(gain(.5))
+
+let melodyB = "[0@2 ~ 0@4 1 2@2 ~ 2@5]/4".sub("0,3")
+  .scale('g4 major').note().layer(
+    x=>x.s("recorder_alto_sus").clip(1).shape(.8).gain(.75),
+    x=>x.s("square").gain(.1).add(note(12))
+  )
+  .room(.6).release(.2)
+
+
+function arrange(...sections) {
+  let total = sections.reduce((sum, [cycles]) => sum + cycles, 0)
+  sections = sections.map(([cycles, section]) => [cycles, section.fast(cycles)])
+  return timeCat(...sections).slow(total)
+}
+
+grooveA.stack(
+  arrange([8, silence], [8, melodyA], [4, melodyB], [8, melodyA], [4, melodyB])
+)

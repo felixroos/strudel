@@ -1,0 +1,37 @@
+// another stumbling beat with quintuplet swing and some sliced string instruments
+await samples('github:felixroos/samples/main')
+await samples({ 
+  jz_gtr:'https://cdn.freesound.org/previews/59/59500_538383-hq.mp3', 
+  jz_bass:'https://cdn.freesound.org/previews/16/16171_18811-hq.mp3'}
+)
+Pattern.prototype.slice = function(slices, control) {
+  return control.fmap(i => this.begin(i/slices).end((i+1)/slices)).outerJoin()
+}
+
+stack(
+  // guitar slices
+  s('jz_gtr').slice(8, "[3@3 3@2]*2 2*[3 6] 1*4 0*2").speed("1 -2").late(.008)
+  .slow(4).cut(1).release(.2).attack("0.05 0.25").pan(sine.range(.2,.8).slow(4))
+  .mul(speed(4/3)).gain(rand.range(.3,.6))
+  .lpf(sine.range(500,5000).slow(8)).lpq(12)
+  , // bass slices
+  s('jz_bass').slice(8, "[0 [7@3 7@2]] [1 6*8] 2 <5 6>*2").decay(.2).sustain(.5)
+  .add(begin(.012).end(.0)).mul(begin(.88).end(.89)).release(.1)
+  .slow(4).cut(2).note("d2")
+  , // kick 
+  s("[bd:0(<2 1>,5,<3 0>),~ <~ [~@3 bd@2]>] ~").bank('YamahaRX5')
+  .gain(rand.range(.5,.9)).mask("<1@6 0@2>")
+  , // snare
+  s("~ <sd sd>").bank('YamahaRX5').gain(.8).room("<0 .1>").speed("<.9 1>")
+  .end("<.1 .2>").release(.1)
+  , // hihat
+  s("hh@3 hh@2".fast(2)).n(1).bank('KorgM1').speed(.8).end(0).release(.05).gain(.5)
+  .off(1/5, x=>x.mul(speed(1.2)).gain(.1).degrade())
+  , // xylophone
+  note("<[e4@3 a3] d4 ~@2>/2".add(24))
+  .s("xylo").gain(.4).late(4).clip(1)
+  .hpf(500).hpq(16)
+  .room(1).delay(.5).delaytime(.11).delayfeedback(.9)
+  .mask("<0 1>/8")
+).early(2)
+.fast(2/3)

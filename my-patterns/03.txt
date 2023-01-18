@@ -1,0 +1,24 @@
+// who knows this groove?
+"2 ~ 3 ~ 4 ~ ~ -1 ~ -1 0 ~ -1 ~ 0 ~".layer(
+  // whistle
+  x=>x.scale('e7 minor').note().s('sine')
+    .decay(.1).sustain(.2).gain(.2).pan(.2).room(.8),
+  // fattt bass
+  x=>x.scale('e1 minor').add("0,12,11.92")
+    .note().s("sawtooth,square").cutoff(800)
+    .decay(.1).sustain(.1).gain(.4)
+).stack(
+  // percussive synth
+  "2*16".degradeBy("1 .2@7").scale('e3 minor').note().jux(rev)
+  .s('sawtooth').cutoff(500).gain(sine.range(.2,.8).slow(4))
+  .decay(.08).sustain(0)
+).slow(2)
+  .stack(
+    // drums
+    stack(
+      s("~@3 hh ~ hh ~ ~").late(.02).speed(.8).gain(.2).room(.4).hcutoff(4000),
+      s("bd"),
+      s("~ sd").room("<0 .6>"),
+      s("~ perc:1*2 ~ perc:1").speed("2 3").room(.2).gain(.15)
+    ).bank('RolandCompurhythm1000')
+)

@@ -1,0 +1,22 @@
+// goin a little psycho with this one
+await samples('github:felixroos/samples/main/')
+
+stack(
+  "<0 4 2 1>/2"
+  .layer(
+    sub(7), add(2), add("4,6")
+  )
+  .arpSqueeze("0(3,8), 2 1 0 1, 3")
+  .stack("{<0 3> 5 4 2 3 1 2}%3".add.squeeze(14))
+  .scale('E2 hirajoshi').add.trig("0 0.1 0.4 0.5@20")
+  .note().s("rhodes,pluck").gain(.6).cutoff(perlin.range(200,2000).slow(8))
+  .add(note(sine.range(-.1,.1).slow(3))).room(.6).clip(1).release(.4).attack(.02),
+  note("<e1 ~@3>").legato(.1).s('sawtooth')
+  .echoWith(4, 1/8, (x,n) => x.add(note(n*12))).cutoff(800).resonance(11),
+  s("bd(<3 2>,8,-1), ~ hh(<3 2>,4)").bank('president').jux(rev).mul(pan(.25)).add(pan(.5))
+  .off(cat(1/8, 1/4), x=>x.speed(2).cutoff(sine.range(800,4000).slow(8))
+  .stack(s("~ <sd sd:1>").bank('president').lastOf(2,x=>x.delay(.5).delaytime(.25).end(.4).room(.4)))
+  .resonance(10)).gain(.8)
+)
+  .slow(1.5)
+  .pianoroll({fold:1})

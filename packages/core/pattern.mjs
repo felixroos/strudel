@@ -861,6 +861,18 @@ Pattern.prototype.arp = function (pat) {
   return this.arpWith((haps) => pat.fmap((i) => haps[i % haps.length]));
 };
 
+// this does not exist upstream
+// the current arp is not using squeeze anymore which changes some patterns I made when it was still squeeze
+Pattern.prototype.arpSqueezeWith = function (func) {
+  return this.collect()
+    .fmap((v) => reify(func(v)))
+    .squeezeJoin()
+    .withHap((h) => new Hap(h.whole, h.part, h.value.value, h.combineContext(h.value)));
+};
+Pattern.prototype.arpSqueeze = function (pat) {
+  return this.arpSqueezeWith((haps) => pat.fmap((i) => haps[i % haps.length]));
+};
+
 //////////////////////////////////////////////////////////////////////
 // compose matrix functions
 

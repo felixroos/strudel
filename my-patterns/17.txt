@@ -1,0 +1,23 @@
+// trying out exponential rhythms
+// inspired by https://www.youtube.com/watch?v=hbsQ3w0hPcw
+
+await samples('https://shabda.ndre.gr/speech/exponential,rhythm,time.json?gender=f&language=cmn-CN&strudel=1')
+
+const sawx = saw.rangex(.1,1);
+const stamps = sawx.segment(8).firstCycleValues.map(v=>1-v);
+
+"x".late(stack(...stamps))
+  .layer(
+    x=>x.s("[lt sd:1]*2").speed(sawx.range(8,.25)),
+    x=>x.s('sawtooth').note("7 6 5 4 3 2 1 0".scale('C2 hirajoshi').add("0,.1"))
+      .decay(.1).sustain(0),
+    x=>x.slow(1).note("c5").s('square')
+      .hpf(sine.range(1000,10000).slow(5))
+      .decay(.05).sustain(0).early(.1).juxBy(.5, rev),
+  ).slow(2).early(.25)
+.stack(s("bd*2 , ~ sd:1").bank('RolandTR909')).room(.4)
+.stack(
+  s("<exponential <rhythm time>>")
+  .lpf(perlin.range(500,4000).slow(6))
+  .ply("<1 3 2>").clip(1).room(.5)
+)

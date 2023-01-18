@@ -1,0 +1,42 @@
+await samples('github:felixroos/samples/main/')
+
+addVoicings('triads', {
+  '': ['1P 3M 5P', '3M 5P 8P', '5P 8P 10M'],
+  m: ['1P 3m 5P', '3m 5P 8P', '5P 8P 10m'],
+  o: ['1P 3m 5d', '3m 5d 8P', '5d 8P 10m'],
+  aug: ['1P 3m 5A', '3m 5A 8P', '5A 8P 10m'],
+});
+
+stack(
+  s("<bd [~@3 bd@2]> ~").off(.1, x=>x.gain(.4).degrade()).bank('AkaiLinn'),
+  s("~ [sd:2,sd:4]").bank('RolandTR909').room("<0 .8>"),
+  s("[hh@3 <hh oh>@2]*<2@3 4>").cut(1).end(perlin.range(.08,.2))
+  .room(.3).bank('BossDR110').speed(sine.range(1,1.05).slow(6)).gain(rand.range(.5,.8))
+)
+  .stack(
+    note("<g1 [bb1 b1] c2 [b1 ab1]>")
+    .struct("x [~@4 <x ~>] [x@3 x@2] [~ x ~@3]".slow(2))
+    .layer(
+      x=>x.s('sawtooth').add(note("-.05,0"))
+        .decay(.2).sustain(0.6).attack(.01).cutoff(250).resonance(16),
+      x=>x.s('square').add(note("48.2"))
+        .decay(.03).late(.1).sustain(0).room(.6).pan(.8).mask("<1 0>/16")
+        .cutoff(sine.range(800,2000).slow(2)).delay(.2)
+    )
+  )
+  .stack(
+    note("<0 [-1 -2] -3 <[-4 -8] [[-1 0] [2 4 6]]>>".sub("<0 7>/4")
+    .scale('G4 harmonic minor'))
+    .s('pluck').add(note("-.1,0,.1"))
+    .decay(.1).sustain(0).gain(.4)
+    .off(1/10, add(note(12))).room(.8)
+    .mask("<0 1>/16").pan(.2)
+  )
+  .stack(
+    "<[Gm Bb] [Cm D]>/2".voicings('triads').note()
+    .s('xylo').add(note(stack(0,.1))).clip(1)
+    .struct("~ x")
+    .off(1/10,x=>x.add(12).cutoff(800).gain(.1))
+    .legato(.4).delay(.4)
+  )
+.fast(3/4)

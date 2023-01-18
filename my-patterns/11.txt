@@ -1,0 +1,10 @@
+// quick little drone to zone out
+await samples('github:felixroos/samples/main/')
+
+note("<c3 eb3 bb3 <d4 f4>>".add(tri.range(0,.2).slow(128)))
+  .layer(
+    x=>x.s("flute").color('silver'),
+    x=>x.s("xylo").slow(6.125).add(note(12)).delay(.8).delaytime(.5).color('maroon'),
+    x=>x.s("jazzbass").slow(8.25).sub(note(24)).color('salmon')                
+  ).cutoff(sine.range(800,8000).slow(127))
+.pianoroll({fold:1})

@@ -1,0 +1,39 @@
+// trying out hex rhythms
+const hex2bin = (hex, len) => (parseInt(hex, 16).toString(2)).padStart(len, '0');
+const hex = register('hex', (n, l, pat) => pat.struct(...hex2bin(n,l).split('').map(d=>d==='1')))
+
+stack(
+  // drums
+  stack(
+  s("hh:1, ~ <sd:5 sd:1>").hex("<92 <24 42>>", 8)
+    .off(1/8, x=>x.gain(.2).speed(1.2).degradeBy(sine.range(.1,.5).slow(8)))
+    ,
+  s("bd@3 <~!3 bd>")
+    .layer(id,x=>x.hex("<c a f e>", 8).speed("<2 4 -4>").hcutoff(1000).room(.5))
+    ,
+  s("perc:2 perc:3").hex("<aefa e8f2>", 8)
+    .slow(2).speed(2).end(.05)
+    .cutoff(sine.range(800,4000).slow(7))
+    .jux(rev).mul(pan(.5)).gain(.6),
+  ).bank('AlesisSR16')
+  , // chords
+  "[0,2,<4 3 5 6 5 3>/2]".scale('A3 hirajoshi')
+  .add.trig("<[0 .2 .4 .5@21]>".sub(.5))
+  .late(.46)
+  .note().gain(saw.fast(24))
+  .s('piano').clip(1)
+  .attack(.1).decay(.4).sustain(0).release(.2)
+  .delay(.8).delaytime(.16)
+  .room(.5).cutoff(sine.range(300,4000).slow(7)).pan(.4)
+  , // bass
+  "0 [-1 2] 4 3".hex("abcdef", 8).slow(8)
+  .scale('A1 hirajoshi').sub(.3).note().s('sawtooth')
+  .cutoff(perlin.range(500,3000)).resonance(10)
+  .decay(.2).sustain(0.1).release(.1)
+  , // adlib
+  rand.range(0,10).scale('A4 hirajoshi').add("0,.1,12").note()
+  .s('sine').hex("{c a f e 4}%2", 8)
+  .decay(.03).sustain(0)
+  .delay(.4).orbit(2).delaytime(.125)
+  .mask("<0 1>/16").pan(.6)
+)

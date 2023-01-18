@@ -1,0 +1,26 @@
+// loungin' with some rhodes:
+await samples('github:felixroos/samples/main')
+
+let ribbon = register('ribbon', (at, cycles, pat) => pat.early(at).restart(pure(1).slow(cycles)))
+
+stack(
+  n(rand.range(0,7).floor().add(0))
+  .off(1/2, add(3))
+  .pan(sine.range(.2,.8).slow(3))
+  .euclidLegato(5,8)
+  .s('flute').clip(1).slow(4).attack(.5)
+  .cutoff(sine.range(500,4000).slow(8)).lpq(12),
+  n(rand.range(0,7).floor().add("0,[2 4]"))
+  .pan(.2)
+  .euclidLegato(3,8)
+  .s('rhodes').clip(1).attack(".25 0@3"),
+  n(rand.range(0,7).floor().segment(4).sub(5))
+  .s('jazzbass').clip(1).gain(.8)
+).scale('C major pentatonic')
+.ribbon("<9 22 9 31>/2",2) // <--- change the numbers within <...> to get different seeds
+.slow(2)
+.stack(
+  s("bd <~ bd> ~ [~@3 bd@2?]").bank('EmuDrumulator').gain("1 .4").speed(.85),
+  s("~ [sd:0,sd:3]").bank('MPC1000').speed("<.8 .9>").room("<0 .2>").end("<.3 .5>").release(.05).lastOf(8, ply("2")),
+  s("[~ <hh [hh@3 hh@2]>]*2").bank('LinnDrum').speed(.8).end(.08).release(.1).gain(.5).hpf(4000),
+).fast(2/3)

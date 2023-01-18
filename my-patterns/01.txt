@@ -1,0 +1,7 @@
+// some pretty chords in 31 edo
+"2".pow.out("<[2,15,33] [7,20,33] [12,25,33] [7,15,33]>".div(31))
+  .mul(110).mul(cat(1, 9/8).slow(8)).freq()
+  .layer(
+    x=>x.arpSqueeze("0 1 2@30".legato(32)),
+    x=>x.mul(freq(4)).late(0).arpSqueeze("0 1 2 1".fast(1.5)).legato(4)
+  ).piano().slow(4).room(.5)
