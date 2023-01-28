@@ -1,0 +1,34 @@
+// speedrun no 4, gettin fuzzier
+
+await samples('github:felixroos/samples/main')
+await samples('github:tidalcycles/Dirt-Samples/master')
+
+samples({ pluck: {e4: 'https://cdn.freesound.org/previews/592/592442_10870880-lq.mp3'} })
+
+addVoicings('cookie', {
+  7: ['3M 7m 9M 12P 15P', '7m 10M 13M 16M 19P'],
+  '^7': ['3M 6M 9M 12P 14M', '7M 10M 13M 16M 19P'],
+  m7: ['8P 11P 14m 17m 19P', '5P 8P 11P 14m 17m'],
+  m7b5: ['3m 5d 8P 11P 14m', '5d 8P 11P 14m 17m'],
+  o7: ['3m 6M 9M 11A 15P'],
+  '7alt': ['3M 7m 10m 13m 15P'],
+  '7#11': ['7m 10m 13m 15P 17m'],
+}, ['C3', 'C6'])
+
+stack(
+  note("<F2 <E2!3 F#2>>/4").s('jazzbass').ply(4).clip(1).gain(.5),
+  "<F7#11 <E^7!3 F#m7>>/4".layer(
+    x=>x.voicings('cookie').add("-0.05,12.05").note().s('rhodes').clip(1)
+      .arp("{0 1 2 4 2 3 2 1 0}%4".legato(4)).jux(rev)
+      .lpf(sine.range(200,8000).slow(12)).lpq(12),
+    x=>x.voicings('cookie').arp("<0 1 2 3 4>/4").add(24).add("-.05,.05").note()
+      .s('square').ply(32).lpf(sine.range(200,1000).slow(4)).gain(.4)
+      .decay(.02).sustain(0.2).pan(sine.range(.2,.8).slow(8)),
+  ),
+  stack(
+    speed("<1!7 [4 8*<1 2 3 4>]>*2").s("bd").bank('ViscoSpaceDrum'),
+    speed("1 2 1*2 1.8").s("hh").bank('ViscoSpaceDrum').gain(1).n(4).room(.2),
+    speed("~ 2 ~ 1").s("sd:1").bank('ViscoSpaceDrum').room(.5)
+  )
+)
+.slow(2).cpm(100)

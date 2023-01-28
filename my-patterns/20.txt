@@ -1,0 +1,33 @@
+// hip hop speedrun no 2:
+
+await samples('github:felixroos/samples/main')
+await samples('github:tidalcycles/Dirt-Samples/master')
+
+samples({ sax: 'https://cdn.freesound.org/previews/495/495734_10350281-hq.mp3' })
+
+addVoicings('cookie', {
+  7: ['3M 7m 9M 12P 15P', '7m 10M 13M 16M 19P'],
+  '^7': ['3M 6M 9M 12P 14M', '7M 10M 13M 16M 19P'],
+  m7: ['8P 11P 14m 17m 19P', '5P 8P 11P 14m 17m'],
+  m7b5: ['3m 5d 8P 11P 14m', '5d 8P 11P 14m 17m'],
+  o7: ['3m 6M 9M 11A 15P'],
+  '7alt': ['3M 7m 10m 13m 15P'],
+  '7#11': ['7m 10m 13m 15P 17m'],
+}, ['C3', 'C6'])
+
+stack(
+  "<C^7 A7#11 Dm7 Fm7>/2".layer(
+    x=>x.voicings('cookie').note().piano().arp("0 1 2 3 4@40".legato(24).slow(2)),
+    x=>x.rootNotes(1).add.out("0 <7 12>").note().piano()
+  ).gain(.6),
+  stack(
+    s("[bd*2 ~] <~ [~@2 bd]>"),
+    s("<[hh*2]!3 [hh@2 hh]*2>*2").room(.5).gain(1.2),
+    s("~ sd").crush("<8 4>").room("<.4 .8>")
+  ).bank('president'),
+  //n("~ 16".fast(2)).s('gretsch').cutoff(sine.range(400,8000).slow(32)),
+  n("18").struct("x*2,<~ [~ [~@2 x]]>").s("gretsch").room(.4).cut(1)
+  .gain(sine.range(.2,.5).fast(3)),
+  s("sax/8").echoWith(4, 1, (x,n)=>x.speed(0.5+n*.25)).room(.5)
+)
+.slow(2).cpm(90)

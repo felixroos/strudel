@@ -1,0 +1,37 @@
+// speedrun no 3, this time a more fuzzy type of genre
+
+await samples('github:felixroos/samples/main')
+await samples('github:tidalcycles/Dirt-Samples/master')
+
+samples({ pluck: {e4: 'https://cdn.freesound.org/previews/592/592442_10870880-lq.mp3'} })
+
+addVoicings('cookie', {
+  7: ['3M 7m 9M 12P 15P', '7m 10M 13M 16M 19P'],
+  '^7': ['3M 6M 9M 12P 14M', '7M 10M 13M 16M 19P'],
+  m7: ['8P 11P 14m 17m 19P', '5P 8P 11P 14m 17m'],
+  m7b5: ['3m 5d 8P 11P 14m', '5d 8P 11P 14m 17m'],
+  o7: ['3m 6M 9M 11A 15P'],
+  '7alt': ['3M 7m 10m 13m 15P'],
+  '7#11': ['7m 10m 13m 15P 17m'],
+}, ['C3', 'C6'])
+
+stack(
+  "<Cm7!2 Dm7b5 C#7#11>/4".layer(
+    x=>x.voicings('cookie').note().s('pluck').clip(1)
+      .arp("[3 2 1 0@21] [0 1 2 3 4@21]".legato(40).fast(2)).early(1/48)
+      .lpf(sine.range(400,4000).slow(16)).gain(1.2).pan(.25),
+    x=>x.rootNotes(2).add.out("[0@3 0] [7 12 ~ 12] ~ ~".slow(2)).note()
+      .s('jazzbass').clip(1).gain(.8),
+    x=>x.voicings('cookie').add("-.1,.1").note()
+      .s('sine').attack(.5).decay(.2).sustain(.5).gain(.1).pan(.75),
+    x=>x.voicings('cookie').add(0).arp("{1 [2 3] 0!3}%4").note()
+      .s('square').lpf(sine.range(400,2000).slow(36)).degrade()
+      .decay(.1).sustain(0).off(1/6, add(note(12))).room(.8).gain(.6)
+  ),
+  stack(
+    s("bd [~ <~ bd>]").n(2).speed(.5).bank('RolandTR909').gain(".8 .5"),
+    s("bd*2".late(.25)).speed(.5).bank('UnivoxMicroRhythmer12').hpf(2000).room(.25),
+    s("~ sd").speed(.25).bank('UnivoxMicroRhythmer12').room(.5).end("<.04@3 .8>")
+  )
+)
+.slow(2).cpm(92)
