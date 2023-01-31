@@ -1,0 +1,23 @@
+// load samples from https://github.com/yaxu/clean-breaks/
+await samples('github:yaxu/clean-breaks/main/')
+
+s("useme").loopAt(8).chop(16)
+  .rarely(x=>x.ply("2")).cut(1)
+  .when("0 0 0 1", x=>x.room(.9))
+  .shape(.5)
+  .stack(
+    note("<c2(3,8) <g1 [g1 b1]>>".add("0,.1"))
+    .s('sawtooth')
+    .lpf(sine.range(400,2000).slow(7))
+    .lpq(12)
+  )
+  .stack(
+    "<Cm7 Do7 Eb^7 Do7>".voicings('lefthand')
+    .note().decay(.1).sustain(0)
+    .struct("~ x")
+    .off(1/8, x=>x.add(note("12")).degradeBy(.6)
+      .lpf(1000).lpq(12).gain(.2).decay(.05))
+    .shape(.4)
+    .delay(.8).delaytime("<.125 .25>/2")
+    .delayfeedback(.7)
+  )
