@@ -1,0 +1,22 @@
+// only 7 to go :)
+await samples('github:felixroos/samples/main')
+
+"<Fm7 F#7>/4"
+  .layer(
+    x=>x.voicings('lefthand').sub(12).note().struct("x(5,8)/2")
+      .decay(.1).sustain(0).s("rhodes").clip(1).release(.5)
+    .off(1/6, x=>x.add(note(12)).hpf(2000)).juxBy(.5,rev).shape(.7),
+    x=>x.rootNotes(1).add("-.05,.05")
+      .note().s('jazzbass')
+      .lpf(300).lpq(8)
+      .late(.125).struct("<[~ x]!15 [[x@3 [x ~]@2]*2]>*4")
+      .decay(.18).sustain(0),
+    x=>x.rootNotes(5).note().s("kalimba").gain(.5)
+      .echoWith(4, .125, (x,n)=>x.speed(1-n*.5))
+  )
+  .stack(
+    s("<bd bd(2,5,-2)> <sd!3 sd(2,5,-2)>".fast(2)).gain(.8).bank('YamahaRM50').speed(.8),
+    s("hh@3 hh@2".lastOf(4,fast(2)).fast(4)).bank('YamahaRM50')
+    .room(.1).end(.5).speed(.92).gain(.8)
+  )
+  .slow(4).cpm(83)
