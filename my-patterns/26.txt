@@ -1,0 +1,41 @@
+// drunken groove no 112358
+
+await samples('github:felixroos/samples/main')
+
+addVoicings('cookie', {
+  7: ['3M 7m 9M 12P 15P', '7m 10M 13M 16M 19P'],
+  '^7': ['3M 6M 9M 12P 14M', '7M 10M 13M 16M 19P'],
+  m7: ['8P 11P 14m 17m 19P', '5P 8P 11P 14m 17m'],
+  m7b5: ['3m 5d 8P 11P 14m', '5d 8P 11P 14m 17m'],
+  o7: ['3m 6M 9M 11A 15P'],
+  '7alt': ['3M 7m 10m 13m 15P'],
+  '7#11': ['7m 10m 13m 15P 17m'],
+}, ['C3', 'C6'])
+
+stack(
+  "<Dm7 [Cm7 Db7]>/2"
+  .layer(
+    x=>x.voicings('cookie').sub(0)
+      .note()
+      .outside(4,struct("x(3,5) [~@3 x] x(3,5) [~@4 x]"))
+      .s('stage73').clip(1).decay(.2).sustain(0).shape(.4).room(.5),
+    x=>x.voicings('lefthand').note().s('flute').arp("<0 1 3 2>".off(1/5,add(1))).room(1)
+      .pan(sine.slow(8)).lpf(sine.range(500,2000).slow(16)).lpq(12)
+      .attack(.2).gain(.5).clip(1),
+    x=>x.rootNotes(2)
+      .add.out("<0*2 [-5*2, [~@4 -1]]>").note().s('jazzbass').clip(1)
+      .lpf(500).lpq(12)
+      .decay(.2).sustain("0.4")
+    ,
+    x=>x.voicings('lefthand').add(1).sub(12).note().arp("[0@3 0@2]*<2>")
+      .s("rene").n("2@3 5").bpf(2000).shape(.5).late(0.01).mask("<0 1>/16")
+  ),
+  stack(
+    s("[bd@3 bd@2] <~ [~@4 bd]>").gain("[1 .6]*2"),
+    s("~ sd").room("<0 .2>").end(.8).early("<.02 0.04>")
+    .lastOf(8,x=>x.end(0,saw.range(.1,.6)).ply(10).gain(0,saw.range(0,.6))),
+    s("~ [hh@3 hh@2]").end(.3).lastOf(4,fast(2)).room(.3).gain("[.5 .9]*2")
+  ).bank('YamahaRM50').shape(.3).lpf(12000).lpq(8).speed(.8)
+).slow(2).cpm(86).late(1)
+  .mul(gain(.8))
+  
