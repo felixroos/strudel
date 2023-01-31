@@ -1,0 +1,44 @@
+// just another episode in "browser breaking beats"
+
+await samples('github:felixroos/samples/main');
+
+Pattern.prototype.slice = function(slices, control) {
+  return control.fmap(i => this.begin(i/slices).end((i+1)/slices)).outerJoin()
+}
+
+s("beautybeast/8")
+  .slice(8, "<0 1 2 3 4 5 6 7>*2")
+  .speed(.9)
+  .cut(1).release(0.05)
+  .reset("<x@7 x(<3 5>,8)>")
+  .lpf(1100).lpq(16).shape(.4)
+  .gain(0.9)
+  .stack(
+    s("~ pluck@3").note("c3").slow(8)
+    .echoWith(4, .125/2, (x,n) => x.add(note(n*5)))
+    .add(note(rand.range(-.2,.2))).delay(.5)
+    .mul(speed(-1)).hpf(1500)
+  )
+  .stack(
+    note("{0 4 3 2 1}%2".scale('C4 minor'))
+    .struct("x@5 x@3 x@2").lastOf(4, x=>x.fast("2"))
+    .sometimes(x=>x.add(note("12")))
+    .s('sawtooth')
+    .decay(.04).sustain(0).gain(.8)
+    .lpf(2000).lpq(12)
+    .delay(.2).delaytime(.125)
+    .pan(.8).lpf(saw.range(100,8000).slow(32))
+    .add(note(rand.range(-.1,.1)))
+    .reset("<x@7 x(<3 5>,8)>")
+  )
+  .stack(
+    note("<[c2 ~] g2(3,5)>").s('jazzbass').clip(1).release(.1)
+    .decay("<.8 .2>").sustain(0)
+    .shape(.5).add(note(.3))
+  )
+  .stack(
+    s("<bd!7 bd(<3 5>,8)>"),
+    s("~ sd"),
+    s("[hh@3 hh@2]*4").lpf(4000).speed(perlin.range(.95,1.05).slow(6)).gain("[.2 .9]*2")
+  )
+  .slow(2).cpm(86)
