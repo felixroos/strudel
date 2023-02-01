@@ -32,6 +32,12 @@ export default defineConfig({
   ],
   site: 'https://felixroos.github.io',
   base: '/strudel',
+  vite: {
+    ssr: {
+      // Example: Force a broken package to skip SSR processing, if needed
+      external: ['fraction.js'], // https://github.com/infusion/Fraction.js/issues/51
+    },
+  },
 });
 
 /*

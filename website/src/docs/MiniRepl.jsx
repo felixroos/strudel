@@ -8,13 +8,13 @@ if (typeof window !== 'undefined') {
   modules = evalScope(
     controls,
     import('@strudel.cycles/core'),
-    // import('@strudel.cycles/tone'),
     import('@strudel.cycles/tonal'),
     import('@strudel.cycles/mini'),
     import('@strudel.cycles/midi'),
     import('@strudel.cycles/xen'),
     import('@strudel.cycles/webaudio'),
     import('@strudel.cycles/osc'),
+    import('@strudel.cycles/csound'),
   );
 }
 
