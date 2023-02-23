@@ -1,0 +1,16 @@
+await samples('github:felixroos/samples/main')
+await samples('github:yaxu/clean-breaks/main/')
+
+const run = (n) => saw.range(0,n).floor().segment(n)
+
+stack(
+  n(run(8).slow(2).add(1)).s("rene")
+  .clip(1).lastOf(4,rev)
+  .sometimes(ply(2))
+  .lastOf(8, x=>x.speed(1.5)),
+  s("action").loopAt(2).chop(8).gain(.4)
+  .lpf(sine.range(1500,8000).slow(8)).lpq(12)
+  .rarely(x=>x.speed("1,4").mul(gain(.5)))
+  .almostNever(x=>x.ply("4"))
+)
+  
