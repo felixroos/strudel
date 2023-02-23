@@ -21,12 +21,148 @@ let stringParser;
 // intended to use with mini to automatically interpret all strings as mini notation
 export const setStringParser = (parser) => (stringParser = parser);
 
+const alignments = ['in', 'out', 'mix', 'squeeze', 'squeezeout', 'trig', 'trigzero'];
+
+const methodRegistry = [];
+const getterRegistry = [];
+const controlRegistry = [];
+const controlSubscribers = [];
+const composifiedRegistry = [];
+
+//////////////////////////////////////////////////////////////////////
+// Magic for supporting higher order composition of method chains
+
+// Dresses the given (unary) function with methods for composition chaining, so e.g.
+// `fast(2).iter(4)` composes to pattern functions into a new one.
+function composify(func) {
+  if (!func.__composified) {
+    for (const [name, method] of methodRegistry) {
+      func[name] = method;
+    }
+    for (const [name, getter] of getterRegistry) {
+      Object.defineProperty(func, name, getter);
+    }
+    func.__composified = true;
+    composifiedRegistry.push(func);
+  } else {
+    console.log('Warning: attempt at composifying a function more than once');
+  }
+  return func;
+}
+
+export function registerMethod(name, addAlignments = false, addControls = false) {
+  if (addAlignments || addControls) {
+    // This method needs to make its 'this' object available to chained alignments and/or
+    // control parameters, so it has to be implemented as a getter
+    const getter = {
+      get: function () {
+        const func = this;
+        const wrapped = function (...args) {
+          const composed = (pat) => func(pat)[name](...args);
+          return composify(composed);
+        };
+
+        if (addAlignments) {
+          for (const alignment of alignments) {
+            wrapped[alignment] = function (...args) {
+              const composed = (pat) => func(pat)[name][alignment](...args);
+              return composify(composed);
+            };
+            for (const [controlname, controlfunc] of controlRegistry) {
+              wrapped[alignment][controlname] = function (...args) {
+                const composed = (pat) => func(pat)[name][alignment](controlfunc(...args));
+                return composify(composed);
+              };
+            }
+          }
+        }
+        if (addControls) {
+          for (const [controlname, controlfunc] of controlRegistry) {
+            wrapped[controlname] = function (...args) {
+              const composed = (pat) => func(pat)[name](controlfunc(...args));
+              return composify(composed);
+            };
+          }
+        }
+        return wrapped;
+      },
+    };
+
+    getterRegistry.push([name, getter]);
+
+    // Add to functions already 'composified'
+    for (const composified of composifiedRegistry) {
+      Object.defineProperty(composified, name, getter);
+    }
+  } else {
+    // No chained alignments/controls needed, so we can just add as a plain method,
+    // probably more efficient this way?
+    const method = function (...args) {
+      const func = this;
+      const composed = (pat) => func(pat)[name](...args);
+      return composify(composed);
+    };
+
+    methodRegistry.push([name, method]);
+
+    // Add to functions already 'composified'
+    for (const composified of composifiedRegistry) {
+      composified[name] = method;
+    }
+  }
+}
+
+export function registerControl(controlname, controlfunc) {
+  registerMethod(controlname);
+  controlRegistry.push([controlname, controlfunc]);
+  for (const subscriber of controlSubscribers) {
+    subscriber(controlname, controlfunc);
+  }
+}
+
+export function withControls(func) {
+  for (const [controlname, controlfunc] of controlRegistry) {
+    func(controlname, controlfunc);
+  }
+  controlSubscribers.push(func);
+}
+
+export function addToPrototype(name, func) {
+  Pattern.prototype[name] = func;
+  registerMethod(name);
+}
+
+export function curryPattern(func, arity = func.length) {
+  const fn = function curried(...args) {
+    if (args.length >= arity) {
+      return func.apply(this, args);
+    }
+
+    const partial = function (...args2) {
+      return curried.apply(this, args.concat(args2));
+    };
+    if (args.length == arity - 1) {
+      return composify(partial);
+    }
+
+    return partial;
+  };
+  if (arity == 1) {
+    composify(fn);
+  }
+  return fn;
+}
+
+//////////////////////////////////////////////////////////////////////
+// The core Pattern class
+
 /** @class Class representing a pattern. */
 export class Pattern {
   /**
    * Create a pattern. As an end user, you will most likely not create a Pattern directly.
    *
    * @param {function} query - The function that maps a {@link State} to an array of {@link Hap}.
+   * @noAutocomplete
    */
   constructor(query) {
     this.query = query;
@@ -51,6 +187,7 @@ export class Pattern {
 
   /**
    * see {@link Pattern#withValue}
+   * @noAutocomplete
    */
   fmap(func) {
     return this.withValue(func);
@@ -62,6 +199,7 @@ export class Pattern {
    * pattern of functions.
    * @param {Function} whole_func
    * @param {Function} func
+   * @noAutocomplete
    * @returns Pattern
    */
   appWhole(whole_func, pat_val) {
@@ -97,6 +235,7 @@ export class Pattern {
    * are not the same but do intersect, the resulting hap has a timespan of the
    * intersection. This applies to both the part and the whole timespan.
    * @param {Pattern} pat_val
+   * @noAutocomplete
    * @returns Pattern
    */
   appBoth(pat_val) {
@@ -117,6 +256,7 @@ export class Pattern {
    * are preserved from the pattern of functions (often referred to as the left
    * hand or inner pattern).
    * @param {Pattern} pat_val
+   * @noAutocomplete
    * @returns Pattern
    */
   appLeft(pat_val) {
@@ -147,6 +287,7 @@ export class Pattern {
    * pattern of values, i.e. structure is preserved from the right hand/outer
    * pattern.
    * @param {Pattern} pat_val
+   * @noAutocomplete
    * @returns Pattern
    */
   appRight(pat_val) {
@@ -332,6 +473,7 @@ export class Pattern {
    * const haps = pattern.queryArc(0, 1)
    * console.log(haps)
    * silence
+   * @noAutocomplete
    */
   queryArc(begin, end) {
     try {
@@ -347,6 +489,7 @@ export class Pattern {
    * some calculations easier to express, as all haps are then constrained to
    * happen within a cycle.
    * @returns Pattern
+   * @noAutocomplete
    */
   splitQueries() {
     const pat = this;
@@ -361,6 +504,7 @@ export class Pattern {
    * timespan before passing it to the original pattern.
    * @param {Function} func the function to apply
    * @returns Pattern
+   * @noAutocomplete
    */
   withQuerySpan(func) {
     return new Pattern((state) => this.query(state.withSpan(func)));
@@ -382,6 +526,7 @@ export class Pattern {
    * begin and end time of the query timespan.
    * @param {Function} func the function to apply
    * @returns Pattern
+   * @noAutocomplete
    */
   withQueryTime(func) {
     return new Pattern((state) => this.query(state.withSpan((span) => span.withTime(func))));
@@ -393,6 +538,7 @@ export class Pattern {
    * present, `whole` timespans).
    * @param {Function} func
    * @returns Pattern
+   * @noAutocomplete
    */
   withHapSpan(func) {
     return new Pattern((state) => this.query(state).map((hap) => hap.withSpan(func)));
@@ -403,6 +549,7 @@ export class Pattern {
    * begin and end time of the hap timespans.
    * @param {Function} func the function to apply
    * @returns Pattern
+   * @noAutocomplete
    */
   withHapTime(func) {
     return this.withHapSpan((span) => span.withTime(func));
@@ -412,6 +559,7 @@ export class Pattern {
    * Returns a new pattern with the given function applied to the list of haps returned by every query.
    * @param {Function} func
    * @returns Pattern
+   * @noAutocomplete
    */
   withHaps(func) {
     return new Pattern((state) => func(this.query(state)));
@@ -421,6 +569,7 @@ export class Pattern {
    * As with {@link Pattern#withHaps}, but applies the function to every hap, rather than every list of haps.
    * @param {Function} func
    * @returns Pattern
+   * @noAutocomplete
    */
   withHap(func) {
     return this.withHaps((haps) => haps.map(func));
@@ -430,6 +579,7 @@ export class Pattern {
    * Returns a new pattern with the context field set to every hap set to the given value.
    * @param {*} context
    * @returns Pattern
+   * @noAutocomplete
    */
   setContext(context) {
     return this.withHap((hap) => hap.setContext(context));
@@ -439,6 +589,7 @@ export class Pattern {
    * Returns a new pattern with the given function applied to the context field of every hap.
    * @param {Function} func
    * @returns Pattern
+   * @noAutocomplete
    */
   withContext(func) {
     return this.withHap((hap) => hap.setContext(func(hap.context)));
@@ -447,6 +598,7 @@ export class Pattern {
   /**
    * Returns a new pattern with the context field of every hap set to an empty object.
    * @returns Pattern
+   * @noAutocomplete
    */
   stripContext() {
     return this.withHap((hap) => hap.setContext({}));
@@ -458,6 +610,7 @@ export class Pattern {
    * @param {Number} start
    * @param {Number} end
    * @returns Pattern
+   * @noAutocomplete
    */
   withLocation(start, end) {
     const location = {
@@ -500,6 +653,7 @@ export class Pattern {
    * Returns a new Pattern, which only returns haps that meet the given test.
    * @param {Function} hap_test - a function which returns false for haps to be removed from the pattern
    * @returns Pattern
+   * @noAutocomplete
    */
   filterHaps(hap_test) {
     return new Pattern((state) => this.query(state).filter(hap_test));
@@ -510,6 +664,7 @@ export class Pattern {
    * inside haps.
    * @param {Function} value_test
    * @returns Pattern
+   * @noAutocomplete
    */
   filterValues(value_test) {
     return new Pattern((state) => this.query(state).filter((hap) => value_test(hap.value)));
@@ -519,6 +674,7 @@ export class Pattern {
    * Returns a new pattern, with haps containing undefined values removed from
    * query results.
    * @returns Pattern
+   * @noAutocomplete
    */
   removeUndefineds() {
     return this.filterValues((val) => val != undefined);
@@ -529,6 +685,7 @@ export class Pattern {
    * with an onset is one with a `whole` timespan that begins at the same time
    * as its `part` timespan.
    * @returns Pattern
+   * @noAutocomplete
    */
   onsetsOnly() {
     // Returns a new pattern that will only return haps where the start
@@ -541,6 +698,7 @@ export class Pattern {
    * Returns a new pattern, with 'continuous' haps (those without 'whole'
    * timespans) removed from query results.
    * @returns Pattern
+   * @noAutocomplete
    */
   discreteOnly() {
     // removes continuous haps that don't have a 'whole' timespan
@@ -550,6 +708,7 @@ export class Pattern {
   /**
    * Combines adjacent haps with the same value and whole.  Only
    * intended for use in tests.
+   * @noAutocomplete
    */
   defragmentHaps() {
     // remove continuous haps
@@ -604,6 +763,7 @@ export class Pattern {
    * @param {Boolean} with_context - set to true, otherwise the context field
    * will be stripped from the resulting haps.
    * @returns [Hap]
+   * @noAutocomplete
    */
   firstCycle(with_context = false) {
     var self = this;
@@ -615,13 +775,17 @@ export class Pattern {
 
   /**
    * Accessor for a list of values returned by querying the first cycle.
+   * @noAutocomplete
    */
   get firstCycleValues() {
-    return this.firstCycle().map((hap) => hap.value);
+    return this.sortHapsByPart()
+      .firstCycle()
+      .map((hap) => hap.value);
   }
 
   /**
    * More human-readable version of the {@link Pattern#firstCycleValues} accessor.
+   * @noAutocomplete
    */
   get showFirstCycle() {
     return this.firstCycle().map(
@@ -633,6 +797,7 @@ export class Pattern {
    * Returns a new pattern, which returns haps sorted in temporal order. Mainly
    * of use when comparing two patterns for equality, in tests.
    * @returns Pattern
+   * @noAutocomplete
    */
   sortHapsByPart() {
     return this.withHaps((haps) =>
@@ -665,7 +830,7 @@ export class Pattern {
     const otherPat = reify(other);
     return this.fmap((a) => otherPat.fmap((b) => func(a)(b))).squeezeJoin();
   }
-  _opSqueezeOut(other, func) {
+  _opSqueezeout(other, func) {
     const thisPat = this;
     const otherPat = reify(other);
     return otherPat.fmap((a) => thisPat.fmap((b) => func(b)(a))).squeezeJoin();
@@ -812,7 +977,7 @@ export class Pattern {
 }
 
 //////////////////////////////////////////////////////////////////////
-// functions relating to chords/patterns of lists
+// functions relating to chords/patterns of lists/lists of patterns
 
 // returns Array<Hap[]> where each list of haps satisfies eq
 function groupHapsBy(eq, haps) {
@@ -832,11 +997,11 @@ function groupHapsBy(eq, haps) {
 const congruent = (a, b) => a.spanEquals(b);
 // Pattern<Hap<T>> -> Pattern<Hap<T[]>>
 // returned pattern contains arrays of congruent haps
-Pattern.prototype.collect = function () {
+addToPrototype('collect', function () {
   return this.withHaps((haps) =>
     groupHapsBy(congruent, haps).map((_haps) => new Hap(_haps[0].whole, _haps[0].part, _haps, {})),
   );
-};
+});
 
 /**
  * Selects indices in in stacked notes.
@@ -844,12 +1009,12 @@ Pattern.prototype.collect = function () {
  * note("<[c,eb,g]!2 [c,f,ab] [d,f,ab]>")
  * .arpWith(haps => haps[2])
  * */
-Pattern.prototype.arpWith = function (func) {
+addToPrototype('arpWith', function (func) {
   return this.collect()
     .fmap((v) => reify(func(v)))
     .innerJoin()
     .withHap((h) => new Hap(h.whole, h.part, h.value.value, h.combineContext(h.value)));
-};
+});
 
 /**
  * Selects indices in in stacked notes.
@@ -857,9 +1022,38 @@ Pattern.prototype.arpWith = function (func) {
  * note("<[c,eb,g]!2 [c,f,ab] [d,f,ab]>")
  * .arp("0 [0,2] 1 [0,2]").slow(2)
  * */
-Pattern.prototype.arp = function (pat) {
+addToPrototype('arp', function (pat) {
   return this.arpWith((haps) => pat.fmap((i) => haps[i % haps.length]));
-};
+});
+
+/**
+ * Takes a time duration followed by one or more patterns, and shifts the given patterns in time, so they are
+ * distributed equally over the given time duration. They are then combined with the pattern 'weave' is called on, after it has been stretched out (i.e. slowed down by) the time duration.
+ * @name weave
+ * @memberof Pattern
+ * @example pan(saw).weave(4, s("bd(3,8)"), s("~ sd"))
+ * @example n("0 1 2 3 4 5 6 7").weave(8, s("bd(3,8)"), s("~ sd"))
+ */
+
+addToPrototype('weave', function (t, ...pats) {
+  return this.weaveWith(t, ...pats.map((x) => set.out(x)));
+});
+
+/**
+ * Like 'weave', but accepts functions rather than patterns, which are applied to the pattern.
+ * @name weaveWith
+ * @memberof Pattern
+ */
+
+addToPrototype('weaveWith', function (t, ...funcs) {
+  const pat = this;
+  const l = funcs.length;
+  t = Fraction(t);
+  if (l == 0) {
+    return silence;
+  }
+  return stack(...funcs.map((func, i) => pat.inside(t, func).early(Fraction(i).div(l))))._slow(t);
+});
 
 // this does not exist upstream
 // the current arp is not using squeeze anymore which changes some patterns I made when it was still squeeze
@@ -969,15 +1163,15 @@ function _composeOp(a, b, func) {
     func: [(a, b) => b(a)],
   };
 
-  const hows = ['In', 'Out', 'Mix', 'Squeeze', 'SqueezeOut', 'Trig', 'Trigzero'];
+  const hows = alignments.map((x) => x.charAt(0).toUpperCase() + x.slice(1));
 
   // generate methods to do what and how
   for (const [what, [op, preprocess]] of Object.entries(composers)) {
     // make plain version, e.g. pat._add(value) adds that plain value
     // to all the values in pat
-    Pattern.prototype['_' + what] = function (value) {
+    addToPrototype('_' + what, function (value) {
       return this.fmap((x) => op(x, value));
-    };
+    });
 
     // make patternified monster version
     Object.defineProperty(Pattern.prototype, what, {
@@ -991,7 +1185,7 @@ function _composeOp(a, b, func) {
 
         // add methods to that function for each behaviour
         for (const how of hows) {
-          wrapper[how.toLowerCase()] = function (...other) {
+          const howfunc = function (...other) {
             var howpat = pat;
             other = sequence(other);
             if (preprocess) {
@@ -1009,19 +1203,41 @@ function _composeOp(a, b, func) {
             }
             return result;
           };
+
+          for (const [controlname, controlfunc] of controlRegistry) {
+            howfunc[controlname] = (...args) => howfunc(controlfunc(...args));
+          }
+          wrapper[how.toLowerCase()] = howfunc;
         }
         wrapper.squeezein = wrapper.squeeze;
+
+        for (const [controlname, controlfunc] of controlRegistry) {
+          wrapper[controlname] = (...args) => wrapper.in(controlfunc(...args));
+        }
 
         return wrapper;
       },
     });
 
-    // Default op to 'set', e.g. pat.squeeze(pat2) = pat.set.squeeze(pat2)
-    for (const how of hows) {
-      Pattern.prototype[how.toLowerCase()] = function (...args) {
-        return this.set[how.toLowerCase()](args);
-      };
-    }
+    registerMethod(what, true, true);
+  }
+
+  // Default op to 'set', e.g. pat.squeeze(pat2) = pat.set.squeeze(pat2)
+  for (const howLower of alignments) {
+    // Using a 'get'ted function so that all the controls are added
+    Object.defineProperty(Pattern.prototype, howLower, {
+      get: function () {
+        const pat = this;
+        const howfunc = function (...args) {
+          return pat.set[howLower](args);
+        };
+        for (const [controlname, controlfunc] of controlRegistry) {
+          howfunc[controlname] = (...args) => howfunc(controlfunc(...args));
+        }
+        return howfunc;
+      },
+    });
+    registerMethod(howLower, false, true);
   }
 
   // binary composers
@@ -1033,36 +1249,36 @@ function _composeOp(a, b, func) {
    *   .struct("x ~ x ~ ~ x ~ x ~ ~ ~ x ~ x ~ ~")
    *   .slow(4)
    */
-  Pattern.prototype.struct = function (...args) {
+  addToPrototype('struct', function (...args) {
     return this.keepif.out(...args);
-  };
-  Pattern.prototype.structAll = function (...args) {
+  });
+  addToPrototype('structAll', function (...args) {
     return this.keep.out(...args);
-  };
+  });
   /**
    * Returns silence when mask is 0 or "~"
    *
    * @example
    * note("c [eb,g] d [eb,g]").mask("<1 [0 1]>").slow(2)
    */
-  Pattern.prototype.mask = function (...args) {
+  addToPrototype('mask', function (...args) {
     return this.keepif.in(...args);
-  };
-  Pattern.prototype.maskAll = function (...args) {
+  });
+  addToPrototype('maskAll', function (...args) {
     return this.keep.in(...args);
-  };
+  });
   /**
    * Resets the pattern to the start of the cycle for each onset of the reset pattern.
    *
    * @example
    * s("<bd lt> sd, hh*4").reset("<x@3 x(3,8)>")
    */
-  Pattern.prototype.reset = function (...args) {
+  addToPrototype('reset', function (...args) {
     return this.keepif.trig(...args);
-  };
-  Pattern.prototype.resetAll = function (...args) {
+  });
+  addToPrototype('resetAll', function (...args) {
     return this.keep.trig(...args);
-  };
+  });
   /**
    * Restarts the pattern for each onset of the restart pattern.
    * While reset will only reset the current cycle, restart will start from cycle 0.
@@ -1070,12 +1286,12 @@ function _composeOp(a, b, func) {
    * @example
    * s("<bd lt> sd, hh*4").restart("<x@3 x(3,8)>")
    */
-  Pattern.prototype.restart = function (...args) {
+  addToPrototype('restart', function (...args) {
     return this.keepif.trigzero(...args);
-  };
-  Pattern.prototype.restartAll = function (...args) {
+  });
+  addToPrototype('restartAll', function (...args) {
     return this.keep.trigzero(...args);
-  };
+  });
 })();
 
 // aliases
@@ -1115,6 +1331,7 @@ export const silence = new Pattern(() => []);
  * @returns {Pattern}
  * @example
  * pure('e4') // "e4"
+ * @noAutocomplete
  */
 export function pure(value) {
   function query(state) {
@@ -1319,74 +1536,123 @@ export function pm(...args) {
   polymeter(...args);
 }
 
-export const mask = curry((a, b) => reify(b).mask(a));
-export const struct = curry((a, b) => reify(b).struct(a));
-export const superimpose = curry((a, b) => reify(b).superimpose(...a));
+export const mask = curryPattern((a, b) => reify(b).mask(a));
+export const struct = curryPattern((a, b) => reify(b).struct(a));
+export const superimpose = curryPattern((a, b) => reify(b).superimpose(...a));
+
+const methodToFunction = function (name, addAlignments = false) {
+  const func = curryPattern((a, b) => reify(b)[name](a));
+
+  withControls((controlname, controlfunc) => {
+    func[controlname] = function (...pats) {
+      return func(controlfunc(...pats));
+    };
+  });
+
+  if (addAlignments) {
+    for (const alignment of alignments) {
+      func[alignment] = curryPattern((a, b) => reify(b)[name][alignment](a));
+      withControls((controlname, controlfunc) => {
+        func[alignment][controlname] = function (...pats) {
+          return func[alignment](controlfunc(...pats));
+        };
+      });
+    }
+  }
+
+  return func;
+};
 
 // operators
-export const set = curry((a, b) => reify(b).set(a));
-export const keep = curry((a, b) => reify(b).keep(a));
-export const keepif = curry((a, b) => reify(b).keepif(a));
-export const add = curry((a, b) => reify(b).add(a));
-export const sub = curry((a, b) => reify(b).sub(a));
-export const mul = curry((a, b) => reify(b).mul(a));
-export const div = curry((a, b) => reify(b).div(a));
-export const mod = curry((a, b) => reify(b).mod(a));
-export const pow = curry((a, b) => reify(b).pow(a));
-export const band = curry((a, b) => reify(b).band(a));
-export const bor = curry((a, b) => reify(b).bor(a));
-export const bxor = curry((a, b) => reify(b).bxor(a));
-export const blshift = curry((a, b) => reify(b).blshift(a));
-export const brshift = curry((a, b) => reify(b).brshift(a));
-export const lt = curry((a, b) => reify(b).lt(a));
-export const gt = curry((a, b) => reify(b).gt(a));
-export const lte = curry((a, b) => reify(b).lte(a));
-export const gte = curry((a, b) => reify(b).gte(a));
-export const eq = curry((a, b) => reify(b).eq(a));
-export const eqt = curry((a, b) => reify(b).eqt(a));
-export const ne = curry((a, b) => reify(b).ne(a));
-export const net = curry((a, b) => reify(b).net(a));
-export const and = curry((a, b) => reify(b).and(a));
-export const or = curry((a, b) => reify(b).or(a));
-export const func = curry((a, b) => reify(b).func(a));
+export const set = methodToFunction('set', true);
+export const keep = methodToFunction('keep', true);
+export const keepif = methodToFunction('keepif', true);
+export const add = methodToFunction('add', true);
+export const sub = methodToFunction('sub', true);
+export const mul = methodToFunction('mul', true);
+export const div = methodToFunction('div', true);
+export const mod = methodToFunction('mod', true);
+export const pow = methodToFunction('pow', true);
+export const band = methodToFunction('band', true);
+export const bor = methodToFunction('bor', true);
+export const bxor = methodToFunction('bxor', true);
+export const blshift = methodToFunction('blshift', true);
+export const brshift = methodToFunction('brshift', true);
+export const lt = methodToFunction('lt', true);
+export const gt = methodToFunction('gt', true);
+export const lte = methodToFunction('lte', true);
+export const gte = methodToFunction('gte', true);
+export const eq = methodToFunction('eq', true);
+export const eqt = methodToFunction('eqt', true);
+export const ne = methodToFunction('ne', true);
+export const net = methodToFunction('net', true);
+export const and = methodToFunction('and', true);
+export const or = methodToFunction('or', true);
+export const func = methodToFunction('func', true);
+
+// alignments
+// export const in = methodToFunction('in'); // reserved word :(
+export const out = methodToFunction('out');
+export const mix = methodToFunction('mix');
+export const squeeze = methodToFunction('squeeze');
+export const squeezeout = methodToFunction('squeezeout');
+export const trig = methodToFunction('trig');
+export const trigzero = methodToFunction('trigzero');
 
 /**
  * Registers a new pattern method. The method is added to the Pattern class + the standalone function is returned from register.
  *
  * @param {string} name name of the function
  * @param {function} func function with 1 or more params, where last is the current pattern
+ * @noAutocomplete
  *
  */
-export function register(name, func) {
+export function register(name, func, patternify = true) {
   if (Array.isArray(name)) {
     const result = {};
     for (const name_item of name) {
-      result[name_item] = register(name_item, func);
+      result[name_item] = register(name_item, func, patternify);
     }
     return result;
   }
   const arity = func.length;
-  var pfunc; // the patternified function
 
-  pfunc = function (...args) {
-    args = args.map(reify);
-    const pat = args[args.length - 1];
-    if (arity === 1) {
-      return func(pat);
-    }
-    const [left, ...right] = args.slice(0, -1);
-    let mapFn = (...args) => {
-      // make sure to call func with the correct argument count
-      // args.length is expected to be <= arity-1
-      // so we set undefined args explicitly undefined
-      Array(arity - 1)
-        .fill()
-        .map((_, i) => args[i] ?? undefined);
-      return func(...args, pat);
+  registerMethod(name);
+
+  var pfunc;
+
+  if (patternify) {
+    pfunc = function (...args) {
+      args = args.map(reify);
+      const pat = args[args.length - 1];
+      if (arity === 1) {
+        return func(pat);
+      }
+      const [left, ...right] = args.slice(0, -1);
+      let mapFn = (...args) => {
+        // make sure to call func with the correct argument count
+        // args.length is expected to be <= arity-1
+        // so we set undefined args explicitly undefined
+        Array(arity - 1)
+          .fill()
+          .map((_, i) => args[i] ?? undefined);
+        return func(...args, pat);
+      };
+      mapFn = curryPattern(mapFn, arity - 1);
+
+      const app = function (acc, p, i) {
+        return acc.appLeft(p);
+      };
+      const start = left.fmap(mapFn);
+
+      return right.reduce(app, start).innerJoin();
     };
-    mapFn = curry(mapFn, null, arity - 1);
-    return right.reduce((acc, p) => acc.appLeft(p), left.fmap(mapFn)).innerJoin();
-  };
+  } else {
+    pfunc = function (...args) {
+      args = args.map(reify);
+      return func(...args);
+    };
+  }
 
   Pattern.prototype[name] = function (...args) {
     args = args.map(reify);
@@ -1410,7 +1676,7 @@ export function register(name, func) {
 
   // toplevel functions get curried as well as patternified
   // because pfunc uses spread args, we need to state the arity explicitly!
-  return curry(pfunc, null, arity);
+  return curryPattern(pfunc, arity);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1460,15 +1726,17 @@ export const ceil = register('ceil', function (pat) {
  * Assumes a numerical pattern, containing unipolar values in the range 0 ..
  * 1. Returns a new pattern with values scaled to the bipolar range -1 .. 1
  * @returns Pattern
+ * @noAutocomplete
  */
 export const toBipolar = register('toBipolar', function (pat) {
   return pat.fmap((x) => x * 2 - 1);
 });
 
 /**
- * Assumes a numerical pattern, containing bipolar values in the range -1 ..
- * 1. Returns a new pattern with values scaled to the unipolar range 0 .. 1
+ * Assumes a numerical pattern, containing bipolar values in the range -1 .. 1
+ * Returns a new pattern with values scaled to the unipolar range 0 .. 1
  * @returns Pattern
+ * @noAutocomplete
  */
 export const fromBipolar = register('fromBipolar', function (pat) {
   return pat.fmap((x) => (x + 1) / 2);
@@ -2173,6 +2441,59 @@ const _loopAt = function (factor, pat, cps = 1) {
     .unit('c')
     .slow(factor);
 };
+
+/**
+ * Chops samples into the given number of slices, triggering those slices with a given pattern of slice numbers.
+ * @name slice
+ * @memberof Pattern
+ * @returns Pattern
+ * @example
+ * await samples('github:tidalcycles/Dirt-Samples/master')
+ * s("breaks165").slice(8, "0 1 <2 2*2> 3 [4 0] 5 6 7".every(3, rev)).slow(1.5)
+ */
+const slice = register(
+  'slice',
+  function (npat, ipat, opat) {
+    return npat.innerBind((n) =>
+      ipat.outerBind((i) =>
+        opat.outerBind((o) => {
+          // If it's not an object, assume it's a string and make it a 's' control parameter
+          o = o instanceof Object ? o : { s: o };
+          // Remember we must stay pure and avoid editing the object directly
+          const toAdd = { begin: i / n, end: (i + 1) / n, _slices: n };
+          return pure({ ...toAdd, ...o });
+        }),
+      ),
+    );
+  },
+  false, // turns off auto-patternification
+);
+
+/**
+ * Works the same as slice, but changes the playback speed of each slice to match the duration of its step.
+ * @name splice
+ * @memberof Pattern
+ * @returns Pattern
+ * @example
+ * await samples('github:tidalcycles/Dirt-Samples/master')
+ * s("breaks165").splice(8,  "0 1 [2 3 0]@2 3 0@2 7").hurry(0.65)
+ */
+const splice = register(
+  'splice',
+  function (npat, ipat, opat) {
+    const sliced = slice(npat, ipat, opat);
+    return sliced.withHap(function (hap) {
+      return hap.withValue((v) => ({
+        ...{
+          speed: (1 / v._slices / hap.whole.duration) * (v.speed || 1),
+          unit: 'c',
+        },
+        ...v,
+      }));
+    });
+  },
+  false, // turns off auto-patternification
+);
 
 const { loopAt, loopat } = register(['loopAt', 'loopat'], function (factor, pat) {
   return _loopAt(factor, pat, 1);
