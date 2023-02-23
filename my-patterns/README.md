@@ -1,5 +1,94 @@
 # my-patterns
 
+- xenboy1 <https://strudel.tidalcycles.org/?cnRM9l1VSNOW>
+- xenboy2 <https://strudel.tidalcycles.org/?-ldyhDjgjZXx>
+- xenboy3 <https://strudel.tidalcycles.org/?QZtGq9xNCjgK>
+- xenboy4 <https://strudel.tidalcycles.org/?57yaxLwAA2ZH>
+- xenboy5 <https://strudel.tidalcycles.org/?ooUNTAltcNlx>
+- latin backingtrack <https://strudel.tidalcycles.org/?wqCIwYFIwY6m>
+- starroom <https://strudel.tidalcycles.org/?li8jZ-O0ajvi>
+- wacworld1 <https://strudel.tidalcycles.org/?JljZfvGA8ZYr>
+- wacworld2 <https://strudel.tidalcycles.org/?M8AFVf4lT96Q>
+- wacworld3 <https://strudel.tidalcycles.org/?Pwc5Bmmjcw4s>
+- sunkenflute <https://strudel.tidalcycles.org/?s4a3-6wXhI16>
+- riverdeep <https://strudel.tidalcycles.org/?V32yNNb_DABl>
+- xendance <https://strudel.tidalcycles.org/?JtmS36ir-n5g>
+- xensleep <https://strudel.tidalcycles.org/?vhpKJXKOE_Jd>
+
+- wonky latino <https://strudel.tidalcycles.org/?r-itqjmog0nF>
+- just piano and flute <https://strudel.tidalcycles.org/?H-lf95hRdKLj>
+- comptine <https://strudel.tidalcycles.org/?_cBfTYJfyQ-O>
+- kalimbus drone <https://strudel.tidalcycles.org/?-pOpAJGRBxTa>
+- sunrays <https://strudel.tidalcycles.org/?caEcKaD9VTdb>
+- sunrays3 <https://strudel.tidalcycles.org/?y-04JiIAjygU>
+- ! dreamscope / summerbliss <https://strudel.tidalcycles.org/?BAxRGitWToYA>
+- klebstoff <https://strudel.tidalcycles.org/?zXPwke_gJwDI>
+- windy city <https://strudel.tidalcycles.org/?YQgvdQU-Uuh_>
+
+- 31edo piano <https://strudel.tidalcycles.org/?dXf3y45VAhrj>
+- cookiecut <https://strudel.tidalcycles.org/?6BpS2gIHVDLz>
+- flute73 <https://strudel.tidalcycles.org/?cdIL5sVD8S6l>
+- gameboyparty <https://strudel.tidalcycles.org/?WFqN2cKzfMdo>
+- iterations (piano) <https://strudel.tidalcycles.org/?XOQN8u_loN-8>
+- solar <https://strudel.tidalcycles.org/?GFDXsoI8wJUk>
+- stage73 <https://strudel.tidalcycles.org/?j_CGaZb9vA2O>
+- ! strum <https://strudel.tidalcycles.org/?d3kD_6vtUbNJ>
+
+- stru tang <https://strudel.tidalcycles.org/?nL1pskRtJSQv>
+- drunken groove no 112358 <https://strudel.tidalcycles.org/?s6aAJcgziBl8>
+- only 5 to go <https://strudel.tidalcycles.org/?ZLDJAWgsmMRA>
+- yay breaks <https://strudel.tidalcycles.org/?hybBkB6rS3I3>
+- gettin fuzzier <https://strudel.tidalcycles.org/?OGZAb7-hhVaJ>
+- fuzzy type <https://strudel.tidalcycles.org/?jRYbJLd1UpTq>
+- hip hop speedrun no 2 <https://strudel.tidalcycles.org/?GY9tUPOhJ_Px>
+- hip hop speedrun no 1 <https://strudel.tidalcycles.org/?e0uCeN79iQs4>
+- slow tide <https://strudel.tidalcycles.org/?JBhUCEAteBda>
+- exponential time <https://strudel.tidalcycles.org/?WRAg_lWZw0lL>
+- stumblin <https://strudel.tidalcycles.org/?k_CZOrXs1A-n>
+- loungin with some rhodes <https://strudel.tidalcycles.org/?vEydeffNPzKx>
+- shepard scale <https://strudel.tidalcycles.org/?GKx8sTfoBrox>
+- insect schneckno <https://strudel.tidalcycles.org/?td5JRvhI7aOH>
+- reliefpfeiler <https://strudel.tidalcycles.org/?YewJb4-a--1f>
+- steve haiku <https://strudel.tidalcycles.org/?drJDbvHifp8Q>
+- doozy dub detective <https://strudel.tidalcycles.org/?Kxhy7twnlgbM>
+- hex rhythms <https://strudel.tidalcycles.org/?Q9lld0Uffe6t>
+- goin psycho <https://strudel.tidalcycles.org/?U2lYqBFd9wVl>
+- clapping music <https://strudel.tidalcycles.org/?cbIKwfnq40AR>
+- a few minutes later <https://strudel.tidalcycles.org/?EgpdbtTkuyC->
+- kalimbas in orbit <https://strudel.tidalcycles.org/?LhOSJ1BGJEDt>
+- firecracker <https://strudel.tidalcycles.org/?OfW_nJwenIkF>
+- rave has started <https://strudel.tidalcycles.org/?oXOMeeCsyx4c>
+- pretty chords in 31edo <https://strudel.tidalcycles.org/?V5VvGLI3cxE6>
+
+beats:
+
+- starroom <https://strudel.tidalcycles.org/?li8jZ-O0ajvi>
+- wacworld1 <https://strudel.tidalcycles.org/?JljZfvGA8ZYr>
+- sunkenflute <https://strudel.tidalcycles.org/?s4a3-6wXhI16>
+- riverdeep <https://strudel.tidalcycles.org/?V32yNNb_DABl>
+- wonky latino <https://strudel.tidalcycles.org/?r-itqjmog0nF>
+- sunrays <https://strudel.tidalcycles.org/?caEcKaD9VTdb>
+- sunrays3 <https://strudel.tidalcycles.org/?y-04JiIAjygU>
+- ! dreamscope / summerbliss <https://strudel.tidalcycles.org/?BAxRGitWToYA>
+- windy city <https://strudel.tidalcycles.org/?YQgvdQU-Uuh_>
+- stru tang <https://strudel.tidalcycles.org/?nL1pskRtJSQv>
+- drunken groove no 112358 <https://strudel.tidalcycles.org/?s6aAJcgziBl8>
+- only 5 to go <https://strudel.tidalcycles.org/?ZLDJAWgsmMRA>
+- yay breaks <https://strudel.tidalcycles.org/?hybBkB6rS3I3>
+- gettin fuzzier <https://strudel.tidalcycles.org/?OGZAb7-hhVaJ>
+- fuzzy type <https://strudel.tidalcycles.org/?jRYbJLd1UpTq>
+- hip hop speedrun no 2 <https://strudel.tidalcycles.org/?GY9tUPOhJ_Px>
+- hip hop speedrun no 1 <https://strudel.tidalcycles.org/?e0uCeN79iQs4>
+- slow tide <https://strudel.tidalcycles.org/?JBhUCEAteBda>
+- stumblin <https://strudel.tidalcycles.org/?k_CZOrXs1A-n>
+- loungin with some rhodes <https://strudel.tidalcycles.org/?vEydeffNPzKx>
+- doozy dub detective <https://strudel.tidalcycles.org/?Kxhy7twnlgbM>
+- goin psycho <https://strudel.tidalcycles.org/?U2lYqBFd9wVl>
+- cookiecut <https://strudel.tidalcycles.org/?6BpS2gIHVDLz>
+- stage73 <https://strudel.tidalcycles.org/?j_CGaZb9vA2O>
+- ! strum <https://strudel.tidalcycles.org/?d3kD_6vtUbNJ>
+
+
 This directory can be used to save your own patterns, which then get
 made into a pattern swatch.
 
