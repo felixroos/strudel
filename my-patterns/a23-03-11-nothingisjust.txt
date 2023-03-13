@@ -1,0 +1,32 @@
+// froos - nothing is just - 11.03.23
+
+await samples('github:felixroos/samples/main')
+await samples('https://shabda.ndre.gr/speech/nothing,is,just.json?gender=f&language=cmn-CN&strudel=1')
+
+
+const ratio = (pat) => pat.fmap((v) => !Array.isArray(v) ? v : v[0] / (v[1] || 1)).freq()
+
+stack(
+  ratio("1, 5:<2 <4 1 3>>, 3:2").piano()
+  .attack(.5).gain(.6),
+  ratio("1:2").s('jazzbass').clip(1).ply(2).late(.25),
+  ratio("<7:4 [2 4 5:2 7:[3,4]] ~@2>")
+  .delay(.5)
+  .off(1/8, mul(ratio("3:2")))
+  .s("rhodes,xylo").clip(1)
+  .lpf(sine.range(500,2000).slow(7))
+  .pan(sine.range(.2,.8).slow(32)).gain(.6),
+  ratio("{4 5 7 6 3}%4:[3 2]").s('pluck')
+  .lpf(cosine.range(200,2000).slow(14))
+  .room(.6).delay(.3).gain(.4)
+  .pan(cosine.range(.2,.8).slow(32))
+).mul(freq(108))
+  .room(.5)
+  .slow(2)
+  .stack(
+    s("<nothing is just>/2.4").gain(.2)
+    .echoWith(8, 1/4, (x,n)=>x.speed(.5+n*.1))
+    .room(2).degradeBy("<.4 .9>/8")
+    .bpf(perlin.range(500,2000)).pan(rand.range(.2,.8))
+  )
+//.pianoroll()

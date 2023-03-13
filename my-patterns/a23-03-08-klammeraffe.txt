@@ -1,0 +1,48 @@
+/* 
+ __ _  __     __   _  _  _  _  ____  ____   __   ____  ____  ____ 
+(  / )(  )   / _\ ( \/ )( \/ )(  __)(  _ \ / _\ (  __)(  __)(  __)
+ )  ( / (_/\/    \/ \/ \/ \/ \ ) _)  )   //    \ ) _)  ) _)  ) _) 
+(__\_)\____/\_/\_/\_)(_/\_)(_/(____)(__\_)\_/\_/(__)  (__)  (____)
+
+"klammeraffe" by froos 03-08-22
+
+*/
+await samples('github:felixroos/samples/main')
+
+let sc = "<C:minor Bb2:mixolydian Ab2:lydian [G2@3 Db]:mixolydian>/2"
+let wrbl = add(note(perlin.range(0,.25).fast(2)))
+
+stack(
+  // chords
+  n("{0 3 2 1 4}%4,[2,4]")
+  .scale(sc)
+  .set.mix(s("rhodes2x,rhodes(<3@3 <2 5 4 8>>,8)"))
+  .clip(1)
+  .release(.1)
+  .room(.8)
+  .gain(.5)
+  .apply(wrbl)
+  , // bass
+  n("-7")
+  .scale(sc)
+  .add(note("0,.1"))
+  .s("sawtooth")
+  .lpf(perlin.range(200,1000)).lpq(10)
+  .struct("x(<3 2 5 4>,8,<0 1 0 -1>)")
+  .sometimes(add(note("12")))
+  .decay(perlin.range(.04,.08))
+  .gain(rand.range(.4,.7))
+  .sustain(0)
+  .apply(wrbl)
+  , // drums
+  s("[bd ~]*2,<~ rim:1*<1 [4 ~]>>,[~ hh:1]*2")
+  .bank('YamahaRY30')
+  .speed(.8)
+  .gain(.4)
+  .superimpose(x=>x.rev().degradeBy(.7).speed("2").late(1/8))
+  .sometimesBy(.1, x=>x.ply("2").room(.4))
+) // post
+  .end(perlin.range(.05,1).slow(16)) // randomize sample length
+  .sometimesBy(.2, x=>x.set.mix(speed("1,[2 4]*2")).gain(.25))
+  .mul(gain(rand.range(.7,1)))
+  .fast(9/10)
