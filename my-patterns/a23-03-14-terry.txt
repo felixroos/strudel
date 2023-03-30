@@ -1,0 +1,11 @@
+"<C^7 Dbo7 Dm7 C7>"
+  .voicings('lefthand') // voice chords
+  .arp("0 3 <2 0> [1 3]".iter(4))
+  .add(perlin.range(0,.5))// pitch warble
+  .add("<0 12>/16,.1") // hippie chorus
+  .sometimes(add("12")) // vary octaves
+  .almostNever(ply("2")) // little rhythmic glitches
+  .note().s('sine')
+  .decay(.125).gain(.8)
+  .sustain(sine.range(0,.5).slow(32))
+  .jux(rev).room(.8).fast(3/4)

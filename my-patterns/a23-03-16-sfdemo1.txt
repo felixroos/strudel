@@ -1,0 +1,22 @@
+setcps(.5)
+
+"<Gm7 C7 Am7 D7b9>/2"
+  .layer(
+  // chords
+  x=>x.voicings("lefthand")
+    .note()
+    .arp("~ <[0,2] ~!3>").decay(.2).sustain(0).add(note(12))
+    .delay(.5).delayfeedback(.8).s('gm_muted_trumpet'),
+  // bass
+  x=>x.rootNotes(1).ply(4).add.out("0 [7 <12 [12 24]>]")
+    .note().s("gm_acoustic_bass")
+    .shape(.4).lpf(perlin.range(500,4000)),
+  // pad
+  x=>x.voicings('lefthand').arp("<1 2 3>,0").note()
+    .s('gm_pad_halo').attack(.5)
+  .lpf(perlin.range(800,8000))
+).stack(
+    s("bd*2,~ <~ rim>,hh(3,8)*<1@3 2>")
+    .bank('RolandTR909').n(0)
+  )
+  .room(.5)

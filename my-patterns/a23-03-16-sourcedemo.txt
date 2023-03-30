@@ -1,0 +1,29 @@
+const ac = getAudioContext();
+const lfo = (frequency, range = 1, type = 'sine') => {
+  const o = new OscillatorNode(ac, { type, frequency })
+  o.start();
+  const g = new GainNode(ac, { gain: range/2 });
+  o.connect(g);
+  return g;
+}
+const pitchLFO = lfo(8, 10);
+
+note("<c a f e>(3,8)")
+  .off(1/4, add(note(12)))
+  .jux(rev)
+  .source((t, value, duration) => {
+    const { freq, note } = value;
+    const frequency = freq || getFreq(note);
+    const o = new OscillatorNode(ac, { frequency, type: 'sawtooth' });
+    const release = 0.05;
+    o.start(t);
+    o.stop(t+duration+release);
+    const g = ac.createGain();
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(.3, t+0.05);
+    g.gain.setValueAtTime(.3, t + duration);
+    g.gain.linearRampToValueAtTime(0, t+duration+0.05);
+    o.connect(g);
+    pitchLFO.connect(o.frequency)
+    return g;
+}).lpf(400).gain(.25)
