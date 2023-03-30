@@ -6,13 +6,7 @@ This program is free software: you can redistribute it and/or modify it under th
 
 import { cleanupDraw, cleanupUi, controls, evalScope, getDrawContext, logger } from '@strudel.cycles/core';
 import { CodeMirror, cx, flash, useHighlighting, useStrudel, useKeydown } from '@strudel.cycles/react';
-import {
-  getAudioContext,
-  getLoadedSamples,
-  initAudioOnFirstClick,
-  resetLoadedSamples,
-  webaudioOutput,
-} from '@strudel.cycles/webaudio';
+import { getAudioContext, initAudioOnFirstClick, resetLoadedSounds, webaudioOutput } from '@strudel.cycles/webaudio';
 import { createClient } from '@supabase/supabase-js';
 import { nanoid } from 'nanoid';
 import React, { createContext, useCallback, useEffect, useState } from 'react';
@@ -24,6 +18,7 @@ import * as tunes from './tunes.mjs';
 import PlayCircleIcon from '@heroicons/react/20/solid/PlayCircleIcon';
 import { themes } from './themes.mjs';
 import { settingsMap, useSettings, setLatestCode } from '../settings.mjs';
+import Loader from './Loader';
 
 const { latestCode } = settingsMap.get();
 
@@ -48,12 +43,11 @@ const modules = [
   import('@strudel.cycles/csound'),
 ];
 
-evalScope(
+const modulesLoading = evalScope(
   controls, // sadly, this cannot be exported from core direclty
   ...modules,
 );
 
-export let loadedSamples = [];
 const presets = prebake();
 
 let drawContext, clearCanvas;
@@ -61,11 +55,6 @@ if (typeof window !== 'undefined') {
   drawContext = getDrawContext();
   clearCanvas = () => drawContext.clearRect(0, 0, drawContext.canvas.height, drawContext.canvas.width);
 }
-
-Promise.all([...modules, presets]).then((data) => {
-  // console.log('modules and sample registry loade', data);
-  loadedSamples = Object.entries(getLoadedSamples() || {});
-});
 
 const getTime = () => getAudioContext().currentTime;
 
@@ -114,24 +103,28 @@ export function Repl({ embedded = false }) {
   const isEmbedded = embedded || window.location !== window.parent.location;
   const [view, setView] = useState(); // codemirror view
   const [lastShared, setLastShared] = useState();
-  const [pending, setPending] = useState(false);
+  const [pending, setPending] = useState(true);
 
   const { theme, keybindings, fontSize, fontFamily } = useSettings();
 
   const { code, setCode, scheduler, evaluate, activateCode, isDirty, activeCode, pattern, started, stop, error } =
     useStrudel({
-      initialCode: '// LOADING',
+      initialCode: '// LOADING...',
       defaultOutput: webaudioOutput,
       getTime,
-      beforeEval: () => {
+      beforeEval: async () => {
+        setPending(true);
+        await modulesLoading;
         cleanupUi();
         cleanupDraw();
-        setPending(true);
       },
       afterEval: ({ code }) => {
         setPending(false);
         setLatestCode(code);
         window.location.hash = '#' + encodeURIComponent(btoa(code));
+      },
+      onEvalError: (err) => {
+        setPending(false);
       },
       onToggle: (play) => !play && cleanupDraw(false),
       drawContext,
@@ -147,6 +140,7 @@ export function Repl({ embedded = false }) {
         'highlight',
       );
       setCode(decoded || latestCode || randomTune);
+      setPending(false);
     });
   }, []);
 
@@ -156,10 +150,14 @@ export function Repl({ embedded = false }) {
       async (e) => {
         if (e.ctrlKey || e.altKey) {
           if (e.code === 'Enter') {
+            if (getAudioContext().state !== 'running') {
+              alert('please click play to initialize the audio. you can use shortcuts after that!');
+              return;
+            }
             e.preventDefault();
             flash(view);
             await activateCode();
-          } else if (e.code === 'Period') {
+          } else if (e.key === '.') {
             stop();
             e.preventDefault();
           }
@@ -211,7 +209,8 @@ export function Repl({ embedded = false }) {
     const { code, name } = getRandomTune();
     logger(`[repl] ✨ loading random tune "${name}"`);
     clearCanvas();
-    resetLoadedSamples();
+    resetLoadedSounds();
+    scheduler.setCps(1);
     await prebake(); // declare default samples
     await evaluate(code, false);
   };
@@ -265,6 +264,7 @@ export function Repl({ embedded = false }) {
           //        'bg-gradient-to-t from-green-900 to-slate-900', //
         )}
       >
+        <Loader active={pending} />
         <Header context={context} />
         <section className="grow flex text-gray-100 relative overflow-auto cursor-text pb-0" id="code">
           <CodeMirror
