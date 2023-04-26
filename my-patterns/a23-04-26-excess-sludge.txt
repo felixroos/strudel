@@ -1,0 +1,40 @@
+// froos - excess sludge
+
+await samples('github:felixroos/samples/main')
+
+let drums = s("[bd <~ [~@3 bd]>],~ sd:<0 1>,[~ hh]*2,~ <~ oh?.2>")
+  .bank('president').fast(2).gain(3)
+  .lastOf(8, late(".25")).almostNever(x=>x.speed(".9,2").mul(gain(.5)))
+  .rarely(ply("2")).sometimesBy(.3, x=>x.end(".2").release(.2))
+
+let chords = n("<[0,5,7 9] <[0,4,6,[9 11 12]] [0,5,8,[10 11 <6 10>]]>>/2").scale('C2 major')
+  .s("rhodes").clip(1).gain(1.5).attack(".3 0").room(.5)
+
+let flute = n("0 <1 4>").off(1/8, add(n("<2 [2 3] [2 4]>")))
+  .scale('C4 major').s('flute').clip(1).release(.5).slow(2)
+  .lpf(perlin.range(200,6000).slow(2)).lpq(8)
+
+let xylo = n("0*8").gain("[1 .5]*5")
+  .scale("C5:major").s('xylo').delay(.5).delaytime(.125)
+  .hpf(perlin.range(200,4000).slow(1.5)).pan(.2)
+
+let bass = n("<2 0 -2 0>/2").scale('C2 major').s('jazzbass').clip(1)
+
+let clav = n("4 2 1 0")
+  .superimpose(
+    x=>x.add(3).late(1/8),
+    x=>x.add(7).late(2/8).slow(3),
+    x=>x.add(12).late(3/8).slow(2),
+  )
+  .scale("C3:major").s('gm_clavinet').decay(.1).sustain(0)
+  .lpf("1".sub(perlin).range(200,4000).slow(1.5)).pan(.8)
+  .gain(sine.range(.6,1).slow(2))
+
+stack(
+  drums,
+  chords,
+  flute,
+  xylo,
+  bass,
+  clav,
+).slow(2)
