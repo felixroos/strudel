@@ -1,0 +1,63 @@
+let morseMap = {
+  a: 13,
+  b: 3111,
+  c: 3131,
+  d: 311,
+  e: 1,
+  f: 1131,
+  g: 331,
+  h: 1111,
+  i: 11,
+  j: 1333,
+  k: 313,
+  l: 1311,
+  m: 33,
+  n: 31,
+  o: 333,
+  p: 1331,
+  q: 3313,
+  r: 131,
+  s: 111,
+  t: 3,
+  u: 113,
+  v: 1113,
+  w: 133,
+  x: 3113,
+  y: 3133,
+  z: 3311,
+  0: 33333,
+  1: 13333,
+  2: 11333,
+  3: 11133,
+  4: 11113,
+  5: 11111,
+  6: 31111,
+  7: 33111,
+  8: 31111,
+  9: 11111
+}
+
+let morse = (code) => {
+    const units = code.split(' ').map(
+      word => word
+        .split('')
+        .map(char => String(morseMap[char])
+          .split('')
+          .map(n => n+'1')
+          .join(' '))
+        .join(' 10 ')
+      )
+    .join('7')
+    .split(' ')
+    .map(el => [Number(el.split('')[0]),el.split('')[1]])
+  //console.log(units)
+  return timeCat(...units)
+}
+
+stack(
+  s("hh").struct(morse('d').slow(3)),
+  s("bd").struct(morse('r')),
+  s("sd").struct(morse('u')),
+  s("rim").struct(morse('m')),
+  s("ht").struct(morse('s')),
+).slow(2).legato(.2)

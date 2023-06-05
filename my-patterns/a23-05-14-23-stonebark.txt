@@ -1,0 +1,53 @@
+// froos - stonebark
+
+addVoicings('water',{m7:['1P 5P 7m 2A','1P 5P 6A 2A','1P 7m 3m 5P','1P 7m 2A 5P','3m 7m 1P 5P','2A 1P 5P 6A','3m 1P 5P 7m','5P 1P 3m 6A','5P 1P 2A 7m','5P 3m 7m 1P','5P 3m 6A 1P','7m 3m 5P 1P','7m 5P 1P 2A'],m6:['1P 6M 3m 5P','1P 5P 6M 2A','1P 3m 6M 1P','1P 6M 2A 5P'],m9:['1P 7m 3m 5P 2M','1P 3m 7m 2M','1P 3m 6A 2M'],m11:['1P 7m 3m 4P','1P 7m 2A 4P','3m 7m 2M 4P'],'7b9':['1P 7m 3M 5P 1A','1P 7m 2m 3M','1P 3M 7m 1A','1P 3M 6A 1A']});
+
+setcps(.9)
+
+let wood = "<Fm7 Fm9 Fm7 <Fm11 F7b9>>/4"
+let bark = "<F3:minor@3 <F3:minor F3:mixolydian>>/4"
+
+stack(
+  wood.voicings('water').note()
+  .s('gm_pad_warm')
+  .lpf(sine.range(600,8000).slow(31))
+  .add(note("0,.01"))
+  .gain(.5)
+  .pan(rand.range(.3,.7))
+  .attack(".2 .05"),
+  // pick
+  wood.voicings('water')
+  .note().arp("[0 1 2 3]*<3 5>").struct("x*4")
+  .add(note("<0 -12>/32,.02"))
+  .gain("[.1 .2]*2")
+  .s("square")
+  .pan(cosine.slow(32)).mask("<1@32 0@32>")
+  .lpf(sine.range(500,8000).slow(17)).lpq(5).color('pink')
+  .ply(2)
+  .rarely(x=>x.add(note(12)))
+  .room(2),
+  // bass
+  note(wood.rootNotes(1).add("0,.08")).s("gm_synth_bass_1")
+  .struct("<x!3 [x [x? x?]*2]>")
+  .sometimes(add(note("12")))//.cut(1)
+  .sometimesBy("0 .5",x=>x.decay(.1).sustain(0))
+  .gain(.7)
+  .release(.05).lpf(sine.range(800,2000).slow(31)).lpq(8)
+  .mask("<0@16 1@28>").color('salmon').room(.2),
+  // drums
+  stack(
+    s("[bd <~ [~ bd?]>] bd").mask("<0@16 1@28>"),
+    s("~ <rim!32 sd:2!32>").speed(.9)
+    .lastOf(8, x=>x.add.squeeze(speed(".8 1 2 4*2"))).room(.2),
+    s("[~ <hh!3 hh*2>]*2").end("<.5 .1>/32").release(.04).speed(.8)
+    .mask("<0@16 1@64>")
+    .gain(.4).off(1/8, x=>x.speed(.5).degradeBy(.8).gain(.2)).room(.2)
+  )
+  .bank("RolandTR909")
+  .off(1/8, x=>x.degrade().speed(3).gain(.3).end(.2)
+    .lpf(perlin.range(1000,2000)))
+  .when("<0@56 1@8>", x=>x.hpf(1000)).color('steelblue')
+  .juxBy(0.5, rev)
+)
+  .reset("<x@15 x(<5 7 3 4>,8,<0 1 2>)>")
+  .late("[0 0.02]*4").late(1)

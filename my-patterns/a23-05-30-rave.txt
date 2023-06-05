@@ -1,0 +1,18 @@
+stack(
+  s("bd*2, ~ [sd@3 <~ sd:1>],~ cp"),
+  s("hh*[8 4]").gain("[.1 .4]*2")
+).bank("RolandTR707").room(.2)
+.stack(
+  n("<0 4 2 1>/2(3,8)*2").scale("A1:minor")
+  .adsr(".01:.2:0")
+  .s("square,triangle").slow(2)
+  //.add(note("-.1,.1"))
+  .lpf(300).lpq(16),
+ voicings("triads", "<Am Em C E>/2(5,8,-1)").note().s("sawtooth")
+  .lpf(sine.range(500,1000).slow(4)).lpq(12).adsr(".01:.05:0")
+  .room(.5).gain(.6)
+)
+  .late("[0 .02]*4")
+  .color("<orange darkseagreen>")
+  .reset("<x@7 x*4>")
+  .punchcard({fold:1,flipTime:0,vertical:0,smear:0})

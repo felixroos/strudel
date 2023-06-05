@@ -1,0 +1,42 @@
+// froos - how to funk in 42 lines of code
+// adapted from "how to funk in two minutes" by marc rebillet https://www.youtube.com/watch?v=3vBwRfQbXkg
+// thanks to peach for the transcription: https://www.youtube.com/watch?v=8eiPXvIgda4
+
+setcps(.5)
+
+let drums = stack(
+  s("bd*2, ~ sd").bank('RolandTR707').room("0 .1"),
+  s("hh*4").begin(.2).release(.02).end(.25).release(.02)
+  .gain(.3).bank('RolandTR707').late(.02).room(.5),
+  s("shaker_small").struct("[x x*2]*2").speed(".8,.9").release(.02)
+).fast(2)
+
+let wurli = note(`<
+[[a2,g3,[b3 c4],e4] ~ [g3,c4,e4](3,8)@4 ~@2]!3 
+[[e2,e3,a3,b3,e4]@3 [e2,e3,ab3,b3,e4]@5]>`)
+  .s("gm_epiano1:5").decay(.2).sustain("<[1 0@7]!3 1>")
+  .gain("<[.8@2 .4@14]!3 .7>").room(.3)
+
+let organ = note("<[~@3 [a3,d4,f#4]@2 [[a3,c4,e4]@2 ~] ~@2]!3 ~>".add(12))
+    .s("gm_percussive_organ:2").gain(.6).lpf(1800).pan(.2).room(.3);
+
+let clav = note(`<
+[~@3 a2 [g3,[b3 c4],e4]@2 ~ a2 [g3,b3,e4] ~@2 [g3,c4,e4] ~@4]!3
+[~@3 e3 [[a3 b3],c3,e3]@2 ~ e2 [e3,a3]@3 [b3,e3] ~@2 [b3,e3]@2]>`)
+  .s("gm_clavinet:1").decay("<.25!3 [.25 .4]>").sustain(0)
+  .gain(.7).pan(.8).room(.2);
+
+let bass = note(`<
+[a1 [~ [g2 a2]] [g1 g#1] [a1 [g2 a2]]] 
+[a1 [~ [g2 a2]] [e3 d3] [c3 [g3 a3]]] 
+[a1 [~ [g2 a2]] [g1 g#1] [a1 [g2 a2]]] 
+[e2@6 e1@5 e1 [[d2 e3] g1]@4]
+>`).s("gm_electric_bass_pick:1").release(.1)
+
+stack(
+  drums.mask("1")
+  ,wurli.mask("<0@4 1@48>")
+  ,organ.mask("<0@12 1@40>")
+  ,clav.mask("<0@20 1@32>")
+  ,bass.mask("<0@28 1@24>")
+)//.late("[0 .01]*8")

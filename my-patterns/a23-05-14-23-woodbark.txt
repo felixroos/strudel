@@ -1,0 +1,49 @@
+// froos - woodbark
+
+addVoicings('water',{m7:['1P 5P 7m 2A','1P 5P 6A 2A','1P 7m 3m 5P','1P 7m 2A 5P','3m 7m 1P 5P','2A 1P 5P 6A','3m 1P 5P 7m','5P 1P 3m 6A','5P 1P 2A 7m','5P 3m 7m 1P','5P 3m 6A 1P','7m 3m 5P 1P','7m 5P 1P 2A'],m6:['1P 6M 3m 5P','1P 5P 6M 2A','1P 3m 6M 1P','1P 6M 2A 5P'],m9:['1P 7m 3m 5P 2M','1P 3m 7m 2M','1P 3m 6A 2M'],m11:['1P 7m 3m 4P','1P 7m 2A 4P','3m 7m 2M 4P'],'7b9':['1P 7m 3M 5P 1A','1P 7m 2m 3M','1P 3M 7m 1A','1P 3M 6A 1A']});
+
+setcps(.75)
+
+let wood = "<Fm7 Fm9 Fm7 <Fm11 F#7b9>>/4"
+let bark = "<F3:minor@3 <F3:minor F#3:mixolydian>>/4"
+
+stack(
+  // pick
+  wood.voicings('water')
+  .note().arp("[0 1 2 3]*<3 5>").struct("x*4")
+  .add(note("<0 12>/32"))
+  .release(2).gain("[.5 1.2]*2")
+  .s("gm_electric_guitar_muted")
+  .pan(cosine.slow(32)).mask("<1@32 0@16>")
+  .lpf(sine.range(500,8000).slow(17)).lpq(5).color('pink'),
+  // bass
+  note(wood.rootNotes(1)).s("gm_acoustic_bass")
+  .struct("x [x? x?]*2")
+  .sometimes(add(note("12")))
+  .release(.1).lpf(sine.range(800,1500).slow(31)).lpq(4)
+  .mask("<0@4 1@28>").color('salmon'),
+  // drums
+  stack(
+    s("[<bd*2 bd> <~ [~ bd?]>] bd").mask("<0@16 1@28>").gain("[.6 .2]*2 .5"),
+    s("~ <rim!32 sd!32>").mask("<0@16 1@16>")
+    .lastOf(8, x=>x.add.squeeze(speed(".8 1 2 4*2"))),
+    s("[~ hh]*2").end("<.5 .02>/32").release(.04).speed(.8)
+    .mask("<0@16 1@64>")
+    .gain(.4).off(1/8, x=>x.speed(.5).degradeBy(.8).gain(.2))
+  )
+  .room(.2).bank('RolandTR707')
+  .off(1/8, x=>x.speed(1.5).gain(.4).end(.2)
+  .lpf(perlin.range(1000,2000)))
+  .when("<0@56 1@8>", x=>x.hpf(1000)).color('steelblue'),
+  // chords
+  "0/4".off(1/2, add("2,4")).n()
+  .chop("<4 16>/16")
+  .s('gm_koto').almostNever(ply("2"))
+  .scale(bark)
+  .lpf(perlin.range(200,2000))
+  .gain(saw.range(.125,.75))
+  .room(.5).pan(sine.slow(32))
+  .lpf(perlin.range(200,2000)).lpq(8)
+  .mask("<0@32 1@40>").color('darkseagreen')
+).late("[0 0.02]*4")
+.reset("<x@15 x(<5 7 3 4>,8,<0 1 2>)>")

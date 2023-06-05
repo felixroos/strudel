@@ -1,0 +1,13 @@
+setcps(1.1)
+
+s("{bd ~ rim ~, ~ ~ hh}").bank('RolandTR909')
+  .chunk(4, fast(2))
+  .jux(rev)
+  .off(.25, mul(speed(.8)))
+  .superimpose(
+    x=>x.vowel("<a <e i>>/4").room(2).slow(2).late(.25).color("#00ff0050")
+  )
+  .lastOf(8, mul(speed(-2)))
+  .color("[#0000ff50 #ffff0020]*3")
+  .punchcard()
+

@@ -1,0 +1,13 @@
+let morseMap={a:13,b:3111,c:3131,d:311,e:1,f:1131,g:331,h:1111,i:11,j:1333,k:313,l:1311,m:33,n:31,o:333,p:1331,q:3313,r:131,s:111,t:3,u:113,v:1113,w:133,x:3113,y:3133,z:3311,0:33333,1:13333,2:11333,3:11133,4:11113,5:11111,6:31111,7:33111,8:31111,9:11111};
+let morse=p=>{const t=p.split(' ').map((p=>p.split('').map((p=>String(morseMap[p]).split('').map((p=>p+'1')).join(' '))).join(' 10 '))).join(' 70 ').split(' ').map((p=>[Number(p.split('')[0]),p.split('')[1]==='0'?silence:1]));return timeCat(...t)};
+
+stack(
+  stack(
+    s("bd").struct(morse('i').fast(2)),
+    s("hh").struct(morse('love').slow(2)),
+    s("rim").delay(.5)
+  ).bank('RolandTR808'),
+  note("<g1 <bb1 f1>>").struct(morse('you'))
+  .s('sawtooth').lpf(500).slow(26/16).legato(.5),
+  
+).slow(2)

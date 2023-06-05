@@ -1,0 +1,29 @@
+// froos - traffic flam
+
+addVoicings('hip', {
+  m11: ['2M 3m 4P 7m'],
+  '^7#11': ['3M 4A 5P 7M'],
+}, ['C4', 'C6'])
+
+stack(
+  stack(
+    "<Bbm11 A^7#11>/2".voicings('hip').note()
+    .s("gm_epiano1:2")
+    .arp("[<[0 1 2 3] [3 2 1 0]> ~@5]/2")
+    .release(2).late(.25).lpf(2000),
+    "<Bb1 A1>/2".note().s('gm_acoustic_bass'),
+    n("<0 2 3>(3,8)".off(1/8, add(4)))
+    .scale("<Bb4:minor A4:lydian>/2")
+    .s('gm_electric_guitar_jazz')
+    .decay(sine.range(.05, .2).slow(32)).sustain(0)
+    .delay(.5).lpf(sine.range(100,5000).slow(64))
+    .gain(.7).room(.5).pan(sine.range(0,1).slow(11))
+  ).add(perlin.range(0,.25).note()),
+  stack(
+    s("bd:1(3,8) rim").bank('RolandTR707').slow(2).room("<0 <.1 .6>>")
+    .when("<0@7 1>",x=>x.echoWith(3, .0625, (x,i) => x.speed(1+i*.24))),
+    s("rim*4").end(.05).bank('RolandTR808').speed(.8).room(.2)
+  )
+)
+  .late("[0 .05]*2")
+

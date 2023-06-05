@@ -1,0 +1,21 @@
+// froos - aquatic fungi
+
+stack(
+  s("bd*4, rim").bank('RolandTR707').slow(2).room("<0 <.1 .6>>")
+  .when("<0@7 1>",x=>x.echoWith(3, .0625, (x,i) => x.speed(1+i*.24))),
+  s("oh, [~ hh*2]*2,[~ rim]*4")
+  .end(saw.range(.001,.08).slow(8))
+  .bank('RolandTR808')
+  .jux(rev).gain(.8)
+  .rarely(ply(2))
+  .mul(speed("<1 <1.5 2>>/4".mul(.3)))
+  .lastOf(4,x=>x.mul(speed("2")))
+  .iter(4).reset("<x@5 x(5,8)>")
+  .off(2, x=>x.mul(speed(".5")).degradeBy(sine.slow(23)))
+  .almostNever(x=>x.crush("4")).room(.4)
+)
+.when("{0 1 0 0}%3", x=>x.lpf(500).lpq(8))
+.late(saw.range(0,"<3 2@8>/8").slow(4))  
+.fast(2.2)
+.color("[indigo | cyan | pink]*8")
+//.punchcard({fold:1}) // uncomment if you're cold
