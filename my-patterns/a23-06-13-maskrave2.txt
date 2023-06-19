@@ -1,0 +1,63 @@
+setcps(1)
+
+let chords = "<Am7 <Dm7 Ab7>>/4"
+let scales = "A4:minor"
+
+stack(
+  stack(
+    // chords stab
+    voicings('lefthand', chords).struct("~ [x <~!3 [~ x]>]")
+    .note().s("gm_epiano1:1").legato(.4).room(.2).gain(.5)
+    .delay("<0 .5:.1>").lpf(tri.range(500,8000).slow(32)),
+
+    // adlib
+    voicings('lefthand', chords).note()
+    .s("<gm_epiano1:1 gm_pizzicato_strings>/32")
+    .gain("<.5 1>/32")
+    .arp("[0 2 1 3](3,8)/4")
+    .outside(4, jux(rev))
+    .sometimes(add(note("12")))
+    .clip(1).release(.4)
+    .lpf(sine.range(200,2000).slow(8)).lpq(6)
+    .legato(.1)
+    .delay(.5)
+    .room(2)
+    .mask("<1!12 0!16>/4"),
+
+    // bass
+    note("<A1!4 <D2 D1>!4>").s("gm_synth_bass_2")
+    .add.squeeze(note("0 12"))
+    .apply(
+      cat(
+        x=>x.ply("<2!7 [2 4]>").late("<0 .125>"),
+        x=>x.struct("<[x@3 x@3 x@2] [~ x!2 ~]>")
+    ).slow(32))
+    .gain("[0.5 .8]*2")
+    .lpf(sine.range(200,2000).slow(8))
+    
+    .decay(rand.range(.1,.16)).sustain(0)
+    .lpq(6)
+    .add(note("0,.1")).legato(.5)
+    //.mask("<0!16 1!48>")
+    .gain(.5),
+
+    // adlib 2
+    n("[0 5 2 1](3,8)/2").scale(scales)
+    .add.squeeze(note("0 12"))
+    .legato(sine.range(.2,2).slow(16))
+    .s("piano").add(note("0,.1")).clip(1)
+    .lpf(perlin.range(100,2000)).lpq(4)
+    .delay(.5).gain(.2).pan(sine.slow(4))
+    .mask("<0!16 1!12>/4")
+  )
+  .add(note(perlin.range(0,.4))), // detune
+
+  // drums
+  stack(
+    s("[~ <hh:1 hh!3>]*2").end(rand.range(.05, .4)).room("<0 .1>").speed(perlin.range(.5,.6)).mask("<0!8 1!32>").gain(rand.range(.3,.5)).lpf(perlin.range(200,8000)),
+    s("bd*<2@3 4>").bank('RolandTR909').speed(.95).mask("<0!16 1!64>"),
+    s("~ <rim!3 rim*2>").bank('RolandTR909').delay(.25).mask("<0!16 1!48>"),
+    s("~ cp").off(1/4, x=>x.speed(1.2).gain(.25)).mul(gain(.8)).room(.25).mul(gain(.125)).mask("<0!12 1!32>")
+  ).mul(gain("[0.9 .5]*2"))
+)
+.hpf("<0!48 800!16>")

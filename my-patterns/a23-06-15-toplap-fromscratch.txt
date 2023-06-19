@@ -1,0 +1,35 @@
+let scales =  "<C:minor>/4"
+
+n("0 1 3 2"
+  .add.squeeze("0 [7 12]") // add into each n
+  .off(1/8, x=>x.add("7")) // add 7 to 1/8s delayed copy
+ ).slow(8)
+  .scale(scales)
+  .s("piano,gm_epiano1:1")
+  //.jux(rev) // stereo effect
+  .room(2) // reverb
+  .lpf(sine.range(200,2000).slow(8)) // cutoff modulation
+  .lpq(8) // resonance
+  .stack( // bass
+    n("0 0(3,8)") // (3,8) = euclidean rhythm
+    .scale(scales)
+    .sub(note(12)) // 1 oct lower
+    .s("sawtooth")
+    .add(note("0,.1")) // cheap chorus effect
+    .lpf(sine.range(300,2000).slow(16)) // cutoff modulation
+    .lpq(8)
+    //.hush()
+  )
+  .add(note(perlin.range(0,.5))) // pitch warble
+  .stack( // drums
+    stack(
+      s("bd(3,8)").bank("RolandTR909").slow(1),
+      s("[~ hh*2]*2").bank("RolandTR909").slow(2).end(.1).room("<0 .2>").gain(rand),
+      s("~ rim").delay("<0 .5:.125>")
+    ).off(1/8, x=>x.speed(1.5).gain(.25)) // ghost notes
+    //.jux(rev)
+    //.hpf(1000)
+    //.hush()
+  )
+  .reset("<x@7 x(5,8,<0 1>)>") // retrigger effect every 8th cycle
+  .punchcard({fold:0})

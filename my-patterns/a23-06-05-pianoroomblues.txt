@@ -1,19 +1,30 @@
 let chords = "<C Eb F Fm>/2"
 
+setcps(.75)
+
 stack(
   chords.voicings("triads").note()
-  .arp("0 1 [2,0] 1").legato(4)
-  .piano().gain(.8).color('cyan'),
+  .arp("0 1 [0,~ 2@8] 1").legato(4)
+  .piano().gain(saw).color('cyan')
+  .late(0.01),
+  
   chords.rootNotes(2).note()
-  .piano().ply(2).color('brown'),
+  .piano().ply(2).color('brown')
+  .gain(rand.range(.5,1))
+  .late(0.02),
+  
   n("<[4 3] 2 1 0 [-1 0] 1 2>*3")
   .scale("C5:blues")
   .piano()
   .legato(2)
   .pan(0)
   .mask("<0!12 0!32 1!32>")
-  .color('magenta'),
+  .color('magenta')
+  .gain(cosine.range(.5,1))
+  .late(0.03),
+  
   n("<0!3 [-1 0 -1] -2!8>*2")
+  .gain(sine)
   .scale("C6:blues")
   .delay(".8:.33")
   .piano().legato(4)
@@ -22,4 +33,7 @@ stack(
   .mul(gain(perlin.range(.5,1)))
   .mask("<0!12 1!34 0!30>")
   .color('yellow')
-).punchcard({vertical:1,fold:0})
+)
+  //.mul(gain(perlin.range(.9,1)))
+  .room(sine.range(.25,.5).slow(8))
+  .punchcard({vertical:1,fold:0})
