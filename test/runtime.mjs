@@ -177,6 +177,7 @@ evalScope(
     loadcsound,
     Clock: {}, // whatever
     setcps: id,
+    setcpm: id,
     // Tone,
   },
 );
