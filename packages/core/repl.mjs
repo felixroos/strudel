@@ -3,6 +3,7 @@ import { evaluate as _evaluate } from './evaluate.mjs';
 import { logger } from './logger.mjs';
 import { setTime } from './time.mjs';
 import { evalScope } from './evaluate.mjs';
+import { register } from './pattern.mjs';
 
 export function repl({
   interval,
@@ -34,11 +35,10 @@ export function repl({
     }
     try {
       await beforeEval?.({ code });
-      let { pattern } = await _evaluate(code, transpiler);
-
+      let { pattern, meta } = await _evaluate(code, transpiler);
       logger(`[eval] code updated`);
       setPattern(pattern, autostart);
-      afterEval?.({ code, pattern });
+      afterEval?.({ code, pattern, meta });
       return pattern;
     } catch (err) {
       // console.warn(`[repl] eval error: ${err.message}`);
@@ -50,10 +50,32 @@ export function repl({
   const start = () => scheduler.start();
   const pause = () => scheduler.pause();
   const setCps = (cps) => scheduler.setCps(cps);
+  const setCpm = (cpm) => scheduler.setCps(cpm / 60);
+
+  // the following functions use the cps value, which is why they are defined here..
+  const loopAt = register('loopAt', (cycles, pat) => {
+    return pat.loopAtCps(cycles, scheduler.cps);
+  });
+
+  const fit = register('fit', (pat) =>
+    pat.withHap((hap) =>
+      hap.withValue((v) => ({
+        ...v,
+        speed: scheduler.cps / hap.whole.duration, // overwrite speed completely?
+        unit: 'c',
+      })),
+    ),
+  );
+
   evalScope({
+    loopAt,
+    fit,
     setCps,
     setcps: setCps,
+    setCpm,
+    setcpm: setCpm,
   });
+
   return { scheduler, evaluate, start, stop, pause, setCps, setPattern };
 }
 

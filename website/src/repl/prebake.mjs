@@ -1,6 +1,7 @@
 import { Pattern, noteToMidi, valueToMidi } from '@strudel.cycles/core';
 import { registerSynthSounds, samples } from '@strudel.cycles/webaudio';
 import './piano.mjs';
+import './files.mjs';
 
 export async function prebake() {
   // https://archive.org/details/SalamanderGrandPianoV3
@@ -118,7 +119,7 @@ const maxPan = noteToMidi('C8');
 const panwidth = (pan, width) => pan * width + (1 - width) / 2;
 
 Pattern.prototype.piano = function () {
-  return this.clip(1)
+  return this.fmap((v) => ({ ...v, clip: v.clip ?? 1 })) // set clip if not already set..
     .s('piano')
     .release(0.1)
     .fmap((value) => {

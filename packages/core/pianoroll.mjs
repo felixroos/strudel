@@ -1,6 +1,6 @@
 /*
 pianoroll.mjs - <short description TODO>
-Copyright (C) 2022 Strudel contributors - see <https://github.com/tidalcycles/strudel/blob/main/packages/tone/pianoroll.mjs>
+Copyright (C) 2022 Strudel contributors - see <https://github.com/tidalcycles/strudel/blob/main/packages/core/pianoroll.mjs>
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details. You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
@@ -83,9 +83,9 @@ Pattern.prototype.pianoroll = function ({
         ctx.fillRect(0, 0, w, h);
       }
       const inFrame = (event) =>
-        (!hideNegative || event.whole.begin >= 0) && event.whole.begin <= t + to && event.whole.end >= t + from;
+        (!hideNegative || event.whole.begin >= 0) && event.whole.begin <= t + to && event.endClipped >= t + from;
       events.filter(inFrame).forEach((event) => {
-        const isActive = event.whole.begin <= t && event.whole.end > t;
+        const isActive = event.whole.begin <= t && event.endClipped > t;
         ctx.fillStyle = event.context?.color || inactive;
         ctx.strokeStyle = event.context?.color || active;
         ctx.globalAlpha = event.context.velocity ?? event.value?.gain ?? 1;
@@ -246,7 +246,7 @@ export function pianoroll({
   haps
     // .filter(inFrame)
     .forEach((event) => {
-      const isActive = event.whole.begin <= time && event.whole.end > time;
+      const isActive = event.whole.begin <= time && event.endClipped > time;
       const color = event.value?.color || event.context?.color;
       ctx.fillStyle = color || inactive;
       ctx.strokeStyle = color || active;

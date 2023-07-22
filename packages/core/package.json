@@ -1,6 +1,6 @@
 {
   "name": "@strudel.cycles/core",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "description": "Port of Tidal Cycles to JavaScript",
   "main": "index.mjs",
   "type": "module",
@@ -36,6 +36,6 @@
   "gitHead": "0e26d4e741500f5bae35b023608f062a794905c2",
   "devDependencies": {
     "vite": "^4.3.3",
-    "vitest": "^0.28.0"
+    "vitest": "^0.33.0"
   }
 }

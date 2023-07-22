@@ -472,44 +472,18 @@ export class Pattern {
   /**
    * Returns a new pattern with the given location information added to the
    * context of every hap.
-   * @param {Number} start
-   * @param {Number} end
+   * @param {Number} start start offset
+   * @param {Number} end end offset
    * @returns Pattern
    * @noAutocomplete
    */
-  withLocation(start, end) {
+  withLoc(start, end) {
     const location = {
-      start: { line: start[0], column: start[1], offset: start[2] },
-      end: { line: end[0], column: end[1], offset: end[2] },
+      start,
+      end,
     };
     return this.withContext((context) => {
       const locations = (context.locations || []).concat([location]);
-      return { ...context, locations };
-    });
-  }
-
-  withMiniLocation(start, end) {
-    const offset = {
-      start: { line: start[0], column: start[1], offset: start[2] },
-      end: { line: end[0], column: end[1], offset: end[2] },
-    };
-    return this.withContext((context) => {
-      let locations = context.locations || [];
-      locations = locations.map(({ start, end }) => {
-        const colOffset = start.line === 1 ? offset.start.column : 0;
-        return {
-          start: {
-            ...start,
-            line: start.line - 1 + (offset.start.line - 1) + 1,
-            column: start.column - 1 + colOffset,
-          },
-          end: {
-            ...end,
-            line: end.line - 1 + (offset.start.line - 1) + 1,
-            column: end.column - 1 + colOffset,
-          },
-        };
-      });
       return { ...context, locations };
     });
   }
@@ -2065,7 +2039,7 @@ export const jux = register('jux', function (func, pat) {
  * @example
  * "<0 [2 4]>"
  * .echoWith(4, 1/8, (p,n) => p.add(n*2))
- * .scale('C minor').note().legato(.2)
+ * .scale('C minor').note().clip(.2)
  */
 export const { echoWith, echowith, stutWith, stutwith } = register(
   ['echoWith', 'echowith', 'stutWith', 'stutwith'],
@@ -2215,6 +2189,7 @@ export const velocity = register('velocity', function (velocity, pat) {
 /**
  *
  * Multiplies the hap duration with the given factor.
+ * With samples, `clip` might be a better function to use ([more info](https://github.com/tidalcycles/strudel/pull/598))
  * @name legato
  * @memberof Pattern
  * @example
@@ -2277,17 +2252,21 @@ const _loopAt = function (factor, pat, cps = 1) {
     .slow(factor);
 };
 
-/*
+/**
  * Chops samples into the given number of slices, triggering those slices with a given pattern of slice numbers.
+ * Instead of a number, it also accepts a list of numbers from 0 to 1 to slice at specific points.
  * @name slice
  * @memberof Pattern
  * @returns Pattern
  * @example
  * await samples('github:tidalcycles/Dirt-Samples/master')
  * s("breaks165").slice(8, "0 1 <2 2*2> 3 [4 0] 5 6 7".every(3, rev)).slow(1.5)
+ * @example
+ * await samples('github:tidalcycles/Dirt-Samples/master')
+ * s("breaks125/2").fit().slice([0,.25,.5,.75], "0 1 1 <2 3>")
  */
 
-const slice = register(
+export const slice = register(
   'slice',
   function (npat, ipat, opat) {
     return npat.innerBind((n) =>
@@ -2295,9 +2274,9 @@ const slice = register(
         opat.outerBind((o) => {
           // If it's not an object, assume it's a string and make it a 's' control parameter
           o = o instanceof Object ? o : { s: o };
-          // Remember we must stay pure and avoid editing the object directly
-          const toAdd = { begin: i / n, end: (i + 1) / n, _slices: n };
-          return pure({ ...toAdd, ...o });
+          const begin = Array.isArray(n) ? n[i] : i / n;
+          const end = Array.isArray(n) ? n[i + 1] : (i + 1) / n;
+          return pure({ begin, end, _slices: n, ...o });
         }),
       ),
     );
@@ -2315,7 +2294,7 @@ const slice = register(
  * s("breaks165").splice(8,  "0 1 [2 3 0]@2 3 0@2 7").hurry(0.65)
  */
 
-const splice = register(
+export const splice = register(
   'splice',
   function (npat, ipat, opat) {
     const sliced = slice(npat, ipat, opat);
@@ -2332,9 +2311,25 @@ const splice = register(
   false, // turns off auto-patternification
 );
 
-const { loopAt, loopat } = register(['loopAt', 'loopat'], function (factor, pat) {
+// this function will be redefined in repl.mjs to use the correct cps value.
+// It is still here to work in cases where repl.mjs is not used
+
+export const { loopAt, loopat } = register(['loopAt', 'loopat'], function (factor, pat) {
   return _loopAt(factor, pat, 1);
 });
+
+// this function will be redefined in repl.mjs to use the correct cps value.
+// It is still here to work in cases where repl.mjs is not used
+
+export const fit = register('fit', (pat) =>
+  pat.withHap((hap) =>
+    hap.withValue((v) => ({
+      ...v,
+      speed: 1 / hap.whole.duration,
+      unit: 'c',
+    })),
+  ),
+);
 
 /**
  * Makes the sample fit the given number of cycles and cps value, by
@@ -2349,6 +2344,6 @@ const { loopAt, loopat } = register(['loopAt', 'loopat'], function (factor, pat)
  * s("rhodes").loopAtCps(4,1.5).cps(1.5)
  */
 // TODO - global cps clock
-const { loopAtCps, loopatcps } = register(['loopAtCps', 'loopatcps'], function (factor, cps, pat) {
+export const { loopAtCps, loopatcps } = register(['loopAtCps', 'loopatcps'], function (factor, cps, pat) {
   return _loopAt(factor, pat, cps);
 });
