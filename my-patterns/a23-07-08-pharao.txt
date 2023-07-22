@@ -1,0 +1,36 @@
+addVoicings('steps',{
+      m7: ['3 7 10 14', '10 14 15 19'],
+      '^7': ['4 7 11 14', '11 14 16 19' ],
+      '7': ['4 9 10 14', '10 14 16 19' ],
+      '7b9': ['4 8 10 14', '10 13 16 19' ]
+})
+
+
+"C5 A5 E5".rev().layer(
+  //x=>note(x).clip(.25).delay(".5:.1:.8"),
+  x=>chord("<Fm7 Cm7 Bbm7>").layer(
+    c=>c
+      .anchor(x).dict('steps')
+      .voicing()
+      //.ply(3)
+      .off(.2, x=>x.add(note(-12.1)).gain(.5))
+      .off(.1, x=>x.add(note(6.9)).gain(.25))
+      .arp("{0 2 3 4 5 6}%3")
+      .gain(sine.range(.6,1).fast(1.5))
+      .slow(2)
+      .clip(1)
+      .lpf(sine.range(400,600).slow(8)).lpq(20)
+      .room(2)
+      .delay(.5)
+      .ribbon("<4 7>",2)
+      .ply(3)
+      .palindrome()
+      .slow(3)
+      //.jux(rev)
+      .crush(12)
+      .mul(gain(.5))
+           ,
+    //x=>x.rootNotes(2).note().s("sawtooth").lpf(1000).clip(1).ply(3)
+  )
+).s('sawtooth').release(.2)
+  .punchcard({fold:1,vertical:1})

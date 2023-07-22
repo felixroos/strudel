@@ -1,0 +1,12 @@
+let chords = chord("<C^7 F^7 Eb^7 Ab^7>")
+stack(
+  n(run(12).slow(2))
+  .jux(x=>x.rev().late(.5))
+  .set(chords)
+  .offset("<0 1 2 1 0 -1 -2 -1>/2".add(1))
+  .voicing().clip(2)
+  .delay(.5).gain(sine.range(.25,1).fast(1.5)),
+  chords.rootNotes(2)
+).piano().add(note(perlin.range(0,.25)))
+  .mul(gain(saw.slow(32)))
+  .punchcard({fold:1})

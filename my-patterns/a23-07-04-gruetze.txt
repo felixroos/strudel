@@ -1,0 +1,13 @@
+let groß = "bd", schön = "sd", farbenfroh = "Dm7/2"
+
+stack(
+  //s(groß, schön).bank('RolandTR505'),
+  farbenfroh.voicings('guidetones').note().s("gm_epiano1:1")
+  .arp("[0 1]*2").sometimes(x=>x.add(note("12")))
+  .lastOf(4,fast(1.5)).often(x=>x.sub(note("12")))
+  .jux(x=>x.late(.125)).room(2).delay(.2)
+  .add(note("0,<12 24>"))
+  .add.mix(note("<0 2 1 [.9 .8 .7 .6 .5 .4 .3 .2 .1]>"))
+  .clip(0.1).release(.01).rev()
+).pianoroll({color:'white'})
+

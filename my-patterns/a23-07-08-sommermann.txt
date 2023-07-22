@@ -1,0 +1,36 @@
+addVoicings('steps',{
+      m7: ['3 7 10 14', '10 14 15 19'],
+      '^7': ['4 7 11 14', '11 14 16 19' ],
+      '7': ['4 9 10 14', '10 14 16 19' ],
+      '7b9': ['4 8 10 14', '10 13 16 19' ]
+})
+
+
+setcps(.9)
+
+let scales = "<F5:minor C5:minor Bb5:minor C5:mixolydian>/2"
+let chords = "<Fm7 Cm7 Bbm7 C7b9>/2"
+let melody = n("[0!3 2]/2").scale(scales).clip(.25).delay(".5:.1:.8")
+
+stack(
+  stack(
+    melody.lpf(800).s('square').release(.2).ds(".1:0").mask("<1!16 0!16>"),
+    anchor(melody)
+    .chord(chords)
+    .clip(.1).release(.1)
+    .ply("<2!3 [2 4]>").mask("<1 1 1 1 0 1 1 1>*4")
+    .dict('steps')
+    .voicing()
+    .lpf(500).lpq(8)
+    .s('piano').release(.2),
+    chords.rootNotes("<1 2 1 2>/2").note().s("sawtooth,square:0:.4").add(note("0,.02"))
+    .lpf(400).struct("x(<2 3>,8,<0 2>)").clip("<2 1>").lpq(8).mul(gain(.4)).mask("<0!8 1!32>")
+  ).add(note(perlin.range(0,.5).slow(2))),
+  s("bd(3,8,<0 1>),~ [rim ~],[~ [hh:0:.5@5 ~@2]]*2,<~!3 [~!3 ht]*2>").end(perlin.range(.14,.4))
+  .bank('RolandTR707')
+  .fit()
+  .off(.1, x=>x.mul(speed(1.5)).gain(.25).hpf(800).degradeBy(.3))
+  .room(.2).mask("<0!8 1!32>")
+  
+).fast(2/3).mul(gain(1)).late("[0 .022]*8")
+  .punchcard({fold:0,vertical:1})

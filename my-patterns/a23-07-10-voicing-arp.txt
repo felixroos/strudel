@@ -1,0 +1,14 @@
+stack(
+  note("<D2 G1 C2 A1>").s('gm_acoustic_bass')
+  .lpf(1000)
+  .ply(4),
+  n(run(12))
+  .chord("<Dm7 G7 C^7 A7b9>")
+  .anchor("F4")
+  .voicing()
+  .s('square').add(note("0,12.1")).lpf(1200).lpq(4)
+  .lpq(4)
+  .clip(.5).gain(.5).room(2)
+  .jux(rev)
+).delay(.25).room(.8).slow(2).add(note(perlin.range(0,.5)))
+.punchcard()

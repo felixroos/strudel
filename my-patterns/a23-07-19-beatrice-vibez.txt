@@ -1,0 +1,103 @@
+
+addVoicings('ireal', {
+  '^7': [
+    '1P 5P 7M 10M 12P', // 1 5 7 3 5
+    '3M 7M 9M 10M 13M', // 3 7 9 3 6 // Eb^7 aus autumn leaves
+    '3M 8P 10M 12P 14M', // 3 1 3 5 7
+    '5P 8P 10M 12M 14M', // 5 1 3 5 7
+    '5P 8P 10M 14M 17M', // 5 1 3 7 3
+    '7M 10M 13M 14M 16M', // 7 3 6 7 9 // Bb^7 aus autumn leaves
+    '7M 10M 13M 16M 17M', // 7 3 6 9 3 // Ab^7 aus twinbay
+  ],
+  m7: [
+    '1P 3m 5P 7m 10m', // 1 3 5 7 3
+    '1P 5P 7m 10m 11P', // 1 5 7 3 4  // Gm7 autumn leaves
+    '3m 7m 8P 10m 12P', // 3 7 1 3 4  // Fm7 autumn leaves
+    '3m 7m 8P 10m 12P', // 3 7 1 3 5
+    '3m 7m 8P 10m 14m', // 3 7 1 3 7
+    '5P 7m 8P 10m 14m', // 5 7 1 3 7
+    '5P 7m 9M 10m 14m', // 5 7 9 3 7 // Cm7 autumn leaves
+    '5P 8P 11P 14m 17m', // 5 1 4 7 3 // Cm7 autumn leaves
+    '5P 8P 10m 14m 17m', // 5 1 3 7 3
+    '7m 10m 12P 15P 17m', // 7 3 5 1 3
+    '7m 10m 12P 14m 15P', // 7 3 5 7 1
+  ],
+  m6: [
+    '3m 5P 6M 8P 9M', // 3 5 6 1 9 // Gm6 autumn leaves
+    '1P 3m 5P 6M 9M', // 1 5 6 3 4  // Gm6 autumn leaves
+    '3m 5P 6M 8P 9M', // 3 5 6 1 9 // Gm6 autumn leaves
+    '3m 5P 6M 8P 11P', // 3 5 6 1 11 // Gm6 autumn leaves
+    '1P 5P 6M 10m 11P', // 1 5 6 3 4  // Gm6 autumn leaves
+    '5P 8P 10m 13M 15P', // 5 1 3 6 1 // Cm6 solar
+    '1P 3m 5P 6M 8P', // 1 3 5 6 1 // Cm6 solar
+  ],
+  6: [
+    '3M 5P 9M 10M 13M', // 3 5 9 3 6 Eb6 aus twinbay
+  ],
+  7: [
+    '3M 7m 8P 10M 12P', // 3 7 1 3 5
+    '1P 7m 8P 10M 12P', // 1 7 1 3 5
+    '7m 10M 12P 14m 15P', // 7 3 5 7 1 // Bb7 aus twinbay
+    '7m 10M 12P 15P 17M', // 7 3 5 1 3 Ab7 aus twinbay
+    '3M 7m 10M 12P 15P', // 3 7 3 5 1 // C7 aus twinbay
+  ],
+  '^7#11': [
+    // manchmal / 3
+    '3M 7M 8P 10M 11A', // 3 7 1 3 11
+    '1P 5P 7M 10M 11A', // 1 5 7 3 11
+    '3M 7M 8P 11A 14M', // 3 7 1 11 7
+    '5P 8P 10M 11A 14M', // 5 1 3 11 7
+  ],
+  '7#11': [
+    '3M 7m 9M 11A 13M', // 3 7 9 11 6
+    '7m 10M 11A 13M 16M', // 7 3 #11 6 9 // Db7#11 aus twinbay
+  ],
+  m7b5: [
+    '5d 8P 10m 14m 17m', // 5 1 3 7 3
+    '3m 7m 8P 10m 12d', // 3 7 1 3 b5
+    // '7m 10m 11P 12d 14m', // 7 3 4 5 7 // Am7b5 autumn leaves
+    '7m 10m 12d 14m 15P', // 7 3 5 7 1 // Am7b5 autumn leaves
+  ],
+  '7b9': [
+    '7m 9m 10M 14m 15P', // 7 b9 3 7 1
+    '1P 3M 7m 9m 10M', // 1 3 7 9 3 // G7b9 twinbay
+  ],
+  '7b13': [
+    '3M 7m 8P 13m 14m', // 3 7 1 13 7 // D7b13 autumn leaves
+  ],
+});
+
+
+let beatrice = chord(`<
+F^7 Gb^7#11 F^7          Eb^7#11
+Dm7 Eb^7#11 [Dm7   Cm7]  Bbm7
+Am7 Bb^7    [Em7b5 A7b9] Dm7
+Gm7 Gb^7#11 Fm7          Gb^7#11
+>`)
+
+let chords = beatrice;
+
+setcps(.6)
+
+stack(
+  n(run(6).reset(chords)).clip(2).when("<0 1>/16",jux(rev))
+  
+  .set(chords)
+  //.set.squeeze(n("[0 1 2 3] ~@7.5").clip(32))
+  .superimpose(x=>x.set.out(n("{7 9 8 12 9}%3")).clip(.1).delay(.5).degrade())
+  .offset(0)
+  .dict('ireal')
+  .anchor("C5")
+  .voicing()
+  .s("gm_epiano1:1")//.lpf(500).lpq(8)
+  //.piano()
+  //.gain(rand.range(.4,.8))
+  ,
+  chords
+  .rootNotes(1)
+  .s('gm_acoustic_bass')
+  .struct("x*2")
+  .add.out(note("0 0").reset(chords))
+).room(.5)
+  .add(note(perlin.range(0,.25)))
+  .punchcard({fold:0})

@@ -1,0 +1,40 @@
+samples('github:tidalcycles/Dirt-Samples/master')
+
+let chords = "<Fm7 Bb7b9 Fm7 Bb7b9 Eb^7!4>/2"
+
+setcps(.8)
+
+stack(
+  stack(
+    // chord stabs
+    offset("<0 1 0 -1>")
+    .euclid(3,8)
+    .delay(".5:.125:.2")
+    .s("gm_epiano1")
+    .mask("<1 0>/8")
+    .late(0.03),
+
+    // wall of arpeggio
+    offset("<0 1 0 -1>".sub(3))
+    .set.squeeze(n(run(16)))
+    .jux(rev)
+    .clip(1)
+    .room(2).s("square")
+    .lpf(900).lpq(2)
+    .mask("<0 1>/8")
+  ).chord(chords).voicing(),
+
+  // bass
+  voicing(
+    n("[0 1 -2 -1]").outside(2,x=>x.euclidLegato(3,8))
+    .offset(-4)
+    .chord(chords)
+  )
+  .shape(.5)
+  .s("gm_acoustic_bass"),
+
+  // drums
+  s("breaks125/2").fit().cut(9),
+
+)
+.punchcard({fold:0})

@@ -1,0 +1,16 @@
+setcps(.5)
+
+stack(
+  s("bd(3,8)").color('#ff000080'),
+  s("rim(2,8)").color('#00ff0080'),
+  s("hh(5,8)").color('#0000ff80')
+).fast("<1 2>")
+  .jux(rev)
+  .spiral({
+    colorizeInactive:1,
+    cap:'butt',
+    fade:0,
+    thickness:100,
+    size:110,
+    steady:1.1
+  })

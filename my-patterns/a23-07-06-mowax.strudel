@@ -1,0 +1,19 @@
+await samples('~/music/wax') // yeeeehaaaa
+await samples('~/music/samples') // yeeeehaaaa
+
+setcps(.8)
+
+stack(
+  //s("loop2/4").fit().chop(8).degrade().delay(.5),
+  s("bassloop2:1/4").fit().gain(1.5).cut(1),//.chop(32).clip(.5).release(.1),
+  "~ <~ Bm>".voicings('triads').note().s("gm_epiano1").ds(".1:0").delay(.8).room(2).gain(2),
+  //s("~ <timeslie ~>").gain(4).clip(1).note("eb1"),
+  s("quincy_danger:<1 4>/16").clip(1).room(.5).gain(.5),
+  s("~ hornhit/8").note("d2").delay(".5:.25:.8").orbit(2),
+  //s("[~ midnight]*2").clip(1),
+  s("break2:8/4").fit().cut(2).gain(1.5),
+  s("bd,[~ hh*<1!7 2>]*2,~ rim").gain(.5).bank("RolandTR707"),
+  s("ooh:<0 1>/8").delay(".5:.5:.8").room(2).gain(1).late(.25)
+).reset("<x@15 x(5,8)>")
+  //.mul(gain(.5))
+  //.spiral({cap:'round',steady:1,thickness:75})

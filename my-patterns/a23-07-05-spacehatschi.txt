@@ -1,0 +1,31 @@
+// "spacehatschi" @by froos
+
+setcps(.75)
+
+n("<0 1 2>").s("<space>")
+  .off(1/4, x=>x.speed(.5).gain(.5))
+  .off(1/8, x=>x.speed(.25).gain(.25))
+  .chop("<4 8>").clip(.2).release(.1).delay(.5)
+  .lpf(perlin.range(500, 2000))
+  .gain("[0.25 1]*4")
+  .mask("<1!32 0!16>")
+  .stack(
+    n("0 4 <12 <11 13>> 2").scale("G:minor")
+    .ds(".4:0").s("gm_violin").gain(.75)
+    .add(note("0,12")).lpf(sine.range(500,2000).slow(2))
+    .chop(4).jux(rev).mask("<0!8 1!32>")
+  )
+  .stack(
+    stack(
+      s("<bd [~ bd ~ ~]>").gain(1.2).mask("<0!16 1!64>"),
+      s("~ rim"),
+      s("hh*<4 [4 8]>").gain(rand.range(.25,1)).room(.2).mask("<0!8 1!64>")
+    ).bank('RolandTR909').fast(2),
+    s("sawtooth").adsr(".05:.1:0:.1").ply("<4 [4 8]>")
+    .note("g1,<[g2] [g2 f2]>").add(note("0,.1"))
+    .gain(1.2).lpf(sine.range(500,1500).slow(16)).lpq(8)
+    .sometimesBy("0 .5@3", x=>x.add.squeeze(note("<12 12.25 12.5 12.75 13>*2")))
+    .mask("<0!32 1!32>")
+  ).slow("<2!32 1!64>")
+  //.color("<red green>")
+  //.spiral({colorizeInactive:1,cap:'round',steady:1})

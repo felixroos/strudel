@@ -1,0 +1,23 @@
+setcps(.95)
+
+stack(
+  // drums
+  stack(
+    s("bd*<2!3 [2 8]>").bank("RolandTR909"),
+    s("~ [cp:2,rim]").bank("AlesisSR16").mask("<0!16 1!64>"),
+    s("[hh:0:.25 <hh!7 oh>]*2").bank("AlesisSR16").mask("<0!8 1!32 0!32>"),
+    s("hh*8").gain(.4).when("1 0 0 1 0 0 1 0", x=>x.gain(1)).n("[0 1]*2")
+    .bank("EmuSP12").mask("<0!8 0!32 1!32>").cut(1)
+  ).room(.2)
+  .outside(8, lastOf(4, x=>x.hpf("1000")))
+  , // bass
+  n("<0 5 2 1>/2(<3!7 5>,8)").scale("G1:minor:pentatonic").s("square")
+  .add(note("0,.1")).lpf(400).lpq(3)
+  .off(1/8, x=>x.add(note(12)).degradeBy(.8))
+  , // chord
+  "~ Gm".voicings('triads').note().s("square")
+  .room(.5).delay("<0 .5:<.25 .125>:<.5 .8>>")
+  .decay(perlin.fast(1.1).range(.05,.2)).sustain(0)
+  .lpf(perlin.range(200,2000)).gain(.7).lpq(8).room(.6)
+  .mask("<1!32 0!16>")
+)

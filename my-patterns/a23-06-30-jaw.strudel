@@ -1,0 +1,23 @@
+await samples('~/music/drumbreaks-alle-84bpm')
+await samples('~/music/samples');
+
+setcps(.8)
+
+stack(
+stack(
+  s("bd [~@3 bd:0:.25?],~ sd").bank("cobra"),
+  s("hh:1*4").bank("vinyl").gain(rand.ribbon(8,2).range(.4,.8)).sustain(0).decay(perlin.range(.2,.05)),
+  s("drumbreaks-alle-84bpm:7/2").fit().cut(2).shape(.6)
+).mask("<0!16 1!32>"),
+  "<Dm7 Db^7 Cm7 Eb^7>/2".layer(
+    x=>x.voicings('lefthand').note().s("gm_epiano1:1")
+      .arp("[0 1 2 3 ~@30]*4").release(.5).gain("[.5 1]*2").mul(gain(0.8))
+    ,
+    x=>x.rootNotes(2).note().s("piano").clip(1).add.mix(note("0 <7 -5>")).mask("<0!8 1!32>").release(.4)
+  ).add(perlin.range(0,.25).note()),
+  n(irand(8).segment(4))
+  .s("jawharp").note("g3")
+  .room(.5).gain(.2)
+  .degradeBy(perlin.slow(4).range(0,.5)).delay(.25).mask("<0!16 1!32>")
+)
+.late("[0 .01]*2")

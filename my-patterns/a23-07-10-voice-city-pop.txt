@@ -1,0 +1,21 @@
+stack(
+  note("<D2 G1 C2 A1>").s('gm_acoustic_bass')
+  .lpf(1000)
+  .ply(4),
+  
+  offset(run(8).mul(-1))
+  //.n("<0 [0,1] 2 [0,3]>")
+  .chord("<Dm7 G7 C^7 A7b9>")
+  .anchor("E8,A9")
+  .voicing()
+  .s('square')
+  .add(note("0,12.1"))
+  .lpf(800)
+  .lpq(4)
+  .adsr(".1:.02:0")
+  .gain(.8).room(4)
+  .mul(gain(saw))
+  //.jux(rev)
+).delay(.25).room(.8).slow(2)//.add(note(perlin.range(0,.5)))
+  //.piano()
+.punchcard({fold:0,maxMidi:120})

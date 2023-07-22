@@ -1,0 +1,23 @@
+setcpm(96/2)
+
+stack(
+  stack(
+    s("bd [~@3 bd:0:.5?]").bank("RolandTR707"),
+    s("~ sd").bank("RolandTR707"),
+    s("<hh!8 oh>*8").gain("[.5 1]*4").bank("RolandTR505").release(0.05).clip(.1).mul(gain(.5))
+  ).late(.5).mask("<0!8 1!36>").early(.5),
+  n("[<0 0*<2 4>>]@2 ~ [~ 0]".add("<0 2 3 1>")).scale("A1:minor")
+  .sometimesBy("0 .5", add(note(12)))
+  .s("gm_acoustic_bass")
+  .add(note("0,.05"))
+  .lpf(800).lpq(4).crush(8).mask("<0!4 1!36>"),
+  "<Am7 [Dm7 <Bm7b5 Bb^7>]>/2".voicings('lefthand').note().s("piano")
+  .superimpose(
+    x=>x.arp(rand.range(0,3).round().segment(3))
+      .gain(sine.range(.5,1).fast(3))
+      .add(note(24))
+      .mask("<0!16 1!24>").room(.5).delay(.25)
+  ))
+  .late("[0 .016]*4")
+  .late(.5)
+  .pianoroll({fold:1,vertical:1,flipTime:1})

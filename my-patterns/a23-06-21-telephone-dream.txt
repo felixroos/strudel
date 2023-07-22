@@ -1,0 +1,31 @@
+// "Telephone Operators Dream #1"
+// @by froos
+
+register('additive', (v, pat) => {
+  v = Array.isArray(v) ? v : [v];
+  const [
+    partials = 8, // number of partials
+    attack = .01, // time between each partial
+    damp = .6,  // dampening per partial: 2^(-n*damp)
+    spread = 1 // partial spread factor (1=natural)
+  ] = v;
+  return pat.echoWith(
+    partials,
+    attack,
+    (x,n)=>x
+      .mul(freq(n+1*spread))
+      .gain(Math.pow(2, -n*damp))
+  )
+})
+
+
+"55" // 55Hz = A2
+.mul.mix("<1 4:3(3,8)>".ratio()) // 1 = fundamental, 4:3 = just fourth
+.freq()
+.s('sine')
+.additive("<16 8>/8    : <.01 .05 .5 .9>/6 : .3 :    <1 1.5 2 3>/4")
+//          ^ partials    ^ attack           ^ damp   ^ spread
+.mul(gain(.8))
+.pan(rand)
+.color('tomato')
+.pianoroll({vertical:1,fold:0,playheadColor:'tomato',playhead:.7})

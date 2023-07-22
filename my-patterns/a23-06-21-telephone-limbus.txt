@@ -1,0 +1,30 @@
+// "Telephone Limbus"
+// @by froos
+
+const walk = (n) => run(n).slow(n)
+
+setcps(.95)
+
+"55/4".div("<2 1.5>/32")
+.freq()
+.s("<sawtooth square>/64")
+.mul.mix(freq(walk("<20 40>/256").fast("<16 32 8 12>/32")))
+.mul(gain("[0.125 .6]*2"))
+.mul(freq("1,1.015"))
+.decay(sine.range(0.02,.2).slow(16))
+.sustain(0)
+.pan(rand.range(.25,.75))
+.lpf(sine.range(200,2000).slow(24)).lpq(sine.range(2,8).slow(14))
+.delay(perlin.range(.1,.5))
+.room(perlin.slow(1.1).range(.2,2))
+.stack(
+  s("bd*2, ~ rim, [~ hh]*2").bank("RolandTR909").speed(.8).room(.2)
+  .off(1/8, x=>x.speed(.5).gain(perlin.range(.1,.5)).hpf(perlin.slow(2).range(500,200)))
+  .mask("<0!16 1!64>")
+)
+.outside(8,lastOf(8, x=>x.hpf("1000")))
+.outside(4,lastOf(8, x=>x.lpf("600")))
+.color('tomato')
+//.coarse(8)
+//.crush(8)
+//.punchcard({vertical:1,fold:0,playheadColor:'tomato',playhead:.7})
