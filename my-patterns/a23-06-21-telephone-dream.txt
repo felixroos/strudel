@@ -1,4 +1,4 @@
-// "Telephone Operators Dream #1"
+// "Telephone Operators Dream 1"
 // @by froos
 
 register('additive', (v, pat) => {
