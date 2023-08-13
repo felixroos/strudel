@@ -1,4 +1,4 @@
-// froos - woodbark
+// "woodbark" @by froos
 
 addVoicings('water',{m7:['1P 5P 7m 2A','1P 5P 6A 2A','1P 7m 3m 5P','1P 7m 2A 5P','3m 7m 1P 5P','2A 1P 5P 6A','3m 1P 5P 7m','5P 1P 3m 6A','5P 1P 2A 7m','5P 3m 7m 1P','5P 3m 6A 1P','7m 3m 5P 1P','7m 5P 1P 2A'],m6:['1P 6M 3m 5P','1P 5P 6M 2A','1P 3m 6M 1P','1P 6M 2A 5P'],m9:['1P 7m 3m 5P 2M','1P 3m 7m 2M','1P 3m 6A 2M'],m11:['1P 7m 3m 4P','1P 7m 2A 4P','3m 7m 2M 4P'],'7b9':['1P 7m 3M 5P 1A','1P 7m 2m 3M','1P 3M 7m 1A','1P 3M 6A 1A']});
 

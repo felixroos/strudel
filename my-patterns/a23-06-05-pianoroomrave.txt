@@ -1,5 +1,5 @@
+// "crumbling dumplings" @by froos
 // https://strudel.tidalcycles.org/?MCc4-cDOwIdG
-// froos - crumbling dumplings
 
 let chords = "<Dm!7 <A!3 <F C>>>"
 

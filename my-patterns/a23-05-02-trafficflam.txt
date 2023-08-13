@@ -1,4 +1,4 @@
-// froos - traffic flam
+// "traffic flam" @by froos
 
 addVoicings('hip', {
   m11: ['2M 3m 4P 7m'],

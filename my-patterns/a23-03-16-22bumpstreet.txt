@@ -1,4 +1,4 @@
-// froos - "22 bump street", licensed with CC BY-NC-SA 4.0
+// "22 bump street" @by froos
 
 await samples('github:felixroos/samples/main')
 

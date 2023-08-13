@@ -1,4 +1,4 @@
-// froos - freakuency - 2023/03/29
+// "freakuency" @by froos
 
 setcps(.5)
 
