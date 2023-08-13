@@ -1,0 +1,66 @@
+// "mallet salad" @by froos
+
+await samples('github:tidalcycles/Dirt-Samples/master')
+
+setcpm(120/4)
+
+let chords = `<
+Cm9!4
+Fm11!4
+B^7#11!4
+E^7#11!2 A^7#11!2
+>`
+
+stack(
+  stack(
+  // chords
+  chord(chords)
+  .set.out(n("<0 1 2 <3 4>>*6").add("<0 1>"))
+  .jux(rev)
+  .clip(1).ds(".12:0").delay(".5:.125:.8")
+  .dict("ireal-ext")
+  .anchor("C5")
+  .sometimes(x=>x.offset(1))
+  .voicing()
+  .s("gm_epiano1:3")
+  .release(.2)
+  .gain(.6)
+  .room(.8).color('cyan')
+  //.struct("<x!3 x(3,8)>")
+  ,
+  n("<8 7 3 [4 5] 6>*2".add("<3 4>/8"))
+  .chord(chords)
+  .dict('ireal')
+  .voicing()
+  .s("sawtooth,square")
+  .jux(rev)
+  .add(note("0,.1"))
+  .ds(".1:0").ply(6)
+  .gain(saw).room(.5)
+  .lpf(400).lpq(4)
+  .color('magenta')
+  .mask("<0!2 1!32>")
+  ,
+    
+  // bass
+  chord(chords)
+  .rootNotes("1,2")
+  .struct("x*2")
+  .s("gm_acoustic_bass")
+  .gain(1)
+  .color('yellow')
+  .mask("<0!4 1!32>")
+  )
+  .add(note(perlin.range(0,.3)))
+  ,
+
+  // drums
+  n("[19 [~@1.9 19]]*2,[~ 4]*2 ,~@3 <~@3 [2@1.9 2]>")
+  .s('gretsch')
+  .gain("[.9 .6]*3").speed(.5).slow(2).room(1.5)
+  .rarely(x=>x.mul(speed("1,2")))
+  .off(1/8, x=>x.hpf(1000).degrade().speed("-2"))
+  .color('white').mask("<1!32 0!8>")
+  
+)
+//.punchcard({fold:1})

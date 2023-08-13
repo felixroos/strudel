@@ -1,0 +1,44 @@
+// "silver swamp" @by froos
+setcpm(90/2)
+
+//let chords = "<Dm7 G7 Eb^7 A7b9>"
+let chords = "<[Cm7 C7b13] Fm7 [F#7#11 F11] [Db^9@3 G7b9]>/2"
+
+stack(
+  stack(
+    s("<[bd@3 bd@2] ~ [~@3 bd@2] ~>*2")
+    .off(-1/10,x=>x.speed(.9).gain(.25).degrade())
+    ,
+    s("~ <rim!16 sd:[1 | 0]!16>").room("<0 .2>")
+    .rarely(x=>x.struct("~ [x@3 x@2]").end("~ [.8 .2]"))
+    .early("<0 .005>")
+    ,
+    s("<hh tb>/16")
+    .struct("[x@3 x@2]*2".lastOf(4,fast("1 2")))
+    .gain(saw.range(.2,.6)).room(.2)
+  ).bank('RolandTR707')
+  .when("<1!8 0!16 0!8>",x=>x.hpf(500).hpq(8))
+  ,
+  stack(
+    n("0,[1 3 2]")
+    .chord(chords).dict('ireal-ext')
+    .voicing()
+    .s("gm_epiano1:3").add(note(12))
+    .ds(".1:0").delay(".9:.1").room(1)
+    .mask("<0!16 1!32>"),
+    
+    chord(chords).dict('ireal-ext')
+    .voicing()
+    .s("gm_epiano2:0").attack(.2)
+    .lpf(perlin.range(500,8000))
+    .mask("<1!32 0!16>"),
+    
+    chord(chords).rootNotes("1,2").s('gm_acoustic_bass')
+    .struct("[x@3 x@2]*2")
+    .sometimesBy("0 .5",x=>x.add(note("12")))
+    .mask("<0!8 1!32>")
+  ).add(note(perlin.range(0,.25)))
+).reset("<x@15 x(5,8)>")
+.lastOf(16,x=>x.lpf(saw.range(500,2000)).lpq(8))
+
+//.punchcard({vertical:1,fold:0})

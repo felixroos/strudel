@@ -1,0 +1,66 @@
+// "molten montuno" @by froos
+
+let chords = arrange(
+  [16,"<Cm7!4 [Bb7 Ab^7 G7b9!2]@4>"],
+  [32,"<Dm!4 Em7b5!2 A7b9!2>"]
+).chord()
+
+stack(
+  stack(
+    
+    // pad
+    chords.dict('ireal-ext')
+    .set.mix(offset("<0!3 [1 2]>"))
+    .voicing()
+    .s('sawtooth').s("<sawtooth square triangle>*2")
+    .clip(.9).delay(.6).attack(.3).add(note("0,.1"))
+    .lpf(sine.range(300,800).slow(8)).lpq(8).gain(.4).pan(.4)
+    .mask("<1!32 0!16>")
+    //.hush()
+    ,
+    // bass
+    chords.rootNotes("1").s("sawtooth,triangle")
+    .lpf(perlin.range(400,600)).lpq(8).ply("<2 4>").late("<0 <.125 .25>>")
+    .sometimesBy("0 .5@3",x=>x.add(note("11.9")))
+    .attack(".02 .001@3").sustain(.2)
+    .clip(.5).shape(.5).add(note("0,.1")).gain(.5)
+    .late(.008)
+    .mask("<0!16 1!32>")
+    //.hush()
+    ,
+    // arpeggios
+    n(run(12).slow(4).sub("<0 1 2 3>"))
+    .set(chords).voicing()
+    .clip(sine.range(1,3).slow(16))
+    .add.squeeze(note("0 -12")).color('darkblue').room(.9)
+    .jux(rev).s("gm_epiano1:1")
+    .hpf(perlin.range(800,2000)).hpq(4)
+    .mask("<0!8 1!32 0!8>").pan(.6).gain(.5)
+    //.hush()
+    ,
+    // latin piano
+    n("<0 5 2 1>*<3 4>".add("<4 3>/64")).set(chords).voicing()
+    .clip(perlin.range(.4, .8))
+    .juxBy(.5,rev).s('piano').delay(.4)
+    .lpf(perlin.range(300,6000).slow(4)).lpq(8).room(.8)
+    .gain(rand.range(.4,.7))
+    .mask("<0!32 1!32>")
+    //.hush()  
+  )
+  .add(note(perlin.range(0,.4)))
+  ,
+  // drums
+  stack(
+    s("bd*<2!3 [2 4]>").bank('RolandTR909').speed(.8).gain(1.2),
+    s("~ rim:1").bank('RolandTR909').late(".005!3").speed("<.5 .95>/16").lastOf(8, ply("~ [2 4]")),
+    s("[~ hh*2]*2").bank('RolandTR909').gain(saw.range(.2,.6)).late(.003).mask("<1!32 0!16>")
+    .juxBy(.25, rev).end(sine.range(.06,.2).slow(16))
+    .release(.02).speed(.9)
+    .lpf(saw.range(1000,4000).slow(4)).room(.5)
+  )
+  .off(1/8,x=>x.mul(speed(.5)).gain(.25).degrade().hpf(300).mul(end(.5)))
+  .mask("<1!32 0!7 1>")
+  .late("[0 .003]*4")
+  
+)//.jux(rev)
+//.punchcard({fold:1})
