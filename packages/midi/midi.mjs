@@ -113,8 +113,8 @@ Pattern.prototype.midi = function (output) {
     const velocity = hap.context?.velocity ?? 0.9; // TODO: refactor velocity
     const duration = hap.duration.valueOf() * 1000 - 5;
 
-    if (note) {
-      const midiNumber = noteToMidi(note);
+    if (note != null) {
+      const midiNumber = typeof note === 'number' ? note : noteToMidi(note);
       device.playNote(midiNumber, midichan, {
         time,
         duration,
