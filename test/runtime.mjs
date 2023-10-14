@@ -4,7 +4,7 @@
 
 // import * as tunes from './tunes.mjs';
 import { evaluate } from '@strudel.cycles/transpiler';
-import { evalScope } from '@strudel.cycles/core';
+import { evalScope, pure } from '@strudel.cycles/core';
 import * as strudel from '@strudel.cycles/core';
 import * as webaudio from '@strudel.cycles/webaudio';
 import controls from '@strudel.cycles/core/controls.mjs';
@@ -123,7 +123,12 @@ strudel.Pattern.prototype.tune = function () {
 strudel.Pattern.prototype.midi = function () {
   return this;
 };
-
+strudel.Pattern.prototype.theme = function () {
+  return this;
+};
+strudel.Pattern.prototype.fontFamily = function () {
+  return this;
+};
 const uiHelpersMocked = {
   backgroundImage: id,
 };
@@ -178,6 +183,15 @@ evalScope(
     Clock: {}, // whatever
     setcps: id,
     setcpm: id,
+    sliderWithID: () => pure(0),
+    AudioContext: class {
+      constructor() {
+        console.log('new AudioContext');
+        this.audioWorklet = {
+          addModule: id,
+        };
+      }
+    },
     // Tone,
   },
 );
