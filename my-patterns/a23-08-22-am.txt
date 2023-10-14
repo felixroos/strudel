@@ -9,7 +9,7 @@ stack(
   ,
   s("bd*2,~ rim, hh*4").fit()
 )
-  .ami(.8).set(amh("5 <10 [10 20]>"))
+  //.ami(.8).set(amh("5 <10 [10 20]>"))
   //.shape(.5)
   //.delay(.5)
   .room(1)
