@@ -5,15 +5,7 @@ This program is free software: you can redistribute it and/or modify it under th
 */
 
 import { cleanupDraw, cleanupUi, controls, evalScope, getDrawContext, logger } from '@strudel.cycles/core';
-import {
-  CodeMirror,
-  cx,
-  flash,
-  useHighlighting,
-  useStrudel,
-  useKeydown,
-  updateMiniLocations,
-} from '@strudel.cycles/react';
+import { CodeMirror, cx, flash, useHighlighting, useStrudel, useKeydown } from '@strudel.cycles/react';
 import { getAudioContext, initAudioOnFirstClick, resetLoadedSounds, webaudioOutput } from '@strudel.cycles/webaudio';
 import { createClient } from '@supabase/supabase-js';
 import { nanoid } from 'nanoid';
@@ -28,6 +20,9 @@ import { themes } from './themes.mjs';
 import { settingsMap, useSettings, setLatestCode } from '../settings.mjs';
 import Loader from './Loader';
 import { settingPatterns } from '../settings.mjs';
+import { code2hash, hash2code } from './helpers.mjs';
+import { isTauri } from '../tauri.mjs';
+import { useWidgets } from '@strudel.cycles/react/src/hooks/useWidgets.mjs';
 
 const { latestCode } = settingsMap.get();
 
@@ -39,18 +34,27 @@ const supabase = createClient(
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpZHhkc3hwaGxoempuem1pZnRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NTYyMzA1NTYsImV4cCI6MTk3MTgwNjU1Nn0.bqlw7802fsWRnqU5BLYtmXk_k-D1VFmbkHMywWc15NM',
 );
 
-const modules = [
+let modules = [
   import('@strudel.cycles/core'),
   import('@strudel.cycles/tonal'),
   import('@strudel.cycles/mini'),
-  import('@strudel.cycles/midi'),
   import('@strudel.cycles/xen'),
   import('@strudel.cycles/webaudio'),
-  import('@strudel.cycles/osc'),
+  import('@strudel/codemirror'),
+
   import('@strudel.cycles/serial'),
   import('@strudel.cycles/soundfonts'),
   import('@strudel.cycles/csound'),
 ];
+if (isTauri()) {
+  modules = modules.concat([
+    import('@strudel/desktopbridge/loggerbridge.mjs'),
+    import('@strudel/desktopbridge/midibridge.mjs'),
+    import('@strudel/desktopbridge/oscbridge.mjs'),
+  ]);
+} else {
+  modules = modules.concat([import('@strudel.cycles/midi'), import('@strudel.cycles/osc')]);
+}
 
 const modulesLoading = evalScope(
   controls, // sadly, this cannot be exported from core direclty
@@ -73,11 +77,11 @@ async function initCode() {
   try {
     const initialUrl = window.location.href;
     const hash = initialUrl.split('?')[1]?.split('#')?.[0];
-    const codeParam = window.location.href.split('#')[1];
+    const codeParam = window.location.href.split('#')[1] || '';
     // looking like https://strudel.tidalcycles.org/?J01s5i1J0200 (fixed hash length)
     if (codeParam) {
       // looking like https://strudel.tidalcycles.org/#ImMzIGUzIg%3D%3D (hash length depends on code length)
-      return atob(decodeURIComponent(codeParam || ''));
+      return hash2code(codeParam);
     } else if (hash) {
       return supabase
         .from('code')
@@ -122,8 +126,11 @@ export function Repl({ embedded = false }) {
     isLineNumbersDisplayed,
     isAutoCompletionEnabled,
     isLineWrappingEnabled,
+    panelPosition,
   } = useSettings();
 
+  const paintOptions = useMemo(() => ({ fontFamily }), [fontFamily]);
+  const { setWidgets } = useWidgets(view);
   const { code, setCode, scheduler, evaluate, activateCode, isDirty, activeCode, pattern, started, stop, error } =
     useStrudel({
       initialCode: '// LOADING...',
@@ -137,15 +144,25 @@ export function Repl({ embedded = false }) {
       },
       afterEval: ({ code, meta }) => {
         setMiniLocations(meta.miniLocations);
+        setWidgets(meta.widgets);
         setPending(false);
         setLatestCode(code);
-        window.location.hash = '#' + encodeURIComponent(btoa(code));
+        window.location.hash = '#' + code2hash(code);
       },
       onEvalError: (err) => {
         setPending(false);
       },
-      onToggle: (play) => !play && cleanupDraw(false),
+      onToggle: (play) => {
+        if (!play) {
+          cleanupDraw(false);
+          window.postMessage('strudel-stop');
+        } else {
+          window.postMessage('strudel-start');
+        }
+      },
       drawContext,
+      // drawTime: [0, 6],
+      paintOptions,
     });
 
   // init code
@@ -205,7 +222,7 @@ export function Repl({ embedded = false }) {
   const handleChangeCode = useCallback(
     (c) => {
       setCode(c);
-      started && logger('[edit] code changed. hit ctrl+enter to update');
+      //started && logger('[edit] code changed. hit ctrl+enter to update');
     },
     [started],
   );
@@ -289,30 +306,12 @@ export function Repl({ embedded = false }) {
     <ReplContext.Provider value={context}>
       <div
         className={cx(
-          'h-full flex flex-col',
-          //        'bg-gradient-to-t from-green-900 to-slate-900', //
+          'h-full flex flex-col relative',
+          // overflow-hidden
         )}
       >
         <Loader active={pending} />
         <Header context={context} />
-        <section className="grow flex text-gray-100 relative overflow-auto cursor-text pb-0" id="code">
-          <CodeMirror
-            theme={currentTheme}
-            value={code}
-            keybindings={keybindings}
-            isLineNumbersDisplayed={isLineNumbersDisplayed}
-            isAutoCompletionEnabled={isAutoCompletionEnabled}
-            isLineWrappingEnabled={isLineWrappingEnabled}
-            fontSize={fontSize}
-            fontFamily={fontFamily}
-            onChange={handleChangeCode}
-            onViewChanged={handleViewChanged}
-            onSelectionChange={handleSelectionChange}
-          />
-        </section>
-        {error && (
-          <div className="text-red-500 p-4 bg-lineHighlight animate-pulse">{error.message || 'Unknown Error :-/'}</div>
-        )}
         {isEmbedded && !started && (
           <button
             onClick={() => handleTogglePlay()}
@@ -322,7 +321,28 @@ export function Repl({ embedded = false }) {
             <span>play</span>
           </button>
         )}
-        {!isEmbedded && <Footer context={context} />}
+        <div className="grow flex relative overflow-hidden">
+          <section className="text-gray-100 cursor-text pb-0 overflow-auto grow" id="code">
+            <CodeMirror
+              theme={currentTheme}
+              value={code}
+              keybindings={keybindings}
+              isLineNumbersDisplayed={isLineNumbersDisplayed}
+              isAutoCompletionEnabled={isAutoCompletionEnabled}
+              isLineWrappingEnabled={isLineWrappingEnabled}
+              fontSize={fontSize}
+              fontFamily={fontFamily}
+              onChange={handleChangeCode}
+              onViewChanged={handleViewChanged}
+              onSelectionChange={handleSelectionChange}
+            />
+          </section>
+          {panelPosition === 'right' && !isEmbedded && <Footer context={context} />}
+        </div>
+        {error && (
+          <div className="text-red-500 p-4 bg-lineHighlight animate-pulse">{error.message || 'Unknown Error :-/'}</div>
+        )}
+        {panelPosition === 'bottom' && !isEmbedded && <Footer context={context} />}
       </div>
     </ReplContext.Provider>
   );
