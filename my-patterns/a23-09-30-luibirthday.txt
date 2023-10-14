@@ -1,0 +1,58 @@
+// HAPPY BIRTHDAYYYYYYYYYYYYYYYYYY
+const chrds = `F@3 C@6 F@6 Bb@3 F@2 C F@3`.slow(8);
+
+stack(
+  // melody
+`d c f 
+e@2 [c@2 c] d c g 
+f@2 [c@2 c] 
+c4 a f 
+e d [bb@2 bb] 
+a f g 
+f@2 [c@2 c]`.slow(8)
+  .note()
+  .s("sawtooth")
+  .lpf(600)
+  .lpenv(-6)
+  .lpa(.1)
+  .add(note("12,11.9"))
+  .delay(".25:.16:.8")
+  .room(0.5)
+  .gain(slider(1))
+  ,
+  // chords
+chord(chrds)
+  .anchor("G4")
+  .struct("x*3")
+  .voicing()
+  .s("square")
+  .lpf(600)
+  .lpenv(4)
+  .lpa(.1)
+  .gain("[0.2 .4@2]*3")
+  .segment(9)
+  .ds(".1:0")
+  .room(0.5)
+  .mul(gain(slider(1))),
+  // bass
+n("2 ~ [~@2 2]@2 <1 0> ~")
+  .chord(chrds)
+  .anchor(chrds.rootNotes(2))
+  .voicing()
+  .s("sawtooth")
+  .lpf(300)
+  .lpenv(-4)
+  .lpa(.1)
+  .gain(2)
+  .color('blue')
+  .mul(gain(slider(1))),
+  // drums
+  stack(
+    s("[bd@2 bd] rim [~@2 bd?]").rarely(ply("2")),
+    s("hh*9").gain(perlin.range(.1,.5).fast(8))
+  ).bank('RolandTR505')
+  .mul(gain(slider(1)))
+              
+)
+  .late(1/3)
+  .cpm(120/4)

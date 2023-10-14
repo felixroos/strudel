@@ -1,0 +1,317 @@
+
+/*
+        *     .     *   .  
+   
+   
+    . 
+    *  .   *    
+
+*/
+
+/*n(run(8)).chord("<Dm Am>/2").voicing()
+  .fast("<1!3 2>")*/
+
+stack(
+  arrange(
+    [32, note("<c d eb f>(3,8)")],
+    [8, note("<eb g bb f>(2,8)")],
+  )
+  .outside(4,lastOf(4,rev))
+  .off(1/8, x=>x.add(note("<12 24>")).degrade())
+  
+  .rarely(x=>x.add.squeeze(note("0 12 24")))
+  
+  .sub(note(12))
+  .add(note(1)) // tune!
+  //.add(note("<0 1 2 1>/16"))
+  .slow(2)
+  .midichan(13)
+  .midi('Steinberg UR22mkII')
+  ,
+
+  // exciter
+  // note("<c g c2>(5,8)")
+  note("c1(<3!3 5>,8,<0 1>)")
+  .sometimes(sub(note("12")))
+  .degradeBy("0 .5@3")
+  .velocity(".25 .5 .75 1")
+  .midichan(11)
+  .midi('Steinberg UR22mkII')
+  ,
+  note("c1")
+  .midichan(12)
+  .midi('Steinberg UR22mkII')
+  ,
+
+  
+
+  /*
+  s("[bd hh rim hh*<1 3>]*2")
+  //.lastOf(4, fast(2))
+  .bank('RolandTR909')
+  */
+  
+  
+  s("<bd ~ bd ~ rim>*2,rd/2:0:.0")
+  .bank('RolandTR909')
+  .speed(.8)
+  //.end(rand)
+  .rarely(x=>x.mul.squeeze(speed(run("<4 8>").add(1))))
+  
+  
+  //.sometimes(x=>x.set.mix(vowel("[a e i o]*2")))
+  //.sometimes(mul(speed("-2")))
+  
+  
+)
+  //.fontFamily('teletext')
+  //.fontFamily('galactico')
+  //.fontSize(32)
+  .color('cyan')
+  .punchcard({vertical:1,fold:0,labels:1,fill:0})
+
+
+
+
+
+
+stack(
+  
+  
+  "0 1 <2 3>"
+  .add.squeeze("<0 <0 1 -1>>")
+  .n()
+  .set.squeeze(offset("<-2 [-1 [0 1]] -2 -3>/8"))
+  .chord("<C^7 <F^7>>/8").voicing()
+  
+  .layer(
+    x=>x
+      .slow(2).set.mix(note("<c2 d2 e2 f2 g2 a2>"))
+      .clip(1)
+      .sometimes(add(note("3")))
+      .ply("<<2!3 4> 1>").slow(2)
+      .midichan(11).midi('Steinberg UR22mkII'),
+    x=>x.sometimes(ply("2")).rarely(add(note("12")))
+      .slow(1)
+      .midichan(13).midi('Steinberg UR22mkII')
+  )
+  ,
+  n(run(8))
+  .s("east")
+  //.degradeBy(.125)
+  .gain(.5)
+  .sometimes(x=>x.speed(".75 | 1.5"))
+  .iter(4)
+  .room(1)
+  .slow(2)
+  .sometimes(ply(2))
+  .gain(.75)
+  .mul(gain(rand.range(.5,1)))
+  ,
+  
+  n("<0 1 2 3>/2".add(2))
+  .s("balafon(3,8), tambourine:0:.5*2")
+  .end(.25)
+  .speed(perlin.range(.6,1))
+  .mul(speed("1,1.1"))
+  .add.squeeze(n("0 1 2"))
+  .rarely(x=>x.mul.squeeze(speed("1 2 3")))
+  .delay(.5)
+  .room(1.5)
+  .gain(.5)
+  .mul(gain(1.5))
+  .degradeBy(.75)
+  //.chop(2)
+
+  ,
+
+  
+  note("c1*3")
+  .midichan(12)
+  .midi('Steinberg UR22mkII')
+  
+)
+
+  //.sometimes(speed(-1))
+
+
+ n(run(8))
+  .s("east")
+  //.degradeBy(.125)
+  .gain(.5)
+  .sometimes(x=>x.speed(".75 | 1.5"))
+  .iter(4)
+  .room(1)
+  .slow(2)
+  .sometimes(ply(2))
+  .gain(.75)
+  .mul(gain(rand.range(.5,1)))
+
+
+
+
+
+
+
+
+stack(
+  n(run("<4 [4 3]>"))
+  .sometimes(ply(2))
+  .mul(gain(rand.range(.5,1)))
+  .iter(4)
+  .end(perlin.range(.1,.4))
+  .sometimes(x=>x.speed(".75 | 1.5"))
+  .room(.5)
+  .degradeBy(.15)
+  .s("east(3,8)")
+  .juxBy(.5, rev)
+  .gain(2)
+  .hush()
+  
+  ,
+
+  n(2).s("<space? insect? gm_telephone?>")
+  .clip(1).degrade().room(.5).delay(.5)
+  .hush()
+  ,
+
+  s("bd*2,<~!3 [~ cp]>")
+  .bank('RolandTR909')
+  .lpf(1000).lpq(4)
+  .gain(8)
+  //.hpf(1000)
+  //.shape(.75)
+  .hush()
+  ,
+  
+  s("bd(3,8,<0 1>)/4,~ rim, [~ hh*<2!3 1>], ~ misc?,<mt mt>*2?")
+  .bank('ViscoSpaceDrum')
+  .sometimesBy(.5, fast("2"))
+  .rarely(x=>x.speed("-2"))
+  .ply("<1!4 2>")
+  .room(.5)
+  .lpf(8000).lpq(12).shape(.75)
+  .degradeBy(.1)
+  .hush()
+  ,
+  
+
+  n(run(12)).chord("<Cm>/8")
+  .voicing()
+  .jux(rev).s("piano")
+  .clip(2)
+  .gain(0.75).slow(2)
+  .add(note(perlin.range(0,.5)))
+  .lpf(sine.range(3000,8000).slow(5)).lpq(8)
+  .mask("<0!7 1>")
+  .ds(".1:0")
+  .delay(".5:.1:.8")
+  .room(2)
+  .hush()
+  ,
+  
+  //note("<c [eb g] f>*2")
+  n("<3@3 2 ~ [1@3 0]>".outside(4,rev))
+  .chord("<Cm>/8")
+  .voicing()
+  .sub(note(12))
+  .ply(8)
+  .velocity(rand.range(.5,1))
+  .clip(perlin.range(.25,1))
+  .layer(
+    x=>x
+      //.degradeBy(perlin.range(.25,.75))
+      .midichan(11).midi('Steinberg UR22mkII'),
+    x=>x
+      .slow(2)
+      .sub(note(0))
+      //.ribbon(4, 2)
+      .midichan(13).midi('Steinberg UR22mkII')
+  )
+
+)
+
+
+//n("<[1@3 3@2] ~ [~@3 2@2]>*2")
+  n("<1 3 4 [2 3]>*2")
+  
+  .layer(
+    x=>x
+      .scale("F1:minor")
+      .slow(16).decay(.1).sustain(0)
+      .s("gm_acoustic_bass")
+      .gain(.75).delay(".5:.125:.8").orbit(2)
+      .lpf(1000).lpq(8)
+      
+      //.hush()
+    ,
+    x=>x
+      .sub(n("<0 1 2>/8"))
+      .scale("<F:major>/8")
+      .s("<gm_whistle gm_flute:1>")
+      
+      .slow(4)
+      //.s("gm_electric_guitar_muted")
+      .add(note(12)).delay(".5:.25:.9")
+      .off(1/4, x=>x.add(note(12)).degrade())
+      .color('red')
+      .lpf(sine.range(200,8000).slow(32)).lpq(4)
+      .degrade()
+      .gain(.125).room(2)
+    //.hush()
+    ,
+    
+    x=>x // 
+      .scale("<F:major>/8")
+      .iter(4)
+      .slow(4)
+      .color('green')
+      .sometimes(add(note("12")))
+      .rarely(ply("2"))
+      //.degradeBy(perlin.range(.25,.75))
+      .midichan(11).midi('Steinberg UR22mkII')
+    ,
+    
+    x=>x // ring
+      .scale("<F:major>/8")
+      .iter(4)
+      .slow("3")
+      //.sometimes(ply("2"))
+      //.ply("<2 3>")
+      .add.squeeze(note("<0 12>*<2!3 1>".add(0)))
+      .color('orange')
+      .sub(note(12))
+      //.ribbon(4, 2)
+      .midichan(13).midi('Steinberg UR22mkII')
+    
+  )
+.stack(
+  n(run("<4>").add("<0>"))
+  .slow(4)
+  .s("east")
+  .sometimes(ply("2"))
+  .juxBy(.5, rev)
+  //.degradeBy(.5)
+  .gain(.5)
+  .shape(.25)
+  .off(-1/16,x=>x.speed(2).gain(.25))
+  .late(.5).early(1/32)
+  .lpf(800).room(1).ds(".05:0")
+  .note("<c eb f>*2")
+  .mul(gain(.5))
+  
+  //.bpf(sine.range(1000,4000).slow(8)).bpq(8)
+)
+//.pan(0)
+    
+//.fontFamily('galactico')
+.fontFamily('teletext')
+  
+//.punchcard({labels:1,smear:.5,vertical:1})
+.spiral({size:250,cap:'round',thickness:120,steady:0.9})
+
+
+
+
+
+

@@ -1,0 +1,32 @@
+let state = (id, init) => {
+  id = 'strudel-state_'+id;
+  window[id] = window[id] ?? init;
+  let getter = () => window[id];
+  let _ref = ref(getter);
+  _ref.get = getter;
+  _ref.update = (next) => {
+    if(typeof next === 'function') {
+      window[id] = next(window[id])
+    } else {
+      window[id] = next
+    }
+    return _ref;
+  }
+  return _ref;
+}
+
+///
+
+let speedFactor = state('speed', 1)
+
+document.onkeydown = (e) => speedFactor.update(s=>s*-1)
+
+stack(
+  s("bd rim,hh*4"),
+  s("hh").fast("<1 <2 4> 1.5>*2").fit()
+  .delay(.4)
+)
+.speed(speedFactor.mul(-2))
+.room(.5)
+.gain(.8)
+//.jux(rev)

@@ -1,0 +1,8 @@
+// demo of sliders with step: slider(value, min, max, step)
+run(slider(7,3,8,1)).n()
+  .offset(slider(0,0,4,1))
+  .jux(rev)
+  .chord("<Am7 Em7 Dm7 G7>/8").dict('ireal-ext').voicing()
+  .vib(4).vibmod(.5).fm(2).fmh(5.1).fmdecay(.1).fmsustain(0)
+  .lpf(saw.range(400,1000).slow(8)).lpenv(-2).lpa(.1)
+  .room(.5).delay(".25:.125:.8")

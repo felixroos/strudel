@@ -1,0 +1,11 @@
+stack(
+  n("<6 [5 4] 3 [5 6] 5>").s('sawtooth').clip(2).delay(.25),
+  n("[0,~ [1,2]]/2").s('sine').clip("<.5 1>/16")
+  ).lpf(sine.range(1000,2000).slow(32)).lpq(4)
+  .fmi(4).fmh(1/400)
+  .chord("<F Fm C Db>/2")
+  .voicing()
+  .add(note("0,.02"))
+  .ds(".1:.5")
+  .room(1)
+  .gain(.5)

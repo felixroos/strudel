@@ -1,0 +1,43 @@
+// seis8s patterns
+// https://iclc.toplap.org/2023/catalogue/workshop/live-coding-latin-dance-music-with-seis8s.html
+// https://seis8s.org/
+// https://github.com/luisnavarrodelangel/seis8s
+await samples('github:felixroos/estuary-samples/master')
+
+let teclado_tumbao = note("<d2@2 [f2,a2]@2 d2@3 d2@3 [e2,g2] c2@2 [e2,g2]@3>*8")
+
+
+const cumbia = {
+  bajo: [
+    note("<d2 [f2 a2] c2 [e2 g2]>*2"), // tumbao 0 $ cumbia bajo === cumbia bajo
+    note("<d2 a2 c2 g2>*2"), // tumbao 1 $ cumbia bajo
+    note("<d2 [a2 a1] c2 [g2 g1]>*2"), // tumbao 2 $ cumbia bajo
+    note("<d2 [a2 d3] c2 [g2 c3]>*2"), // tumbao 3 $ cumbia bajo
+    note("<d2 [a2 f2] c2 [g2 e2]>*2"), // tumbao 4 $ cumbia bajo
+    // tumbao >=5 plays tumbao 0
+  ], // tumbao 3 $ cumbia bajo
+  teclado: [
+    note("<[d2,f2,a2] [c2,e2,g2]>").late(.75),  // cumbia teclado
+    note("<[d2,f2,a2] [c2,e2,g2]>").late(0),  // acompañamiento 1 $ cumbia teclado
+    note("<[d2,f2,a2] [c2,e2,g2]>").late(.25),  // acompañamiento 2 $ cumbia teclado
+    note("<[d2,f2,a2] [c2,e2,g2]>").late(.5),  // acompañamiento 3 $ cumbia teclado
+    note("<[d2,f2,a2] [c2,e2,g2]>").late(.75),  // acompañamiento 4 $ cumbia teclado
+  ],
+  teclado_tumbao: [
+    teclado_tumbao, // tumbao 0 $ cumbia teclado;
+    teclado_tumbao.add(note(12)), // tumbao 1 $ cumbia teclado;
+  ] // tumbao n
+}
+
+/*
+// this like
+cumbia bajo;
+tumbao 0 $ cumbia teclado
+// in https://seis8s.org/
+*/
+
+stack(
+  cumbia.bajo[4].s("bajo").clip(1.2).n(0),
+  cumbia.teclado_tumbao[0].s("teclado").gain(.5).n(1).clip(1.2)
+).early(.11)
+

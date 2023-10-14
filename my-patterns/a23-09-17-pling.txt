@@ -1,0 +1,8 @@
+note("<c ab f eb>").ds(".2:0").sub(note(24))
+  .echoWith(8,.25,(x,n)=>x.add(note(n*12)))
+  .fm(perlin.range(2,8))
+  .lpf(sine.range(400,800).slow(16))
+  .lpenv(2).v(8)
+  .lpa(.001).lpd(.1)
+  .delay(".5:.1:.8")
+  .room(1)

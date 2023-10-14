@@ -1,0 +1,18 @@
+stack(
+  //n(run(8).sub(8)).
+  chord("<Fm <Cm C>>/2")
+  .layer(
+    x=>x.s('sawtooth').voicing().fm(6).fmh(1.009).attack(.5),
+    /*x=>x.set.out(n(run(4).sub(4))).s('sawtooth').voicing(),
+    x=>x.set.out(n("0 1 2 3")).voicing().s('piano').gain(1.2).clip(2)*/
+  )
+  ,
+  s("bd*2,~ rim, hh*4").fit()
+)
+  .ami(.8).set(amh("5 <10 [10 20]>"))
+  //.shape(.5)
+  //.delay(.5)
+  .room(1)
+  .mul(gain(.5))
+  .lpf(3000)
+//.fmi(saw.range(0,10).slow(10)).fmh(1)

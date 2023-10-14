@@ -1,0 +1,49 @@
+let fadeGain = (p,b) => p<.5?1:1-(p-.5)/.5
+
+let xfade = (a, pos, b) => {
+  pos = reify(pos);
+  a = reify(a)
+  b = reify(b)
+  let gaina = pos.fmap(v=>fadeGain(v)).gain();
+  let gainb = pos.fmap(v=>fadeGain(1-v)).gain();
+  return stack(
+    a.mul(gaina),
+    b.mul(gainb))
+}
+  
+
+// the prototype version is actually flipped so left/right makes sense
+Pattern.prototype.xfade = function(pos,b) {
+  return xfade(this,pos,b)
+}
+
+stack(
+  xfade(
+    s("sawtooth(3,8,<0@3 1>):0:.5").note(30)
+    .juxBy(slider(1),rev)
+    .lpenv(-3).lpa(.05).lpf(400).sometimes(add(note(12))), 
+  slider(0.746), 
+    s("<crow space:<1 0>:.1>(3,8,1)").delay(.25).room(1.5)
+    .speed(slider(0.625)).cut(1).ds(".1:0")
+    .mul(speed(perlin.range(slider(0.568,.5,1),1)))
+    .lpf(slider(5605.4,200,8000))
+  )
+  ,
+  xfade(
+    s("bd*2, sd:0:.5").room("0 <0 .5>"),
+  slider(0.496), 
+    s("hh*8")
+    .gain(rand.range(slider(0.205),1))
+    .mul(gain(slider(0.239)))
+    .speed(slider(0.955))
+    .end(slider(0.489)))
+  .bank('RolandTR808')
+  .note(36)
+  .add(note(rand))
+).reset("x".fast("2".pow(slider(0,0,3).round())))
+
+
+
+
+// another idea: instead of 2 inputs there could be a select function that
+// takes an array of patterns and an index or maybe just 0-1?

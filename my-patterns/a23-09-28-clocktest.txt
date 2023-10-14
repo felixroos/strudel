@@ -1,0 +1,5 @@
+stack(
+  note("<c eb f g>*2").ply(2)
+  .s("gm_acoustic_bass").sub(note(12)),
+  midicmd("clock*24*2").midi()
+)

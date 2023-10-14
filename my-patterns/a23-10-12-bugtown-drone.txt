@@ -1,0 +1,61 @@
+/*
+await samples('github:yaxu/clean-breaks/main');
+await samples('github:yaxu/spicule/master');
+await samples('github:felixroos/estuary-samples/main');
+await samples('github:felixroos/samples/main');
+await samples('github:emptyflash/samples/main');
+await samples('github:Bubobubobubobubo/Dough-Fox/main');
+await samples('github:Bubobubobubobubo/Dough-Amen/main');
+await samples('github:Bubobubobubobubo/Dough-Amiga/main');
+await samples('github:Bubobubobubobubo/Dough-Waveforms/main');
+await samples('github:Bubobubobubobubo/Dough-Samples/main');
+*/
+
+await samples('github:Bubobubobubobubo/Dough-Fox/main');
+
+stack(
+  n("0 [1 <2 3>]").s("froomy")
+  .room(.5).sometimes(ply(2))
+  .slow(4).off(1/16, x=>x.speed(.5).degrade())
+  .lpf(perlin.range(200,8000))
+  ,
+  s("fwood:<1 <0 2>>").ds(".1:0").lastOf(16, ply("<2 3>"))
+  ,
+  note("<c2 <eb2 c2>>/4").attack(.25)
+  .s("gm_acoustic_bass")
+  .release(.2).lpf(200).lpa(.5).lpenv(5)
+  //.hush()
+  ,
+  n("<0 4 2 5>/[<1 2>/8]".add("<0 1 2 1>/8"))
+  .offset(-2).rarely(ply("3"))
+  .clip(2)
+  .chord("<Cm7>/4").voicing()
+  //.s("gm_epiano1:1")
+  .s("sine").fm(4).fmh("<1 .5>/4")
+  .sometimes(add(note(12)))
+  .lpf(perlin.range(200,800)).lpq(3)
+  .lpenv(4).lpa(1)
+  //.vib(1).vibmod(.1)
+  //.ds(".1:0")
+  .jux(rev)
+  .delay(".4:.1:.95")
+  .gain(.75)
+  .room(1).shape(.25).roomsize(4)
+  .postgain(0.2)
+  //.hush()
+  ,
+  s("bd*<1!7 <2 3>>").bank('RolandTR909')//.delay(.1)
+  //.shape(.75)
+  //.hpf(2000).hpq(8)
+  ,
+  s("<~ [~ rim]>*1.5").bank('RolandTR909').room(saw.range(0,.5).slow(8))
+  ,
+  //note("<c a f>").s("fdot/4").delay(.5).slow(4),
+  n("<~!3 [~ [0 .. 2]]>").s("ftablas").gain(.5)
+  .speed(rand.range(1,1.2).div(2))
+  .ds(".1:0").room(.5)
+  ,
+
+  midicmd("clock*24").midi('Scarlett 2i4 USB')
+)
+  

@@ -1,0 +1,45 @@
+await samples('github:tidalcycles/Dirt-Samples/master')
+
+let scales = "<E1:minor!16 D1:minor!8>";
+let chords = "<Em7!16 Dm7!8>";
+
+ s("bd*<2 [2 4]>,~ rim, [~ hh*<1 2>]*2")
+   .bank('RolandTR909')
+   .shape(.5)
+   .end(.2).release(.01)
+   .slow(2)
+.stack(
+  stack(
+    n("<9 5 2 1>*3").scale(scales)
+    .s('sawtooth').lpa(.1).lpenv(-5).lpf(8000)
+    .sometimes(add(note(7)))
+    .mask("0 1").room(1).rsize(4).shape(.25)
+    .postgain(.25)
+    ,
+    n("0,2,4,6").chord(chords).dict('ireal')
+    .voicing()
+    .s("sawtooth").shape(.5)
+    .lpf(800).lpa(.1).lpenv(-1.5)
+    .clip(2).room(.25).rsize(4)
+    .sometimes(add(note(-12)))
+    .struct("[~ x]")
+    .ply("<1!3 3>")
+    .postgain(.25)
+  ).add(note(perlin.range(0,.25)))
+)
+.stack(
+  n("<0 4 6 8>").scale(scales)
+  .outside(2, x=>x.euclidLegatoRot("<3 4>",8,0))
+  .s("sawtooth").lpa(.2).lpenv(-2)
+  .add(note("0,.1"))
+  .lpf(perlin.range(100,2000).slow(3))
+  .lpq(perlin.range(6,10)).ftype('24db')
+  .release(.02)
+  .shape(slider(0.291)).postgain(.4)
+  .vib(2).vibmod("<0!8 <8 -12 12 -8>>".mul(rand.range(.5,4)))
+  .delay(.125).room(.75).rsize(4)
+)
+   .reset("<x@7 x*<4 [4 8]>>")
+   .cpm(187/2)
+   .compressor("-20:20:10")
+  //.scope({thickness:1,smear:.5,color:'steelblue'})

@@ -1,0 +1,45 @@
+
+n(
+  //"[<0 <1 -1>>,2,<3 4>,5]*2"
+  `
+  <
+  [0,2,4 5]
+  [0,3,5 7]
+  [0,4,6 8]
+  [0,4,5 7]
+  >`
+).ply(4)
+  .outside(2,jux(rev))
+  .stack(
+    n("-7".ply(4))
+  )
+  .add(n("[0 7]*2"))
+  .slow(2)
+  .gain(isaw.mul(saw.slow(2)))
+  .mul(gain(1.2))
+  .clip(1)
+  .scale("C:major")
+  //.outside(1,jux(rev))
+  //.s("gm_epiano1:1")
+  .s("triangle")
+  .fm(4).fmh(5)
+  .lpa(.1)
+  .lpenv(-2)
+  .fast(2)
+  .lpf(800)
+  .stack(
+    stack(
+      s("[bd@3 bd@2?] ~"),
+      s("~ sd"),
+      s("[hh@3 hh@2]*2")
+      .gain(.2)
+      .end(.02).release(.05)
+      .room(.25)
+    )
+    .bank("RolandTR505")
+    .mul(gain(.5))
+  )
+  //.add.squeeze(note("12 0"))
+  //.room(.5)
+  //.delay(".5:.1:.8")
+  .punchcard({fold:1,labels:1})

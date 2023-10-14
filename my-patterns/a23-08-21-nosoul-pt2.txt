@@ -1,0 +1,70 @@
+// "theres no soul here" @by froos
+
+let chords = arrange(
+    [16, "<Fm!3 [Fm!3 Em]>/2"],
+    [16,"<Fm <Cm C>>/2"],
+    [8,"<Db>/2"],
+    [8,"<Gb>/2"],
+  ).chord()
+
+setcpm(91/2)
+
+let warble = x=>x.add(note(perlin.range(0,.5)))
+
+let guitar = chords.s("sawtooth").voicing().fm(8).fmh(1.0009).gain(.25)
+  .lpf(perlin.range(900,4000)).lpq(8)
+  .struct("[~ x]*2").clip(.5).delay(".5:.125:.8").room(1)
+  .layer(warble)
+  //.hush()
+
+let piano = n("<0 4 2>*[<3 2>/32]")
+  .set(chords).s('piano').voicing()
+  .inside(2,juxBy(.5,rev))
+  .lpf(2000).gain(.5).room(perlin.slow(2))
+  .layer(warble)
+  //.hush()
+
+let bass = n("2").set(chords).anchor(chords.rootNotes(1)).voicing()
+  .s("gm_acoustic_bass")
+  .sometimesBy("0 .5",add(note("12")))
+  .ply(2).clip(.5).ply("<1!4 [2 3]>")
+  .lpf(900).lpq(2).attack(.02).ds(".1:.5").release(.02)
+  .layer(warble)
+  .gain(3)
+  //.hush()
+
+let drums = s("bd [~@3 bd:0:.5?],~@1.02 [sd,rim],hh*4")
+  .gain(.8).bank('RolandTR707').speed(.8)
+  .off(-1/8, x=>x.mul(gain(.25)).degrade().speed(.7))
+  //.hush()
+
+
+//////////////////////////////
+// PR: https://github.com/tidalcycles/strudel/issues/670
+let binpatn = (dec, len) => seq(
+  ...(typeof dec === 'string' ? [1] :
+    dec.toString(2)
+    .padStart(len, '0')
+    .split('')
+    .map(Number)
+     )
+)
+// registers a binpat mask with the given length
+let maskn = (n) => register('mask'+n, (dec, pat) => 
+  pat.mask(
+    reify(dec).fmap(v => binpatn(v, n)).squeezeJoin()
+  ), false)
+
+let mask2 = maskn(2)
+let mask3 = maskn(3)
+let mask4 = maskn(4)
+//////////////////////////////
+
+
+stack(
+  drums .mask4("<0 0 0 1 x!4 7 x x x 9 x x x x x 0 0 0 0>/2"),
+  guitar.mask4("<0 0 0 0 0!4 x x x x x x x x x x x 9 x x x x>/2"),
+  piano .mask4("<x x x x x!4 x x x x x x x x x x x x x x x x x x>/2"),
+  bass  .mask4("<0 0 x x x!4 x x x x x x x x 0 0 0 1 x x x x x x x x>/2"),
+)
+.add(room(.5))

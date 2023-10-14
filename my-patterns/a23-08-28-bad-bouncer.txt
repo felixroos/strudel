@@ -1,0 +1,25 @@
+    // 
+// bad bouncer
+ //
+
+freq("54".mul.out("<1 2 3 4 5 6 7 8 9>*[2,4]"))
+  .off(1/8, x=>x.mul(freq(.5)))
+  .s("sine")
+  .chop(3)
+  //.jux(rev)
+  .sometimes(mul(freq(2)))
+  .fm(saw.slow(32)).fmh("<.25 .5>/16")
+  .decay(cosine.range(0.02,.1).slow(8))
+  .sustain(0.2)
+  .lpf(sine.range(800,4000).slow(8)).lpq(8)
+  .superimpose(mul(freq(1.02)))
+  .clip(.5)
+  .slow(3)
+  .gain(.25)
+  .mul(gain(sine.range(.5,1).slow(3)))
+  .stack(
+    s("bd([3,4],8)").bank('RolandTR808').gain(rand.range(.5,1)).shape(.5),
+  )
+  .fft(4)
+  .tscope({smear:.95,thickness:500,scale:.25,pos:1,color:'#0fffff10',trigger:0})
+  .theme('blackscreen')

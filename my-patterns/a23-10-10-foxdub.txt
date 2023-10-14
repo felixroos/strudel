@@ -1,0 +1,22 @@
+await samples('github:Bubobubobubobubo/Dough-Fox/main');
+
+stack( 
+  s("flazer/5").note("f2").room(2).lpf(800),
+  stack(
+    n("<0 1 5 [2,4]>*3")
+    .scale("<C:minor F:minor>/10").s("fhang:3")
+    .jux(rev).room(1)
+    .lpf(sine.range(50,1000).slow(16))
+    .lpenv(-2).lpa(.1).delay(.4).gain(.25),
+    chord("<Dm Gm>/10").voicing()
+    .s("gm_epiano1:1")
+    .struct("<~ x*2 ~ x*2 ~>*2").clip(.5).room(2)
+    .lpf(perlin.range(300,4000))
+    .lpenv(-2).lpa(.1)
+  ).add(note(perlin.range(0,.5)))
+  ,
+  s("fdarkkick:1*<2!4 4>").shape(.5),
+  s("<~ fmisc:1 ~ fmisc:1 ~>*2").room("<0 .5>"),
+  s("foh*4").gain(saw).room(.25),
+  s("fwood(5,8)").gain(rand).room(.5).degrade()
+)

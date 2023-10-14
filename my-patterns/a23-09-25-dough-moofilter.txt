@@ -1,0 +1,61 @@
+await samples('github:tidalcycles/Dirt-Samples/master')
+
+await dough`
+let f = 0;
+let midi = n => Math.pow(2, (n - 69) / 12) * 440;
+let trigger = (value) => f = midi(value.note)
+let fast_tanh = (x) => {
+  let x2 = x * x;
+  return (x * (27.0 + x2)) / (27.0 + 9.0 * x2);
+};
+function Moog() {
+  let p0, p1, p2, p3;
+  let p32, p33, p34;
+  p0 = p1 = p2 = p3 = p32 = p33 = p34 = 0;
+  let cutoff;
+  return (input, c, q) => {
+    cutoff = (c * 2 * Math.PI) / 44100;
+    cutoff = cutoff > 1 ? 1 : cutoff;
+    let k = q * 4;
+    let out = p3 * 0.360891 + p32 * 0.41729 + p33 * 0.177896 + p34 * 0.0439725;
+    p34 = p33;
+    p33 = p32;
+    p32 = p3;
+    p0 += (fast_tanh(input - k * out) - fast_tanh(p0)) * cutoff;
+    p1 += (fast_tanh(p0) - fast_tanh(p1)) * cutoff;
+    p2 += (fast_tanh(p1) - fast_tanh(p2)) * cutoff;
+    p3 += (fast_tanh(p2) - fast_tanh(p3)) * cutoff;
+    return out;
+  };
+}
+let lp = Moog();
+let dsp = (t) => {
+  let synth = saw(f, t)+saw(f*2+.5, t)
+  let cutoff = sinmod(.125,t,300,2000)
+  let res = sinmod(.0125,t,0,.9)
+  synth = lp(synth,cutoff,res)
+  return synth/6;
+}
+let seq = (items, speed, t) => items[Math.floor(t*speed)%items.length]
+let saw = (x, t) => ((x * t % 1) - 0.5) * 2
+let norm = (bipolar) => (bipolar +1)/2;
+let range = (normalized, min, max) => normalized*(max-min)+min;
+let sinmod = (f,t,a=0,b=1) => range(norm(sin(f, t)),a,b)
+let sin = (x, t) => Math.sin(2 * Math.PI * t * x)
+`
+
+
+n(run(8))
+  .chord("<Am Dm>/8")
+  .voicing()
+  .sub(note(36))
+  .rarely(add(note(12)))
+  .dough()
+.stack(
+  s("casio*<1 2 4 3>")
+  .sometimes(ply(2))
+  .fit()
+  .gain(.125)
+  .room(.5).delay(.5)
+  .degrade()
+)

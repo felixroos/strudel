@@ -1,0 +1,7 @@
+const bela = register('bela', (out,pat) => pat.midichan(out+1).midi('Bela'))
+const cv = (v) => ccv(v).ccn(1);
+
+stack(
+  cv(".25 .5 [.25 .5]*2").bela(0),
+  cv("[1 0]*4").bela(1)
+)

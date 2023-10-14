@@ -1,0 +1,8 @@
+"<c a f e>".sub(24)
+  .add.squeeze(run(4).mul(7))
+  .note()
+  .fmdecay(.2)
+  .fmsustain(0.1)
+  .fmenv('exp')
+  .fm(2).fmh(5.1)
+  .room(1)

@@ -1,0 +1,21 @@
+// "theres no soul here" @by froos
+// add this sample: https://www.youtube.com/watch?v=KMsBuSKQo1s (0:05s)
+let chords = chord("<Fm <Cm C>>/2")
+
+setcpm(90/2)
+
+stack(
+  stack(
+    chords.s("sawtooth").voicing().fm(8).fmh(1.009).attack(.5).gain(.5)
+    //.hush()
+    ,
+    n("0 4 2").set(chords).s('piano').voicing().inside(2,jux(rev))
+    //.hush()
+  ).add(note(perlin.range(0,.5)))
+  ,
+  s("bd ~,~ sd,hh*4").gain(.8).bank('RolandTR707')
+  .off(-1/8, x=>x.mul(gain(.5)).degrade().speed(.8))
+  //.hush()
+)
+  .room(.5)
+  .lpf(perlin.range(1000,4000)).lpq(4)

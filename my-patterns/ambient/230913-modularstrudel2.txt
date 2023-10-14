@@ -1,0 +1,44 @@
+await samples('github:yaxu/spicule/master')
+
+
+
+stack(
+  "<c>"
+  .add.squeeze("0 [12 <13 11>] 24 [36 <37 38 39 40>?]")
+  .sub(24)
+  .almostNever(sub("12"))
+  .note()
+  .rarely(ply("2"))
+  .clip(.25)
+  .reset("<x@8 x(<3 5>,8,<0 1>/2)>")
+  //.sub(note(36))
+  .layer(
+    x=>x.midichan(11).midi('Steinberg UR22mkII'),
+    x=>x.slow(4).midichan(13).midi('Steinberg UR22mkII'),
+  )
+  ,
+  
+  run("<4!3 8>").n().s("foley")
+  .gain(.6)
+  .sustain(0)
+  .decay(.05)
+  .jux(rev)
+ // .degradeBy(.5)
+  //.delay(".5:.1:.6")
+  .slow(2)
+  .lpf(sine.range(800,4000).slow(24))
+  .lpq(8)
+  .room(.75)
+  .speed(perlin.range(.8,1))
+  ,
+  n("<3 5 6>/4").s("bsvocals/8")
+  .gain(1)
+  //.splice(8,"<0 [1 2] 3 4*2 5 [4 6 7]>")
+  //.degradeBy(.4)
+ 
+  //.ds(".2:0")
+  .delay(.5)
+  //.sometimes(mul(speed(2)))
+  //.bpf(perlin.range(500,2000))
+  .room(1)
+)

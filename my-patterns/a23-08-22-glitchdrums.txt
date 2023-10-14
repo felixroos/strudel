@@ -1,0 +1,13 @@
+setcpm(90/2)
+
+s("bd, ~ [sd,rim],hh(3,8,1)")
+  .gain(.8)
+  .bank("RolandTR707")
+  .speed(.8)
+  .off(-1/8, x=>x.mul(gain(.5)).speed(4))
+  .room(.25).ds(".1:0")
+  .mul(speed("<.7 .9>/2"))
+  .delay(".2:.125:.5")
+  .almostNever(
+    x=>x.ply("8").gain(isaw).mul(gain(.5)).bpf(500)
+  )

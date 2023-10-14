@@ -1,0 +1,36 @@
+await samples('github:tidalcycles/Dirt-Samples/master')
+
+let drums = stack(
+  s("RolandTR909_bd*2,[~ hh]*2"),
+  s("breaks125:1/2").fit().cut(1).chop(8)
+    .sometimes(ply(2))
+    
+)
+
+let chords = 
+  stack(
+    note("[c,eb,g,bb](5,16)/2")
+    .lpf(120)
+    .rarely(add(note(12))),
+    note("[c2 ~](3,8)")
+    .lpf(sine.range(200,500).slow(4))
+  )
+  .clip(1)
+  //.add(note("<0 1 2 1>/4"))
+  .s("sawtooth")
+  .lpa(.1)
+  .lpenv(-4)
+  .room(.8)
+  .noise(.125)
+  .shape(.5)
+
+stack(
+  chords,
+  drums
+)
+  //.hpf(400) 
+  //.reset("<x@3 x*4>")
+  //.lastOf(4, x=>x.add.trig(note(run(4).mul(.1))))
+  //.hurry(.5)
+//.punchcard({fold:0})
+.punchcard({labels:1,fill:0,vertical:1,fold:0})

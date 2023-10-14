@@ -1,0 +1,27 @@
+await samples('github:felixroos/samples/main')
+
+stack(
+  "<c eb <g!3 bb> c4>*2"
+  .add.squeeze("0 [7 | 12]?0.9")
+  .rarely(ply("2 | 4"))
+  .note()
+  .clip(.5)
+  //.velocity(rand.range(.2,.8))
+  //.off(1/16, x=>x.add(note(12)).velocity(.25))
+  //.off(1/8, x=>x.add(note(12)).velocity(.125))
+  .layer(
+    x=>x.color('#ff000050').slow("<2 3>/16").midichan(11),
+    x=>x.color('#00ff0050').slow("<3 4>/12").midichan(13),
+  ).midi('Steinberg UR22mkII'),
+  "<0 1 2>*2"
+  .add("<0 1 2 1>/16")
+  .almostNever(x=>x.add.squeeze("12 14 17?"))
+  .n()
+  .ds(".2:0")
+  .room(2).delay(.5)
+  .scale("<C:minor Eb:mixolydian>/4")
+  .s("<rhodes pluck:0:.75>/2")
+  .lpf(perlin.range(300,4000)).lpq(8)
+  .degradeBy(sine.slow(64))
+  .gain(0)
+).punchcard()

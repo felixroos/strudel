@@ -1,0 +1,68 @@
+await samples('github:yaxu/spicule/master')
+
+stack(
+  //s("arc/4").fit(),
+  //s("atlast:1/8").fit().clip(1),
+  s("bd*2,~ rim")
+  .bank('RolandTR909').shape(.5)
+  .gain(3)
+  //.hush()
+  ,
+  n(run(8))
+  .s("blk?,bk")
+  .clip(1)
+  .sometimesBy("0 .5",set(speed("4 | 8")))
+  //.fit()
+  .lpf(perlin.range(500,4000)).lpq(8)
+  .late(.75)
+  .hpf(400)
+  //.hush()
+  ,
+  s("~ bls")
+  //.hush()
+  ,
+  n("0 1(3,8)? 2 3/4")
+  .s("bsguitar")
+  .clip(1)
+  .room(.5)
+  //.hush()
+  ,
+  s("~ bshihat*2").jux(rev).gain(saw.fast(2))
+  //.hush()
+  ,
+  chord("<Dm!8 Gm!8>").voicing()
+  .ply(4)
+  .s("<sawtooth>/16")
+  //.add(note("[0 12]*4"))
+  .lpf(perlin.range(800,8000)).lpq(8)
+  .mul(lpf("[.25 1.5]*2"))
+  .ds(".1:0")
+  .gain(sine.range(1.5,3))
+  //.late(.25)
+  //.hush()
+  ,
+  note("<D2 G1>/8")
+  .struct("x(5,8,<0!3 1>)")
+  .degradeBy("0 .25")
+  .s("sawtooth").lpf(800).gain(2)
+  .sometimes(add(note("12")))
+  .add(note("0,.05"))
+  //.hush()
+  ,
+  n("<10 5 ~ 8 4>*3")//.ply(2)
+  .chord("<Dm!8 Gm!8>").voicing()
+  .jux(rev).ds(".1:0").delay(.5)
+  .s('sine').shape(.4)
+  .lpf(2000).crush(8)
+  .degrade()
+  .hush()
+  ,
+  n("<0 12 9>*2".add(41))
+  .off(1/8, sub(n(12)))
+  .ds(".05:0") //.fast(1)
+  .s("rash").gain(2).room(2)
+  .jux(rev).lpf(400)
+  .hush()
+)
+  .reset("<x@15 x(5,8)>")
+  //.punchcard({vertical:0})

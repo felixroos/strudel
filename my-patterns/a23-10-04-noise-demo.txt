@@ -1,0 +1,16 @@
+// noise demo
+// https://github.com/tidalcycles/strudel/pull/713
+
+note("[c2 ~]*2,eb,g,bb,d").s("sawtooth")
+  .noise(slider(0.452))
+  .lpf(perlin.range(800,2000).mul(slider(0.238)))
+  .lpenv(perlin.range(1,5)).lpa(.25).lpd(.1).lps(0)
+  .add.mix(note("<0!3 [1 <4!3 12>]>")).late(.25)
+  .stack(
+    s("bd, [~@3 hh@2]*2")
+    .stack(s("~ <~!3 rim>").delay(.5))
+    .bank('RolandTR909')
+    .off(1/8, mul(speed(slider(0.755,.5,2)).gain(slider(0.239))))
+    .room(.5)
+  ).fft("<1>")
+.scope({thickness:1,color:'yellow',scale:2,pos:.5,align:0})

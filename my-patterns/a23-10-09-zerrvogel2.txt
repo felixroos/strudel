@@ -1,0 +1,35 @@
+stack(
+  stack(
+    run(4)
+    .n()
+    .scale("<C F>/8:hirajoshi").slow(2)
+    .clip(1)
+    .s("sawtooth")
+    .sub(note(24))
+    .fm(4).fmh(1.03)
+    .lpf(2000).lpq(8).ftype('24db')
+    .lpa(.1).lpenv(-10).fanchor(1)
+    .room(.75)
+    .rarely(ply(2))
+    .shape(slider(0.904))
+    .compressor("-50:20:40")
+    .postgain(.5)
+  )
+  .add(note(perlin.range(0,.5)))
+  .add(note(2))
+  ,
+  stack(
+    s("bd*<2 [2 4]>")
+    .bank("UnivoxMicroRhythmer12,RolandTR909").shape(.2),
+    s("~ <rim sd>").bank('RolandTR909').room("<0 .5>"),
+    s("hh*<8 4>").bank("UnivoxMicroRhythmer12").gain(rand.range(.25,.5))
+    .jux(rev).room(.5)
+  ).rarely(ply("2"))
+  .mul(gain(.25))
+  .shape(.65)
+  .compressor("-10:10:10")
+  .postgain(3)
+  
+) 
+.reset("<x@7 x(5,8)>")
+.slow(1.375)

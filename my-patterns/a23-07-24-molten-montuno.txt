@@ -5,6 +5,8 @@ let chords = arrange(
   [32,"<Dm!4 Em7b5!2 A7b9!2>"]
 ).chord()
 
+setcpm(114/2)
+
 stack(
   stack(
     
