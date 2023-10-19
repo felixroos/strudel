@@ -1,0 +1,39 @@
+setcps(1)
+
+stack(
+  // drums
+  stack(
+    s("bd*<2!3 [2 8]>").bank("RolandTR909")
+    //.hush()
+    ,
+    s("~ [cp:2]").bank("AlesisSR16").gain(.75)
+    //.mask("<0!16 1!64>")
+    //.hush()
+    ,
+    s("[hh:0:.25 <hh!7 oh>]*2").bank("AlesisSR16")
+    //.mask("<0!8 1!32 0!32>")
+    //.hush()
+    ,
+    s("hh*8").gain(.4).when("1 0 0 1 0 0 1 0", x=>x.gain(1)).n("[0 1]*2")
+    .bank("EmuSP12").mask("<0!8 0!32 1!32>").cut(1)
+    //.hush()
+  ).room(.2).speed(.9)
+  .outside(8, lastOf(4, x=>x.hpf("1000")))
+  , // bass
+  n("<0 5 2 1>/2(<3!7 5>,8)")
+  .scale("C1:minor:pentatonic").s("square")
+  .add(note("0,.1")).lpf(400).lpq(3)
+  .lpa(.1).lpenv(-2)
+  .off(1/8, x=>x.add(note(7)).degradeBy(.8))
+  //hush()
+  , // chord
+  "~ Cm9".voicings('ireal-ext').note()
+  .s("gm_epiano1:1").ply("<1 2 4>")
+  .room(.5).delay("<0 .5:<.25 .125>:<.5 .8>>")
+  .decay(perlin.fast(1.1).range(.05,.2)).sustain(0)
+  .lpf(perlin.range(200,2000)).gain(.4).lpq(8).room(.6)
+  .shape(0)
+  //.mask("<1!32 0!16>")
+  //.hush()
+).late(.02)
+.scope({thickness:200,color:'#ffffff90'})

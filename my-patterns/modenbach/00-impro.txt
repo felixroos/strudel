@@ -1,0 +1,19 @@
+await samples('github:yaxu/spicule/master')
+
+stack(
+  s("casio/8").delay(.5).gain(.25),
+  note("[eb,<ab bb>,<c eb>]/4")
+  .s("square").lpenv(-2).lpa(-2)
+  .clip(.2).room(2)//.hush()
+  .lpf(600),
+  s("bd*1,[~ hh]*1").end(.2)
+  .bank('RolandTR909')
+  .room(.25),//.lpf(500),
+  note("f1(3,8)").s('sawtooth')
+  .lpf(perlin.range(400,800))
+  .lpa(.1).lpenv(-2).fm(2)//.hush()
+).reset("<x@15 x(3,8)>")
+  .mul(speed(slider(0.845)))
+  //.hpf(2000)
+.cpm(124)
+  //.early(.2)

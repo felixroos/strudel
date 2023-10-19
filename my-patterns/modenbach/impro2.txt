@@ -1,0 +1,43 @@
+await samples('github:Bubobubobubobubo/Dough-Fox/main');
+
+stack(
+  n("0 [1 <2 3>]").s("froomy").rarely(ply("2"))
+  ,
+  
+  //s("bd*2,~ rim*<1!3 2>, [hh:1:.01 <hh!3>:0:.2]*2")
+  s("[bd@3 bd@2]*1,~ cp,[~ hh]*2")
+  .off(-1/8, set(speed(.5).gain(.1).hpf(500)))
+  .end(.5).release(.02)
+  .bank('RolandTR909').gain(slider(0.352))
+  .slow(1)//.shape(.2)
+  //.hpf(2000)//.delay(.5)
+  //.hush()
+  ,
+  s("fwood:<1 <0 2>>").ds(".1:0").lpf(1000)
+  ,
+  note("[<d2 e2>/8](3,8,<1 0>)")
+  .s("sawtooth,square").lpf(200).vib(2).gain(.75)
+  //.hush()
+  //.fm(4)
+  .lpa(.1).lpenv(-4)
+  .sometimesBy("0 .5",add(note(12)))
+  .room(.5),
+  //n(run(8)).clip(2).jux(rev)
+  chord("[<Dm <Em [G Gm]>>/8](4,10,<0 1>)")
+  .voicing().s('sawtooth')//.ply(3)
+  .lpa(.1).lpenv(0).lpf(perlin.range(1500,1800))
+  .gain(.25).room(.75).clip(.5).sub(note(0))
+  .fm(2).fm(5.1).delay(.6)
+  //.s("gm_epiano1:1")//.ply(2)
+  .add(note(perlin.range(0,.25)))
+  //.hush()
+  
+).fft(4)
+.room(.5)
+  .mul(speed(slider(2,0,2)))
+  .reset("<x@7 x*[2 5]>")
+  //.lastOf(8, set(end(.2)))
+//.delay(.5)
+  .scope({thickness:100,color:'steelblue'})
+
+//.hpf(500)

@@ -1,0 +1,37 @@
+// "seven blips to heaven" @by froos
+stack(
+  s("bd  ~   ~   bd  bd  ~   ~  "),
+  s("~   ~   rim ~   ~   rim ~  "),
+  s("hh*7").gain(saw.fast(2)).mask("<0@7 1@70>")
+  .lastOf(7, ply("2")).cut(1)
+  .sustain(0).decay(.08)
+)
+  .speed(rand.range(1,1.1))
+  .bank("RolandTR707")
+  .shape(.2)
+  .stack(
+    stack(
+      freq("3,5,<7@3 9@2 8@2>").struct("x(2,7,<1 2 3>)")
+      .mask("<0@28 1@70>")
+      ,
+      freq("1").struct("x(2,7)").gain(2.5).ds(".1:0")
+      .mask("<0@14 1@70>")
+    )
+    .lpf(perlin.range(100,1000))
+    .lpa(.1).lpenv(-4)
+    .room(.5)
+    .stack(
+      freq("<9 7 8 6 5>/2")
+      .vib(3.5).vibmod(.25).clip(2)
+      .ds("1:.2")
+      .off(ratio("<2:7 3:7>/2"), mul(freq(2)))
+      .lpf(sine.range(70,700).slow(28))
+      .room(1)
+    )
+    .mul(freq("<55 41.25>/7"))
+    .s("square")
+    .fm(1).roomsize(4)
+    .shape(.5).postgain(.5)
+    .noise(.1),
+  )
+.reset("<x@13 x*3.5>")
