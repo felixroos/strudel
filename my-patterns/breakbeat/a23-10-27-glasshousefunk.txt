@@ -1,0 +1,57 @@
+// "glass house funk" @by froos
+await samples('github:yaxu/clean-breaks/main')
+
+setcps(1.5)
+
+stack(
+  stack(
+    //s("hh*4").gain(saw.fast(2)).end(.2).speed(.8),
+    s("bd").late("<0 .25>").bank('RolandTR909').shape(.5),
+    s("~ rim").speed(perlin.range(.8,.9).slow(4))
+    .rarely(ply("4")).late(.01).hush(),
+    s("think/4").fit()
+    .chop(8).cut(1).shape(.8).postgain(.75)
+    .almostNever(ply("3"))
+    //.hush()
+  )
+  //.hush()
+  .room(.25)
+  .mask("<0!16 1!64>")
+  ,
+  stack(
+    note("<g1(3,8) ~!2 [d2 ~]*2>").s("sawtooth,square")
+    .lpf(perlin.range(500,1000).slow(16))
+    .lpa(.1).lpenv(-3).lpq(4).ftype('24db').gain(.75)
+    .shape(.4)
+    .mask("<0!8 1!64 0!8>")
+    //.hush()
+    ,
+    note("<~ [bb,d,f,<a4 f4(3,8)>]@2 ~>").vib(8).vibmod(.25)
+    .lpf(400).lpa(.5).lpenv(-4).room(.5).s("<sawtooth square>")
+    .delay(.5)
+    //.hush()
+    ,
+    n("<0 6 3 2 1>/2")
+    .off(1/4, add(n(2)))
+    .scale("G4:minor")
+    //.ds(".6:0")
+    .s("sine").clip(.1)
+    .delay(.5).room(1)
+    .jux(rev).ply(2).shape(.6).postgain(.5)
+    //.lpf(sine.range(400,5000).slow(32))
+    .mask("<0!32 1!32>")
+    //.hush()
+    ,
+    note("<d5 c5 bb4 a4 bb4>/1.5")
+    .s("sine").vib(4)
+    .room(2).size(4).clip(2).orbit(2)
+    //.chop(32).delay(.5).clip(.5).release(.05)
+    .gain(isaw.late(.5).fast(2))
+    .sometimes(add(note("7")))
+    .add(note(12)).mul(gain(.25))
+    //.lpf(cosine.range(400,5000).slow(32))
+    .mask("<1!32 0!32>")
+    //.hush()
+  ).add(note(perlin.range(0,.5).slow(4)))
+  .sub(note("<0 2>/16"))
+).reset("<x@15 x(5,8)>").late(1)

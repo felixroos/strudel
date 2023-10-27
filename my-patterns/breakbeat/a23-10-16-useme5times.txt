@@ -1,0 +1,41 @@
+// "use me 5 times" @by froos
+await samples('github:yaxu/clean-breaks/main')
+
+s("useme/8").fit()
+  .chop(16)
+  .cut(1)
+  .ds(".4:0")
+.stack(
+  stack(
+    s("bd").bank('RolandTR909'),
+    s("<~ sd>").room("<0 .5>/2"),
+  ).mask("<0!16 1@32>")
+)
+.stack(
+  note("<g1 [~ <a1 bb1 c2>] ~ d1?>").late(.5)
+  .sometimesBy(
+    "<.2 0 0 .2>",
+    x=>x.add.squeeze(note("[0@3 12@2] ~").clip(2))
+  )
+  .s("sawtooth")
+  .lpa(.25)
+  .lpenv(-5)
+  .lpf(sine.range(200,800).slow(12)).lpq(4)
+  .ftype('24db')
+  .room(.25).noise(.25)
+  .mask("<0!8 1@64>")
+  ,
+  n("<0 3 4 6 <7 8>>*2")
+  .iter(4)
+  .outside(2.5,juxBy(.5,rev))
+  .late("[0 .1]*2")
+  .scale("<G3 G4>/64:minor")
+  .s("<sawtooth square>/32")
+  .fm(run(4).slow(24))
+  .lpf(perlin.range(200,1000).slow(32))
+  .vib("<2.5 5 10>/10")
+  .vibmod(sine.range(.01,.4).slow(32))
+  .clip(saw.range(.1,2).slow(64)).release(.05)
+  .delay(.5).room(1).gain(.5)
+)
+  .fast(1.4)

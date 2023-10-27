@@ -1,0 +1,39 @@
+// rave 90357230948
+stack(
+  stack(
+    s("bd*2, ~ <[sd:2,rim] ~>").mask("<0@8 1@32>"),
+    s("[hh@7 oh:<1 0>]/2(<3 5>,8)")
+    .lpf(4000).lpq(10)
+    .speed(sine.range(.8,1))
+  ).bank('RolandTR909')
+  //.hush()
+  ,
+  "[c {eb c bb g}%5](<4 5 3 4>,8,<0 1>)"
+  .sub("24,11.9").sometimes(add("12"))
+  .note()
+  .s("sawtooth,square")
+  .decay(.1).sustain(0)
+  .lpf(
+    sine.range(200,1800)
+    .slow(16)
+  ).lpq(12).mask("<0@16 1@32>")
+  //.hush()
+  ,
+  "Cm7".voicings('lefthand').note()
+  .s('gm_epiano1').late(.25).ply(1)
+  .decay(.1).sustain(0)
+  .delay(.6).delaytime(.125).room(.8)
+  .mask("<0@4 1@4 1@32>")
+  //.hush()
+  ,
+  "{0 1 2 3 4}%1.5"
+  .off(1/8, add(2))
+  .scale('C4 hirajoshi').note()
+  .s('sawtooth')
+  .lpf(sine.range(200,2000).slow(32)).lpq(10)
+  .decay(.05).sustain(0)
+  .delay(.5).room(.8)
+  .juxBy(.5, rev).degrade()
+  .add(perlin.range(0,.1))
+  //.hush()
+)

@@ -1,0 +1,42 @@
+// "tempotaschentuch" @by froos
+
+setcps(1.5)
+
+stack(
+  stack(
+    s("bd").lastOf(2,late(1/4)).color('#00110050')
+    ,
+    s("~ <sd cp>").clip(.5).color('#ff000020').clip(.25)
+    .mask("<0!16 1!32>")
+    .room("<0 .5>").color('pink')
+    ,
+    s("hh*<2 4> [oh hh*2]")
+    .mask("<0!8 1!32>")
+    .clip(perlin.range(.1,.4)).release(.05)
+    .speed("[1 .9]*3")
+    .gain("[.6 .2]*2")
+    .room(.2).color('#aaffaa50'),
+  ).bank("RolandTR707,RolandTR909")
+  .mul(gain(.6))
+  //.lpf(perlin.range(500,8000).slow(8))
+  ,
+  stack(
+    n("[0 [~ 0] 0*<2 1> 0?]/2").add("<0!2 3 2>/2").scale("G1:minor")
+    .s("sawtooth").lpf(perlin.range(200,2000)).lpq(8)
+    .add(note("0,.03"))
+    .ds(".2:0").clip(.3)
+    .color('#ffaa2250'),
+    "<~ [~ <Gm!7 D>]>".voicings('triads').note()
+    .s("square")
+    .crush(8)
+    .clip(perlin.range(.1,.2))
+    .delay(.5).lpf(perlin.range(800,2000)).lpq(4)
+    .color('#ff004450')
+  )
+)
+  .outside(4,lastOf(4, x=>x.hpf(500).speed(2).hpq(4)))
+  .reset("<x@15 x(5,8)>")
+  .slow("<1!64 2!32>")
+  //.fontFamily("galactico/32")
+  //.theme("nord/32")
+  .spiral({colorizeInactive:0,thickness:80,steady:1.02})
