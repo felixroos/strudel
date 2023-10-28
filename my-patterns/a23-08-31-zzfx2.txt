@@ -1,0 +1,73 @@
+// "world NaN" @by froos
+/*                         
+  _n_________________
+|_|_______________|_|
+|  ,-------------.  |
+| |  .---------.  | |
+| |  |         |  | |
+| |  |  HI!    |  | |
+| |  |         |  | |
+| |  |         |  | |
+| |  `---------'  | |
+| `---------------' |
+|   _ TUNE BOY      |
+| _| |_         ,-. |
+||_ O _|   ,-. "._,"|
+|  |_|    "._,"   A | hjw
+|    _  _    B      | `97
+|   // //           |
+|  // //    \\\\\\  |
+|  `  `      \\\\\\ ,
+|________...______,"
+*/
+
+
+let a = "<Am7 D7 Gm7 C7>"
+let b = "<F^7 Gb^7 B7#11 E7>/2"
+
+chord(arrange([16,a],[8,b]))
+  .dict('ireal')
+  .layer(
+    x=>x.voicing()
+      .s('z_triangle')
+      .slide(.02)
+      .noise(.5)
+      .lfo("<.125 .25 .5 .75>")
+      .tremolo(.2)
+      .mask("<1!8 0!8>")
+      .gain(1.4)
+    ,
+    x=>n(run("<12 [6@3 16]>"))
+      .set(x)
+      .voicing()
+      .s('z_sine').curve(3)
+      .gain(4)
+      .ds(".1:0")
+      .zdelay(.125)
+      .slide("<0 0 .4>")
+      .noise(.4)
+      .zcrush(.05)
+      .mask("<0!8 1!8>")
+    ,
+    x=>n("<0 1 2 3>*1.5")
+      .set(x)
+      .voicing()
+      .sometimes(add(note("12")))
+      .ds(".1:0")
+      .sub(note("12.02,24"))
+      .s("z_square")
+      .lpf(1000).lpq(10)
+      .curve(2)
+      .ply(2)
+    
+  )
+  .room(.8)
+  .fft(3)
+  .tscope({color:'#ff00ff50',thickness:200,scale:1})
+  .stack(
+    s("bd ~ [~ bd?],~ hh*<1!2 2> ~, ~ rim*<0!5 1> rim")
+    .crush(1).room(.2)
+    //.lpf(800)
+  )
+.theme('teletext')
+.fontFamily('teletext')
