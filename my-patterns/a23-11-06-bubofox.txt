@@ -1,0 +1,37 @@
+await samples('bubo:fox')
+
+s("foh fbleep*<2 4>:<2 1>, fglitch:<0 1>")
+  .rarely(chop(8))
+  .juxBy(.5, rev)
+  .chunk(4, set(speed(2)))
+  .rarely(set(speed(isaw)))
+  .slow(2).room(1).degradeBy(perlin)
+  .delay(.2)
+  .lpf(sine.range(100,8000).slow(20)).lpq(8)
+  .play()
+
+n(run(8)).s("ftabla").play()
+
+s("bd(3,8,<0 1>):0:1.5,<~!2 rim:0:1.5>*2").bank('RolandTR909').play()
+
+note("<g1 bb1>/8(5,8)/2")
+  .s("sawtooth")
+  .off(1/4, x=>x.add(note(12)).degrade())
+  .vib(1)
+  .lpf(sine.range(50,1000).slow(32))
+  .lpenv(-4)
+  .lpa(.1)
+  .shape(.6).room(.5)
+  .theme('teletext')
+  .scope({thickness:20,smear:.9,color:'cyan'})
+  .play()
+
+n("<[0,2] 1 [2,4,6]>*2")
+  .chord("<Gm!8 F!8>").dict('ireal').voicing().s("sine")
+  .rarely(add(note("12")))
+  .segment("<4!3 [8 12]>")
+  .ds(".08:0")
+  .late(.125).room(1.5)
+  .play()
+
+silence
