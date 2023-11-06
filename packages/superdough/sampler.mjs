@@ -147,7 +147,12 @@ function getSamplesPrefixHandler(url) {
  *  sd: '808sd/SD0010.WAV'
  *  }, 'https://raw.githubusercontent.com/tidalcycles/Dirt-Samples/master/');
  * s("[bd ~]*2, [~ hh]*2, ~ sd")
- *
+ * @example
+ * samples('shabda:noise,chimp:2')
+ * s("noise <chimp:0*2 chimp:1>")
+ * @example
+ * samples('shabda/speech/fr-FR/f:chocolat')
+ * s("chocolat*4")
  */
 
 export const samples = async (sampleMap, baseUrl = sampleMap._base || '', options = {}) => {
@@ -157,10 +162,33 @@ export const samples = async (sampleMap, baseUrl = sampleMap._base || '', option
     if (handler) {
       return handler(sampleMap);
     }
+    if (sampleMap.startsWith('bubo:')) {
+      const [_, repo] = sampleMap.split(':');
+      sampleMap = `github:Bubobubobubobubo/dough-${repo}`;
+    }
     if (sampleMap.startsWith('github:')) {
       let [_, path] = sampleMap.split('github:');
       path = path.endsWith('/') ? path.slice(0, -1) : path;
+      if (path.split('/').length === 2) {
+        // assume main as default branch if none set
+        path += '/main';
+      }
       sampleMap = `https://raw.githubusercontent.com/${path}/strudel.json`;
+    }
+    if (sampleMap.startsWith('shabda:')) {
+      let [_, path] = sampleMap.split('shabda:');
+      sampleMap = `https://shabda.ndre.gr/${path}.json?strudel=1`;
+    }
+    if (sampleMap.startsWith('shabda/speech')) {
+      let [_, path] = sampleMap.split('shabda/speech');
+      path = path.startsWith('/') ? path.substring(1) : path;
+      let [params, words] = path.split(':');
+      let gender = 'f';
+      let language = 'en-GB';
+      if (params) {
+        [language, gender] = params.split('/');
+      }
+      sampleMap = `https://shabda.ndre.gr/speech/${words}.json?gender=${gender}&language=${language}&strudel=1'`;
     }
     if (typeof fetch !== 'function') {
       // not a browser
