@@ -1,4 +1,4 @@
-// "broken cut #1" @by froos
+// "broken cut 1" @by froos
 
 await samples('github:tidalcycles/Dirt-Samples/master')
 samples({
