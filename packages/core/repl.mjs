@@ -17,7 +17,6 @@ export function repl({
   onToggle,
   editPattern,
 }) {
-  const id = s4();
   const scheduler = new Cyclist({
     interval,
     onTrigger: getTrigger({ defaultOutput, getTime }),
