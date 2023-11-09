@@ -472,44 +472,18 @@ export class Pattern {
   /**
    * Returns a new pattern with the given location information added to the
    * context of every hap.
-   * @param {Number} start
-   * @param {Number} end
+   * @param {Number} start start offset
+   * @param {Number} end end offset
    * @returns Pattern
    * @noAutocomplete
    */
-  withLocation(start, end) {
+  withLoc(start, end) {
     const location = {
-      start: { line: start[0], column: start[1], offset: start[2] },
-      end: { line: end[0], column: end[1], offset: end[2] },
+      start,
+      end,
     };
     return this.withContext((context) => {
       const locations = (context.locations || []).concat([location]);
-      return { ...context, locations };
-    });
-  }
-
-  withMiniLocation(start, end) {
-    const offset = {
-      start: { line: start[0], column: start[1], offset: start[2] },
-      end: { line: end[0], column: end[1], offset: end[2] },
-    };
-    return this.withContext((context) => {
-      let locations = context.locations || [];
-      locations = locations.map(({ start, end }) => {
-        const colOffset = start.line === 1 ? offset.start.column : 0;
-        return {
-          start: {
-            ...start,
-            line: start.line - 1 + (offset.start.line - 1) + 1,
-            column: start.column - 1 + colOffset,
-          },
-          end: {
-            ...end,
-            line: end.line - 1 + (offset.start.line - 1) + 1,
-            column: end.column - 1 + colOffset,
-          },
-        };
-      });
       return { ...context, locations };
     });
   }
@@ -809,13 +783,14 @@ export class Pattern {
       hap.setContext({
         ...hap.context,
         onTrigger: (...args) => {
-          if (!dominant && hap.context.onTrigger) {
-            hap.context.onTrigger(...args);
-          }
+          // run previously set trigger, if it exists
+          hap.context.onTrigger?.(...args);
           onTrigger(...args);
         },
-        // we need this to know later if the default trigger should still fire
-        dominantTrigger: dominant,
+        // if dominantTrigger is set to true, the default output (webaudio) will be disabled
+        // when using multiple triggers, you cannot flip this flag to false again!
+        // example: x.csound('CooLSynth').log() as well as x.log().csound('CooLSynth') should work the same
+        dominantTrigger: hap.context.dominantTrigger || dominant,
       }),
     );
   }
@@ -1582,6 +1557,24 @@ export const range2 = register('range2', function (min, max, pat) {
   return pat.fromBipolar()._range(min, max);
 });
 
+/**
+ * Allows dividing numbers via list notation using ":".
+ * Returns a new pattern with just numbers.
+ * @name ratio
+ * @memberof Pattern
+ * @returns Pattern
+ * @example
+ * ratio("1, 5:4, 3:2").mul(110).freq().s("piano").slow(2)
+ */
+export const ratio = register('ratio', (pat) =>
+  pat.fmap((v) => {
+    if (!Array.isArray(v)) {
+      return v;
+    }
+    return v.slice(1).reduce((acc, n) => acc / n, v[0]);
+  }),
+);
+
 //////////////////////////////////////////////////////////////////////
 // Structural and temporal transformations
 
@@ -1677,6 +1670,9 @@ export const ply = register('ply', function (factor, pat) {
  * s("<bd sd> hh").fast(2) // s("[<bd sd> hh]*2")
  */
 export const { fast, density } = register(['fast', 'density'], function (factor, pat) {
+  if (factor === 0) {
+    return silence;
+  }
   factor = Fraction(factor);
   const fastQuery = pat.withQueryTime((t) => t.mul(factor));
   return fastQuery.withHapTime((t) => t.div(factor));
@@ -1703,6 +1699,9 @@ export const hurry = register('hurry', function (r, pat) {
  * s("<bd sd> hh").slow(2) // s("[<bd sd> hh]/2")
  */
 export const { slow, sparsity } = register(['slow', 'sparsity'], function (factor, pat) {
+  if (factor === 0) {
+    return silence;
+  }
   return pat._fast(Fraction(1).div(factor));
 });
 
@@ -2029,7 +2028,7 @@ export const jux = register('jux', function (func, pat) {
  * @example
  * "<0 [2 4]>"
  * .echoWith(4, 1/8, (p,n) => p.add(n*2))
- * .scale('C minor').note().legato(.2)
+ * .scale('C minor').note().clip(.2)
  */
 export const { echoWith, echowith, stutWith, stutwith } = register(
   ['echoWith', 'echowith', 'stutWith', 'stutwith'],
@@ -2102,22 +2101,42 @@ export const { iterBack, iterback } = register(['iterBack', 'iterback'], functio
 });
 
 /**
+ * Repeats each cycle the given number of times.
+ * @name repeatCycles
+ * @memberof Pattern
+ * @returns Pattern
+ * @example
+ * note(irand(12).add(34)).segment(4).repeatCycles(2).s("gm_acoustic_guitar_nylon")
+ */
+const _repeatCycles = function (n, pat) {
+  return slowcat(...Array(n).fill(pat));
+};
+
+const { repeatCycles } = register('repeatCycles', _repeatCycles);
+
+/**
  * Divides a pattern into a given number of parts, then cycles through those parts in turn, applying the given function to each part in turn (one part per cycle).
  * @name chunk
+ * @synonyms slowChunk, slowchunk
  * @memberof Pattern
  * @returns Pattern
  * @example
  * "0 1 2 3".chunk(4, x=>x.add(7)).scale('A minor').note()
  */
-const _chunk = function (n, func, pat, back = false) {
+const _chunk = function (n, func, pat, back = false, fast = false) {
   const binary = Array(n - 1).fill(false);
   binary.unshift(true);
-  const binary_pat = _iter(n, sequence(...binary), back);
+  // Invert the 'back' because we want to shift the pattern forwards,
+  // and so time backwards
+  const binary_pat = _iter(n, sequence(...binary), !back);
+  if (!fast) {
+    pat = pat.repeatCycles(n);
+  }
   return pat.when(binary_pat, func);
 };
 
-export const chunk = register('chunk', function (n, func, pat) {
-  return _chunk(n, func, pat, false);
+const { chunk, slowchunk, slowChunk } = register(['chunk', 'slowchunk', 'slowChunk'], function (n, func, pat) {
+  return _chunk(n, func, pat, false, false);
 });
 
 /**
@@ -2131,6 +2150,21 @@ export const chunk = register('chunk', function (n, func, pat) {
  */
 export const { chunkBack, chunkback } = register(['chunkBack', 'chunkback'], function (n, func, pat) {
   return _chunk(n, func, pat, true);
+});
+
+/**
+ * Like `chunk`, but the cycles of the source pattern aren't repeated
+ * for each set of chunks.
+ * @name fastChunk
+ * @synonyms fastchunk
+ * @memberof Pattern
+ * @returns Pattern
+ * @example
+ * "<0 8> 1 2 3 4 5 6 7".fastChunk(4, x => x.color('red')).slow(4).scale("C2:major").note()
+  .s("folkharp")
+ */
+const { fastchunk, fastChunk } = register(['fastchunk', 'fastChunk'], function (n, func, pat) {
+  return _chunk(n, func, pat, false, true);
 });
 
 // TODO - redefine elsewhere in terms of mask
@@ -2157,6 +2191,9 @@ export const duration = register('duration', function (value, pat) {
 
 /**
  * Sets the color of the hap in visualizations like pianoroll or highlighting.
+ * @name color
+ * @synonyms colour
+ * @param {string} color Hexadecimal or CSS color name
  */
 // TODO: move this to controls https://github.com/tidalcycles/strudel/issues/288
 export const { color, colour } = register(['color', 'colour'], function (color, pat) {
@@ -2179,6 +2216,7 @@ export const velocity = register('velocity', function (velocity, pat) {
 /**
  *
  * Multiplies the hap duration with the given factor.
+ * With samples, `clip` might be a better function to use ([more info](https://github.com/tidalcycles/strudel/pull/598))
  * @name legato
  * @memberof Pattern
  * @example
@@ -2217,6 +2255,14 @@ export const chop = register('chop', function (n, pat) {
   return pat.squeezeBind(func);
 });
 
+/**
+ * Cuts each sample into the given number of parts, triggering progressive portions of each sample at each loop.
+ * @name striate
+ * @memberof Pattern
+ * @returns Pattern
+ * @example
+ * s("numbers:0 numbers:1 numbers:2").striate(6).slow(6)
+ */
 export const striate = register('striate', function (n, pat) {
   const slices = Array.from({ length: n }, (x, i) => i);
   const slice_objects = slices.map((i) => ({ begin: i / n, end: (i + 1) / n }));
@@ -2241,17 +2287,21 @@ const _loopAt = function (factor, pat, cps = 1) {
     .slow(factor);
 };
 
-/*
+/**
  * Chops samples into the given number of slices, triggering those slices with a given pattern of slice numbers.
+ * Instead of a number, it also accepts a list of numbers from 0 to 1 to slice at specific points.
  * @name slice
  * @memberof Pattern
  * @returns Pattern
  * @example
  * await samples('github:tidalcycles/Dirt-Samples/master')
  * s("breaks165").slice(8, "0 1 <2 2*2> 3 [4 0] 5 6 7".every(3, rev)).slow(1.5)
+ * @example
+ * await samples('github:tidalcycles/Dirt-Samples/master')
+ * s("breaks125/2").fit().slice([0,.25,.5,.75], "0 1 1 <2 3>")
  */
 
-const slice = register(
+export const slice = register(
   'slice',
   function (npat, ipat, opat) {
     return npat.innerBind((n) =>
@@ -2259,9 +2309,9 @@ const slice = register(
         opat.outerBind((o) => {
           // If it's not an object, assume it's a string and make it a 's' control parameter
           o = o instanceof Object ? o : { s: o };
-          // Remember we must stay pure and avoid editing the object directly
-          const toAdd = { begin: i / n, end: (i + 1) / n, _slices: n };
-          return pure({ ...toAdd, ...o });
+          const begin = Array.isArray(n) ? n[i] : i / n;
+          const end = Array.isArray(n) ? n[i + 1] : (i + 1) / n;
+          return pure({ begin, end, _slices: n, ...o });
         }),
       ),
     );
@@ -2269,17 +2319,17 @@ const slice = register(
   false, // turns off auto-patternification
 );
 
-/*
+/**
  * Works the same as slice, but changes the playback speed of each slice to match the duration of its step.
  * @name splice
- * @memberof Pattern
- * @returns Pattern
  * @example
  * await samples('github:tidalcycles/Dirt-Samples/master')
- * s("breaks165").splice(8,  "0 1 [2 3 0]@2 3 0@2 7").hurry(0.65)
+ * s("breaks165")
+ * .splice(8,  "0 1 [2 3 0]@2 3 0@2 7")
+ * .hurry(0.65)
  */
 
-const splice = register(
+export const splice = register(
   'splice',
   function (npat, ipat, opat) {
     const sliced = slice(npat, ipat, opat);
@@ -2296,9 +2346,32 @@ const splice = register(
   false, // turns off auto-patternification
 );
 
-const { loopAt, loopat } = register(['loopAt', 'loopat'], function (factor, pat) {
+// this function will be redefined in repl.mjs to use the correct cps value.
+// It is still here to work in cases where repl.mjs is not used
+
+export const { loopAt, loopat } = register(['loopAt', 'loopat'], function (factor, pat) {
   return _loopAt(factor, pat, 1);
 });
+
+// the fit function will be redefined in repl.mjs to use the correct cps value.
+// It is still here to work in cases where repl.mjs is not used
+/**
+ * Makes the sample fit its event duration. Good for rhythmical loops like drum breaks.
+ * Similar to loopAt.
+ * @name fit
+ * @example
+ * samples({ rhodes: 'https://cdn.freesound.org/previews/132/132051_316502-lq.mp3' })
+ * s("rhodes/4").fit()
+ */
+export const fit = register('fit', (pat) =>
+  pat.withHap((hap) =>
+    hap.withValue((v) => ({
+      ...v,
+      speed: 1 / hap.whole.duration,
+      unit: 'c',
+    })),
+  ),
+);
 
 /**
  * Makes the sample fit the given number of cycles and cps value, by
@@ -2313,6 +2386,38 @@ const { loopAt, loopat } = register(['loopAt', 'loopat'], function (factor, pat)
  * s("rhodes").loopAtCps(4,1.5).cps(1.5)
  */
 // TODO - global cps clock
-const { loopAtCps, loopatcps } = register(['loopAtCps', 'loopatcps'], function (factor, cps, pat) {
+export const { loopAtCps, loopatcps } = register(['loopAtCps', 'loopatcps'], function (factor, cps, pat) {
   return _loopAt(factor, pat, cps);
 });
+
+/** exposes a custom value at query time. basically allows mutating state without evaluation */
+export const ref = (accessor) =>
+  pure(1)
+    .withValue(() => reify(accessor()))
+    .innerJoin();
+
+let fadeGain = (p) => (p < 0.5 ? 1 : 1 - (p - 0.5) / 0.5);
+
+/**
+ * Cross-fades between left and right from 0 to 1:
+ * - 0 = (full left, no right)
+ * - .5 = (both equal)
+ * - 1 = (no left, full right)
+ *
+ * @name xfade
+ * @example
+ * xfade(s("bd*2"), "<0 .25 .5 .75 1>", s("hh*8"))
+ */
+export let xfade = (a, pos, b) => {
+  pos = reify(pos);
+  a = reify(a);
+  b = reify(b);
+  let gaina = pos.fmap((v) => ({ gain: fadeGain(v) }));
+  let gainb = pos.fmap((v) => ({ gain: fadeGain(1 - v) }));
+  return stack(a.mul(gaina), b.mul(gainb));
+};
+
+// the prototype version is actually flipped so left/right makes sense
+Pattern.prototype.xfade = function (pos, b) {
+  return xfade(this, pos, b);
+};

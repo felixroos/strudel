@@ -30,8 +30,9 @@ export function Header({ context }) {
     <header
       id="header"
       className={cx(
-        'py-1 flex-none w-full text-black justify-between z-[100] text-lg  select-none sticky top-0',
+        'flex-none text-black  z-[100] text-lg select-none',
         !isZen && !isEmbedded && 'bg-lineHighlight',
+        isZen ? 'h-12 w-8 fixed top-0 left-0' : 'sticky top-0 w-full py-1 justify-between',
         isEmbedded ? 'flex' : 'md:flex',
       )}
     >
@@ -122,7 +123,7 @@ export function Header({ context }) {
           {!isEmbedded && (
             <a
               title="learn"
-              href="./learn/getting-started"
+              href="./workshop/getting-started"
               className={cx('hover:opacity-50 flex items-center space-x-1', !isEmbedded ? 'p-2' : 'px-2')}
             >
               <AcademicCapIcon className="w-6 h-6" />

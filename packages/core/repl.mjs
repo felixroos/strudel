@@ -3,6 +3,7 @@ import { evaluate as _evaluate } from './evaluate.mjs';
 import { logger } from './logger.mjs';
 import { setTime } from './time.mjs';
 import { evalScope } from './evaluate.mjs';
+import { register } from './pattern.mjs';
 
 export function repl({
   interval,
@@ -19,23 +20,16 @@ export function repl({
   const id = s4();
   const scheduler = new Cyclist({
     interval,
-    onTrigger: async (hap, deadline, duration, cps) => {
-      try {
-        if (!hap.context.onTrigger || !hap.context.dominantTrigger) {
-          await defaultOutput(hap, deadline, duration, cps);
-        }
-        if (hap.context.onTrigger) {
-          // call signature of output / onTrigger is different...
-          await hap.context.onTrigger(getTime() + deadline, hap, getTime(), cps);
-        }
-      } catch (err) {
-        logger(`[cyclist] error: ${err.message}`, 'error');
-      }
-    },
+    onTrigger: getTrigger({ defaultOutput, getTime }),
     onError: onSchedulerError,
     getTime,
     onToggle,
   });
+  let playPatterns = [];
+  const setPattern = (pattern, autostart = true) => {
+    pattern = editPattern?.(pattern) || pattern;
+    scheduler.setPattern(pattern, autostart);
+  };
   setTime(() => scheduler.now()); // TODO: refactor?
   const evaluate = async (code, autostart = true) => {
     if (!code) {
@@ -43,12 +37,14 @@ export function repl({
     }
     try {
       await beforeEval?.({ code });
-      let { pattern } = await _evaluate(code, transpiler);
-
+      playPatterns = [];
+      let { pattern, meta } = await _evaluate(code, transpiler);
+      if (playPatterns.length) {
+        pattern = pattern.stack(...playPatterns);
+      }
       logger(`[eval] code updated`);
-      pattern = editPattern?.(pattern, id) || pattern;
-      scheduler.setPattern(pattern, autostart);
-      afterEval?.({ code, pattern });
+      setPattern(pattern, autostart);
+      afterEval?.({ code, pattern, meta });
       return pattern;
     } catch (err) {
       // console.warn(`[repl] eval error: ${err.message}`);
@@ -60,15 +56,53 @@ export function repl({
   const start = () => scheduler.start();
   const pause = () => scheduler.pause();
   const setCps = (cps) => scheduler.setCps(cps);
+  const setCpm = (cpm) => scheduler.setCps(cpm / 60);
+
+  // the following functions use the cps value, which is why they are defined here..
+  const loopAt = register('loopAt', (cycles, pat) => {
+    return pat.loopAtCps(cycles, scheduler.cps);
+  });
+
+  const play = register('play', (pat) => {
+    playPatterns.push(pat);
+    return pat;
+  });
+
+  const fit = register('fit', (pat) =>
+    pat.withHap((hap) =>
+      hap.withValue((v) => ({
+        ...v,
+        speed: scheduler.cps / hap.whole.duration, // overwrite speed completely?
+        unit: 'c',
+      })),
+    ),
+  );
+
   evalScope({
+    loopAt,
+    fit,
+    play,
     setCps,
     setcps: setCps,
+    setCpm,
+    setcpm: setCpm,
   });
-  return { scheduler, evaluate, start, stop, pause, setCps, id };
+
+  return { scheduler, evaluate, start, stop, pause, setCps, setPattern };
 }
 
-function s4() {
-  return Math.floor((1 + Math.random()) * 0x10000)
-    .toString(16)
-    .substring(1);
-}
+export const getTrigger =
+  ({ getTime, defaultOutput }) =>
+  async (hap, deadline, duration, cps) => {
+    try {
+      if (!hap.context.onTrigger || !hap.context.dominantTrigger) {
+        await defaultOutput(hap, deadline, duration, cps);
+      }
+      if (hap.context.onTrigger) {
+        // call signature of output / onTrigger is different...
+        await hap.context.onTrigger(getTime() + deadline, hap, getTime(), cps);
+      }
+    } catch (err) {
+      logger(`[cyclist] error: ${err.message}`, 'error');
+    }
+  };

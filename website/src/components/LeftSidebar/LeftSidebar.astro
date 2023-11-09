@@ -1,5 +1,5 @@
 ---
-// import { getLanguageFromURL } from '../../languages';
+import { getLanguageFromURL } from '../../languages';
 import { SIDEBAR } from '../../config';
 
 type Props = {
@@ -10,7 +10,7 @@ const { currentPage } = Astro.props as Props;
 const { BASE_URL } = import.meta.env;
 let currentPageMatch = currentPage.slice(BASE_URL.length, currentPage.endsWith('/') ? -1 : undefined);
 
-const langCode = 'en'; // getLanguageFromURL(currentPage);
+const langCode = getLanguageFromURL(currentPage) || 'en';
 const sidebar = SIDEBAR[langCode];
 ---
 
@@ -47,10 +47,11 @@ const sidebar = SIDEBAR[langCode];
 </nav>
 
 <script is:inline>
-  window.addEventListener('DOMContentLoaded', () => {
-    var target = document.querySelector('[aria-current="page"]');
-    if (target && target.offsetTop > window.innerHeight - 100) {
-      document.querySelector('.nav-groups').scrollTop = target.offsetTop;
-    }
-  });
+window.addEventListener('DOMContentLoaded', () => {
+  var target = document.querySelector('[aria-current="page"]');
+  const nav = document.querySelector('.nav-groups');
+  if (nav && target && target.offsetTop > window.innerHeight - 100) {
+    nav.scrollTop = target.offsetTop;
+  }
+});
 </script>

@@ -1,6 +1,6 @@
 {
   "name": "@strudel.cycles/serial",
-  "version": "0.7.1",
+  "version": "0.9.0",
   "description": "Webserial API for strudel",
   "main": "serial.mjs",
   "publishConfig": {
@@ -32,6 +32,6 @@
     "@strudel.cycles/core": "workspace:*"
   },
   "devDependencies": {
-    "vite": "^3.2.2"
+    "vite": "^4.3.3"
   }
 }

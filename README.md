@@ -4,8 +4,8 @@
 
 An experiment in making a [Tidal](https://github.com/tidalcycles/tidal/) using web technologies. This software is slowly stabilising, but please continue to tread carefully.
 
-- Try it here: <https://strudel.tidalcycles.org/>
-- Docs: <https://strudel.tidalcycles.org/learn/>
+- Try it here: <https://strudel.cc>
+- Docs: <https://strudel.cc/learn>
 - Technical Blog Post: <https://loophole-letters.vercel.app/strudel>
 - 1 Year of Strudel Blog Post: <https://loophole-letters.vercel.app/strudel1year>
 
@@ -24,8 +24,8 @@ There are multiple npm packages you can use to use strudel, or only parts of it,
 
 - [`core`](./packages/core/): tidal pattern engine
 - [`mini`](./packages/mini): mini notation parser + core binding
-- [`eval`](./packages/eval): user code evaluator. syntax sugar + highlighting
-- [`tone`](./packages/tone): bindings for Tone.js instruments and effects
+- [`transpiler`](./packages/transpiler): user code transpiler
+- [`webaudio`](./packages/webaudio): webaudio output
 - [`osc`](./packages/osc): bindings to communicate via OSC
 - [`midi`](./packages/midi): webmidi bindings
 - [`serial`](./packages/serial): webserial bindings

@@ -5,6 +5,5 @@ This program is free software: you can redistribute it and/or modify it under th
 */
 
 export * from './webaudio.mjs';
-export * from './sampler.mjs';
-export * from './helpers.mjs';
-export * from './synth.mjs';
+export * from './scope.mjs';
+export * from 'superdough';

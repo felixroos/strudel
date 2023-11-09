@@ -68,32 +68,35 @@ stack(
 `;
 
 export const giantSteps = `// John Coltrane - Giant Steps
-setVoicingRange('lefthand', ['E3', 'G4']);
+
+let melody = note(
+  "[F#5 D5] [B4 G4] Bb4 [B4 A4]",
+  "[D5 Bb4] [G4 Eb4] F#4 [G4 F4]",
+  "Bb4 [B4 A4] D5 [D#5 C#5]",
+  "F#5 [G5 F5] Bb5 [F#5 F#5]",
+)
 
 stack(
   // melody
-  seq(
-    "[F#5 D5] [B4 G4] Bb4 [B4 A4]",
-    "[D5 Bb4] [G4 Eb4] F#4 [G4 F4]",
-    "Bb4 [B4 A4] D5 [D#5 C#5]",
-    "F#5 [G5 F5] Bb5 [F#5 F#5]",
-  ).color('#F8E71C'),
+  melody.color('#F8E71C'),
   // chords
-  seq(
+  chord(
     "[B^7 D7] [G^7 Bb7] Eb^7 [Am7 D7]",
     "[G^7 Bb7] [Eb^7 F#7] B^7 [Fm7 Bb7]",
     "Eb^7 [Am7 D7] G^7 [C#m7 F#7]",
     "B^7 [Fm7 Bb7] Eb^7 [C#m7 F#7]"
-  ).voicings('lefthand').color('#7ED321'),
+  ).dict('lefthand')
+  .anchor(melody).mode('duck')
+  .voicing().color('#7ED321'),
   // bass
-  seq(
+  note(
     "[B2 D2] [G2 Bb2] [Eb2 Bb3] [A2 D2]",
     "[G2 Bb2] [Eb2 F#2] [B2 F#2] [F2 Bb2]",
     "[Eb2 Bb2] [A2 D2] [G2 D2] [C#2 F#2]",
     "[B2 F#2] [F2 Bb2] [Eb2 Bb3] [C#2 F#2]"
   ).color('#00B8D4')
-).slow(20).note()
-//.pianoroll({fold:1})`;
+).slow(20)
+.pianoroll({fold:1})`;
 
 export const zeldasRescue = `// Koji Kondo - Princess Zelda's Rescue
 stack(
@@ -121,8 +124,10 @@ stack(
   .room(1)
   //.pianoroll({fold:1})`;
 
-export const caverave = `// licensed with CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
-// by Felix Roos
+export const caverave = `// "Caverave"
+// @license CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
+// @by Felix Roos
+
 const keys = x => x.s('sawtooth').cutoff(1200).gain(.5)
   .attack(0).decay(.16).sustain(.3).release(.1);
 
@@ -132,28 +137,31 @@ const drums = stack(
   s("[~ hh]*2").delay(.3).delayfeedback(.5).delaytime(.125).gain(.4)
 );
 
-const thru = (x) => x.transpose("<0 1>/8").transpose(-1);
 const synths = stack(
+  
   "<eb4 d4 c4 b3>/2"
-  .scale(timeCat([3,'C minor'],[1,'C melodic minor'])
-  .slow(8)).struct("[~ x]*2")
+  .scale("<C:minor!3 C:melodic:minor>/2")
+  .struct("[~ x]*2")
   .layer(
     x=>x.scaleTranspose(0).early(0),
     x=>x.scaleTranspose(2).early(1/8),
     x=>x.scaleTranspose(7).early(1/4),
     x=>x.scaleTranspose(8).early(3/8)
-  ).apply(thru).note().apply(keys).mask("<~ x>/16")
+  ).note().apply(keys).mask("<~ x>/16")
   .color('darkseagreen'),
-  note("<C2 Bb1 Ab1 [G1 [G2 G1]]>/2".apply(thru))
+  
+  note("<C2 Bb1 Ab1 [G1 [G2 G1]]>/2")
   .struct("[x [~ x] <[~ [~ x]]!3 [x x]>@2]/2".fast(2))
   .s('sawtooth').attack(0.001).decay(0.2).sustain(1).cutoff(500)
   .color('brown'),
-  "<Cm7 Bb7 Fm7 G7b13>/2".struct("~ [x@0.2 ~]".fast(2))
-  .voicings('lefthand')
-  .apply(thru).every(2, early(1/8)).note().apply(keys).sustain(0)
+  chord("<Cm7 Bb7 Fm7 G7b13>/2")
+  .struct("~ [x@0.2 ~]".fast(2))
+  .dict('lefthand').voicing()
+  .every(2, early(1/8))
+  .apply(keys).sustain(0)
   .delay(.4).delaytime(.12)
   .mask("<x@7 ~>/8".early(1/4))
-)
+).add(note("<-1 0>/8"))
 stack(
   drums.fast(2).color('tomato'), 
   synths
@@ -184,8 +192,10 @@ export const barryHarris = `// adapted from a Barry Harris excercise
   .color('#00B8D4')
 `;
 
-export const blippyRhodes = `// licensed with CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
-// by Felix Roos
+export const blippyRhodes = `// "Blippy Rhodes"
+// @license CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
+// @by Felix Roos
+
 samples({
   bd: 'samples/tidal/bd/BT0A0D0.wav',
   sn: 'samples/tidal/sn/ST0T0S3.wav',
@@ -201,37 +211,38 @@ samples({
   }
 }, 'https://loophole-letters.vercel.app/')
 
-const scales = cat('C major', 'C mixolydian', 'F lydian', ['F minor', cat('Db major','Db mixolydian')])
-
 stack(
   s("<bd sn> <hh hh*2 hh*3>").color('#00B8D4'),
   "<g4 c5 a4 [ab4 <eb5 f5>]>"
-  .scale(scales)
+  .scale("<C:major C:mixolydian F:lydian [F:minor <Db:major Db:mixolydian>]>")
   .struct("x*8")
   .scaleTranspose("0 [-5,-2] -7 [-9,-2]")
-  .legato(.3)
   .slow(2)
   .note()
+  .clip(.3)
   .s('rhodes')
-  .clip(1)
   .room(.5)
   .delay(.3)
   .delayfeedback(.4)
   .delaytime(1/12).gain(.5).color('#7ED321'),
-  "<c2 c3 f2 [[F2 C2] db2]>"
-  .legato("<1@3 [.3 1]>")
-  .slow(2).superimpose(x=>x.add(.02))
+  "<c2 c3 f2 [[F2 C2] db2]>/2"
+  .add("0,.02")
   .note().gain(.3)
-  .s('sawtooth').cutoff(600).color('#F8E71C'),
+  .clip("<1@3 [.3 1]>/2")
+  .cutoff(600)
+  .lpa(.2).lpenv(-4)
+  .s('sawtooth').color('#F8E71C'),
 ).fast(3/2)
 //.pianoroll({fold:1})`;
 
-export const wavyKalimba = `// licensed with CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
-// by Felix Roos
+export const wavyKalimba = `// "Wavy kalimba"
+// @license CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
+// @by Felix Roos
+
 samples({
   'kalimba': { c5:'https://freesound.org/data/previews/536/536549_11935698-lq.mp3' }
 })
-const scales = cat('C major', 'C mixolydian', 'F lydian', ['F minor', 'Db major'])
+const scales = "<C:major C:mixolydian F:lydian [F:minor Db:major]>"
 
 stack(
   "[0 2 4 6 9 2 0 -2]*3"
@@ -248,31 +259,38 @@ stack(
   .velocity(0.8)
   .slow(2)
 )
-  .legato("<.4 .8 1 1.2 1.4 1.6 1.8 2>/8")
   .fast(1)
   .note()
-  .clip(1)
+  .clip("<.4 .8 1 1.2 1.4 1.6 1.8 2>/8")
   .s('kalimba')
-  .delay(.2)
-  `;
+  .delay(.2)`;
 
-export const festivalOfFingers = `// licensed with CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
-// by Felix Roos
+export const festivalOfFingers = `// "Festival of fingers"
+// @license CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
+// @by Felix Roos
+
 const chords = "<Cm7 Fm7 G7 F#7>";
 stack(
-  chords.voicings('lefthand').struct("x(3,8,-1)").velocity(.5).off(1/7,x=>x.transpose(12).velocity(.2)),
-  chords.rootNotes(2).struct("x(4,8,-2)"),
+  chord(chords).dict('lefthand').voicing().struct("x(3,8,-1)")
+  .velocity(.5).off(1/7,x=>x.add(note(12)).velocity(.2)),
+  
+  chords.rootNotes(2).struct("x(4,8,-2)").note(),
+  
   chords.rootNotes(4)
   .scale(cat('C minor','F dorian','G dorian','F# mixolydian'))
   .struct("x(3,8,-2)".fast(2))
   .scaleTranspose("0 4 0 6".early(".125 .5")).layer(scaleTranspose("0,<2 [4,6] [5,7]>/4"))
+  .note()
+  
 ).slow(2)
  .velocity(sine.struct("x*8").add(3/5).mul(2/5).fast(8))
- .note().piano()`;
+ .piano()`;
 
 // iter, echo, echoWith
-export const undergroundPlumber = `// licensed with CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
-// by Felix Roos, inspired by Friendship - Let's not talk about it (1979) :)
+export const undergroundPlumber = `// "Underground plumber"
+// @license CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
+// @by Felix Roos
+// @details inspired by Friendship - Let's not talk about it (1979) :)
 
 samples({ bd: 'bd/BT0A0D0.wav', sn: 'sn/ST0T0S3.wav', hh: 'hh/000_hh3closedhh.wav', cp: 'cp/HANDCLP0.wav',
 }, 'https://loophole-letters.vercel.app/samples/tidal/')
@@ -283,100 +301,79 @@ stack(
   s("<<bd*2 bd> sn> hh").fast(2).gain(.7),
   "[c2 a1 bb1 ~] ~"
   .echo(2, 1/16, 1)
-  .legato(.4)
   .slow(2)
   .layer(h)
   .note().s('square')
+  .clip(.4)
   .cutoff(400).decay(.12).sustain(0)
   ,
   "[g2,[c3 eb3]]".iter(4)
   .echoWith(4, 1/8, (x,n)=>x.transpose(n*12).velocity(Math.pow(.4,n)))
-  .legato(.1)
   .layer(h).note()
+  .clip(.1)
 )
   .fast(2/3)
-  .pianoroll({})`;
+  .pianoroll()`;
 
-export const bridgeIsOver = `// licensed with CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
-// by Felix Roos, bassline by BDP - The Bridge Is Over
+export const bridgeIsOver = `// "Bridge is over"
+// @license CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
+// @by Felix Roos, bassline by BDP - The Bridge Is Over
+
 samples({mad:'https://freesound.org/data/previews/22/22274_109943-lq.mp3'})
 stack(
   stack(
-  "c3*2 [[c3@1.4 bb2] ab2] gb2*2 <[[gb2@1.4 ab2] bb2] gb2>".legato(".5 1".fast(2)).velocity(.8),
-  "0 ~".scale('c4 whole tone')
-    .euclidLegato(3,8).slow(2).mask("x ~")
-    .stutWith(8, 1/16, (x,n)=>x.scaleTranspose(n).velocity(Math.pow(.7,n)))
-    .scaleTranspose("<0 1 2 3 4 3 2 1>")
-    .fast(2)
-    .velocity(.7)
-    .legato(.5)
-    .stut(3, .5, 1/8)
-  ).transpose(-1).note().piano(),
+  note("c3*2 [[c3@1.4 bb2] ab2] gb2*2 <[[gb2@1.4 ab2] bb2] gb2>")
+    .gain(.8).clip("[.5 1]*2"),
+  n("<0 1 2 3 4 3 2 1>")
+    .clip(.5)
+    .echoWith(8, 1/32, (x,i)=>x.add(n(i)).velocity(Math.pow(.7,i)))
+    .scale('c4 whole tone')
+    .echo(3, 1/8, .5)
+  ).piano(),
   s("mad").slow(2)
 ).cpm(78).slow(4)
-  
   .pianoroll()
 `;
 
-export const goodTimes = `// licensed with CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
-// by Felix Roos
+export const goodTimes = `// "Good times"
+// @license CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
+// @by Felix Roos
+
 const scale = cat('C3 dorian','Bb2 major').slow(4);
 stack(
-  "2*4".add(12).scale(scale)
-  .off(1/8, scaleTranspose("2")).fast(2)
-  .scaleTranspose("<0 1 2 1>").hush(),
-  "<0 1 2 3>(3,8,2)"
+  n("2*4".add(12)).off(1/8, add(2))
   .scale(scale)
-  .off(1/4, scaleTranspose("2,4")),
-  "<0 4>(5,8,-1)".scale(scale).transpose(-12)
+  .fast(2)
+  .add("<0 1 2 1>").hush(),
+  "<0 1 2 3>(3,8,2)".off(1/4, add("2,4"))
+  .n().scale(scale),
+  n("<0 4>(5,8,-1)").scale(scale).sub(note(12))
 )
   .velocity(".6 .7".fast(4))
-  .legato("2")
-  .scaleTranspose("<0>".slow(4))
-  .transpose(5)
-  .note().piano()
+  .add(note(4))
+  .piano()
+  .clip(2)
   .velocity(.8)
   .slow(2)
-  .pianoroll({maxMidi:100,minMidi:20})`;
+  .pianoroll()`;
 
-/* // new style notation:
-export const goodTimes = `// licensed with CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
-// by Felix Roos
-const scale = cat('C3 dorian','Bb2 major').slow(4);
-stack(
-  n("2*4").add(12)
-  .off(1/8, add("2")).fast(2)
-  .add("<0 1 2 1>").hush(),
-  n("<0 1 2 3>(3,8,2)")
-  .off(1/4, add("2,4")),
-  n("<0 4>(5,8,-1)").sub(7)
-)
-  .scale(scale)
-  .gain(".6 .7".fast(4))
-  .legato(2)
-  .add(note(5))
-  .piano()
-  .mul(gain(.8))
-  .slow(2)
-  .pianoroll({maxMidi:100,minMidi:20})`;
-*/
+export const echoPiano = `// "Echo piano"
+// @license CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
+// @by Felix Roos
 
-export const echoPiano = `// licensed with CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
-// by Felix Roos
-"<0 2 [4 6](3,4,2) 3*2>"
+n("<0 2 [4 6](3,4,2) 3*2>").color('salmon')
+.off(1/4, x=>x.add(2).color('green'))
+.off(1/2, x=>x.add(6).color('steelblue'))
 .scale('D minor')
-.color('salmon')
-.off(1/4, x=>x.scaleTranspose(2).color('green'))
-.off(1/2, x=>x.scaleTranspose(6).color('steelblue'))
-.legato(.5)
 .echo(4, 1/8, .5)
-.note().piano()
+.clip(.5)
+.piano()
 .pianoroll()`;
 
 export const sml1 = `// Hirokazu Tanaka - World 1-1
 stack(
   // melody
-  \`<
+  note(\`<
   [e5 ~] [[d5@2 c5] [~@2 e5]] ~ [~ [c5@2 d5]] [e5 e5] [d5 c5] [e5 f5] [g5 a5]
   [~ c5] [c5 d5] [e5 [c5@2 c5]] [~ c5] [f5 e5] [c5 d5] [~ g6] [g6 ~]
   [e5 ~] [[d5@2 c5] [~@2 e5]] ~ [~ [c5@2 d5]] [e5 e5] [d5 c5] [a5 g5] [c6 [e5@2 d5]]
@@ -385,31 +382,33 @@ stack(
   [f5 ~] [[g5@2 f5] ~] [[e5 ~] [f5 ~]] [[f#5 ~] [g5 ~]]
   [~ a5] [b5 c6] [b5@2 ~@2 g5] ~
   [eb6 d6] [~ c6] ~!2
-  >\`
-  .legato(.95),
+  >\`)
+  .clip(.95),
   // sub melody
-  \`<
+  note(\`<
   [~ g4]!2 [~ ab4]!2 [~ a4]!2 [~ bb4]!2 
   [~ a4]!2 [~ g4]!2 [d4 e4] [f4 gb4] ~!2
   [~ g4]!2 [~ ab4]!2 [~ a4]!2 [~ bb4]!2 
   [~ a4]!2 [~ g4]!2 [d4 e4] [f4 gb4] ~!2
   [~ c5]!4 [~ a4]!2 [[c4 ~] [d4 ~]] [[eb4 ~] [e4 ~]]
   [~ c5]!4 [~ eb5]!2 [g4*2 [f4 ~]] [[e4 ~] [d4 ~]]
-  >\`,
+  >\`),
   // bass
-  \`<
+  note(\`<
   c3!7 a3 f3!2
   e3!2 ~!4
   c3!7 a3 f3!2
   e3!2 ~!4
   f3!2 e3!2 d3!2 ~!2
   f3!2 e3!2 ab3!2 ~!2
-  >\`
-  .legato(.5)
-).fast(2).note()`;
+  >\`)
+  .clip(.5)
+).fast(2)`;
 
-export const randomBells = `// licensed with CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
-// by Felix Roos
+export const randomBells = `// "Random bells"
+// @license CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
+// @by Felix Roos
+
 samples({
   bell: { c6: 'https://freesound.org/data/previews/411/411089_5121236-lq.mp3' },
   bass: { d2: 'https://freesound.org/data/previews/608/608286_13074022-lq.mp3' }
@@ -420,35 +419,37 @@ stack(
   "0".euclidLegato(3,8)
   .echo(3, 1/16, .5)
   .add(rand.range(0,12))
+  .scale("D:minor:pentatonic").note()
   .velocity(rand.range(.5,1))
-  .legato(rand.range(.4,3))
-  .scale(cat('D minor pentatonic')).note()
   .s('bell').gain(.6).delay(.2).delaytime(1/3).delayfeedback(.8),
   // bass
-  "<D2 A2 G2 F2>".euclidLegatoRot(6,8,4).note().s('bass').clip(1).gain(.8)
+  note("<D2 A2 G2 F2>").euclidLegatoRot(6,8,4).s('bass').clip(1).gain(.8)
 )
   .slow(6)
-  .pianoroll({minMidi:20,maxMidi:120,background:'transparent'})
-  `;
+  .pianoroll({vertical:1})`;
 
-export const waa2 = `// licensed with CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
-// by Felix Roos
-n(
+export const waa2 = `// "Waa2"
+// @license CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
+// @by Felix Roos
+
+note(
   "a4 [a3 c3] a3 c3"
   .sub("<7 12 5 12>".slow(2))
   .off(1/4,x=>x.add(7))
   .off(1/8,x=>x.add(12))
 )
   .slow(2)
-  .legato(sine.range(0.3, 2).slow(28))
+  .clip(sine.range(0.3, 2).slow(28))
   .s("sawtooth square".fast(2))
   .cutoff(cosine.range(500,4000).slow(16))
   .gain(.5)
   .room(.5)
-  `;
+  .lpa(.125).lpenv(-2).v("8:.125").fanchor(.25)`;
 
-export const hyperpop = `// licensed with CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
-// by Felix Roos
+export const hyperpop = `// "Hyperpop"
+// @license CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
+// @by Felix Roos
+
 const lfo = cosine.slow(15);
 const lfo2 = sine.slow(16);
 const filter1 = x=>x.cutoff(lfo2.range(300,3000));
@@ -469,7 +470,9 @@ stack(
   .note()
   .s("sawtooth,square")
   .gain(.3).attack(0.01).decay(0.1).sustain(.5)
-  .apply(filter1),
+  .apply(filter1)
+  .lpa(.1).lpenv(2).ftype('24db')
+  ,
   "~@3 [<2 3>,<4 5>]"
   .echo(4,1/16,.7)
   .scale(scales)
@@ -498,26 +501,32 @@ stack(
 ).slow(2)
 // strudel disable-highlighting`;
 
-export const festivalOfFingers3 = `// licensed with CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
-// by Felix Roos
-"[-7*3],0,2,6,[8 7]"
-.echoWith(4,1/4, (x,n)=>x
-          .add(n*7)
-          .velocity(1/(n+1))
-          .legato(1/(n+1)))
-.velocity(perlin.range(.5,.9).slow(8))
-.stack("[22 25]*3"
-       .legato(sine.range(.5,2).slow(8))
-       .velocity(sine.range(.4,.8).slow(5))
-       .echo(4,1/12,.5))
-.scale(cat('D dorian','G mixolydian','C dorian','F mixolydian'))
-.legato(1)
-.slow(2)
-.note().piano()
+export const festivalOfFingers3 = `// "Festival of fingers 3"
+// @license CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
+// @by Felix Roos
+
+n("[-7*3],0,2,6,[8 7]")
+  .echoWith(
+    4, // echo 4 times
+    1/4, // 1/4s between echos
+    (x,i)=>x
+      .add(n(i*7)) // add octaves
+      .gain(1/(i+1)) // reduce gain
+      .clip(1/(i+1))
+    )
+  .velocity(perlin.range(.5,.9).slow(8))
+  .stack(n("[22 25]*3")
+         .clip(sine.range(.5,2).slow(8))
+         .gain(sine.range(.4,.8).slow(5))
+         .echo(4,1/12,.5))
+  .scale("<D:dorian G:mixolydian C:dorian F:mixolydian>")
+  .slow(2).piano()
 //.pianoroll({maxMidi:160})`;
 
-export const meltingsubmarine = `// licensed with CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
-// by Felix Roos
+export const meltingsubmarine = `// "Melting submarine"
+// @license CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
+// @by Felix Roos
+
 await samples('github:tidalcycles/Dirt-Samples/master/')
 stack(
   s("bd:5,[~ <sd:1!3 sd:1(3,4,3)>],hh27(3,4,1)") // drums
@@ -532,11 +541,12 @@ stack(
   .s('sawtooth') // waveform
   .gain(.4) // turn down
   .cutoff(sine.slow(7).range(300,5000)) // automate cutoff
+  .lpa(.1).lpenv(-2)
   //.hush()
-  ,"<Am7!3 <Em7 E7b13 Em7 Ebm7b5>>".voicings('lefthand') // chords
-  .superimpose(x=>x.add(.04)) // add second, slightly detuned voice
-  .add(perlin.range(0,.5)) // random pitch variation
-  .note() // wrap in "note"
+  ,chord("<Am7!3 <Em7 E7b13 Em7 Ebm7b5>>")
+  .dict('lefthand').voicing() // chords
+  .add(note("0,.04")) // add second, slightly detuned voice
+  .add(note(perlin.range(0,.5))) // random pitch variation
   .s('sawtooth') // waveform
   .gain(.16) // turn down
   .cutoff(500) // fixed cutoff
@@ -554,8 +564,11 @@ stack(
 )
   .slow(3/2)`;
 
-export const outroMusic = `// licensed with CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
-// by Felix Roos
+/* 
+export const outroMusic = `// "Outro music"
+// @license CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
+// @by Felix Roos
+
 samples({
   bd: ['bd/BT0AADA.wav','bd/BT0AAD0.wav','bd/BT0A0DA.wav','bd/BT0A0D3.wav','bd/BT0A0D0.wav','bd/BT0A0A7.wav'],
   sd: ['sd/rytm-01-classic.wav','sd/rytm-00-hard.wav'],
@@ -563,14 +576,15 @@ samples({
   perc: ['perc/002_perc2.wav'],
 }, 'github:tidalcycles/Dirt-Samples/master/');
 
-"C^7 Am7 Dm7 G7".slow(2).voicings('lefthand')
-  .stack("0@6 [<1 2> <2 0> 1]@2".scale('C5 major'))
-  .note().slow(4)
+chord("<C^7 Am7 Dm7 G7>*2").dict('lefthand').anchor("G4").voicing()
+  .stack(n("0@6 [<1 2> <2 0> 1]@2").scale('C5 major'))
+  .slow(4)
   .s("gm_epiano1:1")
   .color('steelblue')
   .stack(
-   "<-7 ~@2 [~@2 -7] -9 ~@2 [~@2 -9] -10!2 ~ [~@2 -10] -5 ~ [-3 -2 -10]@2>*2".scale('C3 major')
-    .note().s('sawtooth').color('brown')
+   "<-7 ~@2 [~@2 -7] -9 ~@2 [~@2 -9] -10!2 ~ [~@2 -10] -5 ~ [-3 -2 -10]@2>*2"
+    .scale('C3 major').note()
+    .s('sawtooth').color('brown')
   )
   .attack(0.05).decay(.1).sustain(.7)
   .cutoff(perlin.range(800,2000))
@@ -581,10 +595,13 @@ samples({
     .n(3).color('gray')
   ).slow(3/2)
   //.pianoroll({autorange:1,vertical:1,fold:0})
-  `;
+  `; 
+*/
 
-export const bassFuge = `// licensed with CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
-// by Felix Roos
+export const bassFuge = `// "Bass fuge"
+// @license CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
+// @by Felix Roos
+
 samples({ flbass: ['00_c2_finger_long_neck.wav','01_c2_finger_short_neck.wav','02_c2_finger_long_bridge.wav','03_c2_finger_short_bridge.wav','04_c2_pick_long.wav','05_c2_pick_short.wav','06_c2_palm_mute.wav'] }, 
   'github:cleary/samples-flbass/main/')
 samples({
@@ -609,8 +626,10 @@ x=>x.add(7).color('steelblue')
 .stack(s("bd:1*2,~ sd:0,[~ hh:0]*2"))
 .pianoroll({vertical:1})`;
 
-export const chop = `// licensed with CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
-// by Felix Roos
+export const chop = `// "Chop"
+// @license CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
+// @by Felix Roos
+
 samples({ p: 'https://cdn.freesound.org/previews/648/648433_11943129-lq.mp3' })
 
 s("p")
@@ -622,8 +641,10 @@ s("p")
   .sustain(.6)
   `;
 
-export const delay = `// licensed with CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
-// by Felix Roos
+export const delay = `// "Delay"
+// @license CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
+// @by Felix Roos
+
 stack(
     s("bd <sd cp>")
     .delay("<0 .5>")
@@ -631,8 +652,10 @@ stack(
     .delayfeedback(".6 | .8")
   ).sometimes(x=>x.speed("-1"))`;
 
-export const orbit = `// licensed with CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
-// by Felix Roos
+export const orbit = `// "Orbit"
+// @license CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
+// @by Felix Roos
+
 stack(
     s("bd <sd cp>")
     .delay(.5)
@@ -645,8 +668,10 @@ stack(
     .orbit(2)
   ).sometimes(x=>x.speed("-1"))`;
 
-export const belldub = `// licensed with CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
-// by Felix Roos
+export const belldub = `// "Belldub"
+// @license CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
+// @by Felix Roos
+
 samples({ bell: {b4:'https://cdn.freesound.org/previews/339/339809_5121236-lq.mp3'}})
 // "Hand Bells, B, Single.wav" by InspectorJ (www.jshaw.co.uk) of Freesound.org
 stack(
@@ -658,8 +683,10 @@ stack(
   s("mt lt ht").struct("x(3,8)").fast(2).gain(.5).room(.5).sometimes(x=>x.speed(".5")),
   s("misc:2").speed(1).delay(.5).delaytime(1/3).gain(.4),
   // chords
-  note("[~ Gm7] ~ [~ Dm7] ~".voicings('lefthand').superimpose(x=>x.add(.1)))
-  .s('sawtooth').gain(.5)
+  chord("[~ Gm7] ~ [~ Dm7] ~")
+  .dict('lefthand').voicing()
+  .add(note("0,.1"))
+  .s('sawtooth').gain(.8)
   .cutoff(perlin.range(400,3000).slow(8))
   .decay(perlin.range(0.05,.2)).sustain(0)
   .delay(.9).room(1),
@@ -678,8 +705,10 @@ stack(
   .mask("<1 0>/8")
 ).slow(5)`;
 
-export const dinofunk = `// licensed with CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
-// by Felix Roos
+export const dinofunk = `// "Dinofunk"
+// @license CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
+// @by Felix Roos
+
 samples({bass:'https://cdn.freesound.org/previews/614/614637_2434927-hq.mp3',
 dino:{b4:'https://cdn.freesound.org/previews/316/316403_5123851-hq.mp3'}})
 setVoicingRange('lefthand', ['c3','a4'])
@@ -687,7 +716,11 @@ setVoicingRange('lefthand', ['c3','a4'])
 stack(
 s('bass').loopAt(8).clip(1),
 s("bd*2, ~ sd,hh*4"),
-note("Abm7".voicings('lefthand').struct("x(3,8,1)".slow(2))),
+chord("Abm7")
+  .mode("below:G4")
+  .dict('lefthand')
+  .voicing()
+  .struct("x(3,8,1)".slow(2)),
 "0 1 2 3".scale('ab4 minor pentatonic')
 .superimpose(x=>x.add(.1))
 .sometimes(x=>x.add(12))
@@ -699,8 +732,10 @@ note("Abm7".voicings('lefthand').struct("x(3,8,1)".slow(2))),
 note("<b4 eb4>").s('dino').delay(.8).slow(8).room(.5)
 )`;
 
-export const sampleDemo = `// licensed with CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
-// by Felix Roos
+export const sampleDemo = `// "Sample demo"
+// @license CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
+// @by Felix Roos
+
 stack(
   // percussion
   s("[woodblock:1 woodblock:2*2] snare_rim:0,gong/8,brakedrum:1(3,8),~@3 cowbell:3")
@@ -715,8 +750,10 @@ stack(
   .release(.1).room(.5)
 )`;
 
-export const holyflute = `// licensed with CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
-// by Felix Roos
+export const holyflute = `// "Holy flute"
+// @license CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
+// @by Felix Roos
+
 "c3 eb3(3,8) c4/2 g3*2"
 .superimpose(
   x=>x.slow(2).add(12),
@@ -728,8 +765,10 @@ export const holyflute = `// licensed with CC BY-NC-SA 4.0 https://creativecommo
 .pianoroll({fold:0,autorange:0,vertical:0,cycles:12,smear:0,minMidi:40})
 `;
 
-export const flatrave = `// licensed with CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
-// by Felix Roos
+export const flatrave = `// "Flatrave"
+// @license CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
+// @by Felix Roos
+
 stack(
   s("bd*2,~ [cp,sd]").bank('RolandTR909'),
   
@@ -740,7 +779,8 @@ stack(
   .gain("0.4,0.4(5,8,-1)"),
   
   note("<0 2 5 3>".scale('G1 minor')).struct("x(5,8,-1)")
-  .s('sawtooth').decay(.1).sustain(0),
+  .s('sawtooth').decay(.1).sustain(0)
+  .lpa(.1).lpenv(-4).lpf(800).lpq(8),
   
   note("<G4 A4 Bb4 A4>,Bb3,D3").struct("~ x*2").s('square').clip(1)
   .cutoff(sine.range(500,4000).slow(16)).resonance(10)
@@ -751,8 +791,10 @@ stack(
   .decay(.05).sustain(0).delay(.2).degradeBy(.5).mask("<0 1>/16")
 )`;
 
-export const amensister = `// licensed with CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
-// by Felix Roos
+export const amensister = `// "Amensister"
+// @license CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
+// @by Felix Roos
+
 await samples('github:tidalcycles/Dirt-Samples/master')
 
 stack(
@@ -769,14 +811,16 @@ stack(
   sine.add(saw.slow(4)).range(0,7).segment(8)
   .superimpose(x=>x.add(.1))
   .scale('G0 minor').note()
-  .s("sawtooth").decay(.1).sustain(0)
-  .gain(.4).cutoff(perlin.range(300,3000).slow(8)).resonance(10)
+  .s("sawtooth")
+  .gain(.4).decay(.1).sustain(0)
+  .lpa(.1).lpenv(-4).lpq(10)
+  .cutoff(perlin.range(300,3000).slow(8))
   .degradeBy("0 0.1 .5 .1")
   .rarely(add(note("12")))
   ,
   // chord
   note("Bb3,D4".superimpose(x=>x.add(.2)))
-  .s('sawtooth').cutoff(1000).struct("<~@3 [~ x]>")
+  .s('sawtooth').lpf(1000).struct("<~@3 [~ x]>")
   .decay(.05).sustain(.0).delay(.8).delaytime(.125).room(.8)
   ,
   // alien
@@ -785,21 +829,25 @@ stack(
   n("0 1").s("east").delay(.5).degradeBy(.8).speed(rand.range(.5,1.5))
 ).reset("<x@7 x(5,8,-1)>")`;
 
-export const juxUndTollerei = `// licensed with CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
-// by Felix Roos
+export const juxUndTollerei = `// "Jux und tollerei"
+// @license CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
+// @by Felix Roos
+
 note("c3 eb3 g3 bb3").palindrome()
 .s('sawtooth')
 .jux(x=>x.rev().color('green').s('sawtooth'))
 .off(1/4, x=>x.add(note("<7 12>/2")).slow(2).late(.005).s('triangle'))
-//.delay(.5)
-.fast(1).cutoff(sine.range(200,2000).slow(8))
+.lpf(sine.range(200,2000).slow(8))
+.lpa(.2).lpenv(-2)
 .decay(.05).sustain(0)
 .room(.6)
 .delay(.5).delaytime(.1).delayfeedback(.4)
 .pianoroll()`;
 
-export const csoundDemo = `// licensed with CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
-// by Felix Roos
+export const csoundDemo = `// "CSound demo"
+// @license with CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
+// @by Felix Roos
+
 await loadCsound\`
 instr CoolSynth
     iduration = p3
@@ -832,40 +880,50 @@ endin\`
 //.pianoroll()
 .csound('CoolSynth')`;
 
-export const loungeSponge = `
-// licensed with CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
-// by Felix Roos
-// livecode.orc by Steven Yi
+export const loungeSponge = `// "Lounge sponge"
+// @license CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
+// @by Felix Roos, livecode.orc by Steven Yi
+
 await loadOrc('github:kunstmusik/csound-live-code/master/livecode.orc')
 
 stack(
-  note("<C^7 A7 Dm7 Fm7>/2".voicings('lefthand'))
+  chord("<C^7 A7 Dm7 Fm7>/2").dict('lefthand').voicing()
   .cutoff(sine.range(500,2000).round().slow(16))
   .euclidLegato(3,8).csound('FM1')
   ,
   note("<C2 A1 D2 F2>/2").ply(8).csound('Bass').gain("1 4 1 4")
   ,
-  note("0 7 [4 3] 2".fast(2/3).off(".25 .125",add("<2 4 -3 -1>"))
+  n("0 7 [4 3] 2".fast(2/3).off(".25 .125", add("<2 4 -3 -1>"))
   .slow(2).scale('A4 minor'))
-  .legato(.25).csound('SynHarp')
+  .clip(.25).csound('SynHarp')
   ,
   s("bd*2,[~ hh]*2,~ cp").bank('RolandTR909')
 )`;
 
-export const arpoon = `// licensed with CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
-// "Arpoon" by Felix Roos
+export const arpoon = `// "Arpoon"
+// @license CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
+// @by Felix Roos
+
 await samples('github:tidalcycles/Dirt-Samples/master')
 
-"<<Am7 C^7> C7 F^7 [Fm7 E7b9]>".voicings('lefthand')
-  .arp("[0,3] 2 [1,3] 2".fast(3).lastOf(4, fast(2))).legato(2)
-  .add(perlin.range(0,0.2)).sub("<0 -12>/8")
-  .note().cutoff(perlin.range(500,4000)).resonance(12)
+n("[0,3] 2 [1,3] 2".fast(3).lastOf(4, fast(2))).clip(2)
+  .offset("<<1 2> 2 1 1>")
+  .chord("<<Am7 C^7> C7 F^7 [Fm7 E7b9]>")
+  .dict('lefthand').voicing()
+  .add(perlin.range(0,0.2).add("<-12 0>/8").note())
+  .cutoff(perlin.range(500,4000)).resonance(12)
   .gain("<.5 .8>*16")
   .decay(.16).sustain(0.5)
   .delay(.2)
   .room(.5).pan(sine.range(.3,.6))
-  .s('piano').clip(1)
-  .stack("<<A1 C2>!2 F2 [F2 E2]>".add.out("0 -5".fast(2)).add("0,.12").note().s('sawtooth').clip(1).cutoff(300))
+  .s('piano')
+  .stack(
+    "<<A1 C2>!2 F2 F2>"
+    .add.out("0 -5".fast(2))
+    .add("0,.12").note()
+    .s('sawtooth').cutoff(180)
+    .lpa(.1).lpenv(2)
+  )
   .slow(4)
   .stack(s("bd*4, [~ [hh hh? hh?]]*2,~ [sd ~ [sd:2? bd?]]").bank('RolandTR909').gain(.5).slow(2))
 `;

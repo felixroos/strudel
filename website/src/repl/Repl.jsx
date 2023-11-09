@@ -9,7 +9,7 @@ import { CodeMirror, cx, flash, useHighlighting, useStrudel, useKeydown } from '
 import { getAudioContext, initAudioOnFirstClick, resetLoadedSounds, webaudioOutput } from '@strudel.cycles/webaudio';
 import { createClient } from '@supabase/supabase-js';
 import { nanoid } from 'nanoid';
-import React, { createContext, useCallback, useEffect, useState } from 'react';
+import React, { createContext, useCallback, useEffect, useState, useMemo } from 'react';
 import './Repl.css';
 import { Footer } from './Footer';
 import { Header } from './Header';
@@ -19,6 +19,11 @@ import PlayCircleIcon from '@heroicons/react/20/solid/PlayCircleIcon';
 import { themes } from './themes.mjs';
 import { settingsMap, useSettings, setLatestCode } from '../settings.mjs';
 import Loader from './Loader';
+import { settingPatterns } from '../settings.mjs';
+import { code2hash, hash2code } from './helpers.mjs';
+import { isTauri } from '../tauri.mjs';
+import { useWidgets } from '@strudel.cycles/react/src/hooks/useWidgets.mjs';
+import { writeText } from '@tauri-apps/api/clipboard';
 
 const { latestCode } = settingsMap.get();
 
@@ -30,21 +35,31 @@ const supabase = createClient(
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpZHhkc3hwaGxoempuem1pZnRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NTYyMzA1NTYsImV4cCI6MTk3MTgwNjU1Nn0.bqlw7802fsWRnqU5BLYtmXk_k-D1VFmbkHMywWc15NM',
 );
 
-const modules = [
+let modules = [
   import('@strudel.cycles/core'),
   import('@strudel.cycles/tonal'),
   import('@strudel.cycles/mini'),
-  import('@strudel.cycles/midi'),
   import('@strudel.cycles/xen'),
   import('@strudel.cycles/webaudio'),
-  import('@strudel.cycles/osc'),
+  import('@strudel/codemirror'),
+  import('@strudel/hydra'),
   import('@strudel.cycles/serial'),
   import('@strudel.cycles/soundfonts'),
   import('@strudel.cycles/csound'),
 ];
+if (isTauri()) {
+  modules = modules.concat([
+    import('@strudel/desktopbridge/loggerbridge.mjs'),
+    import('@strudel/desktopbridge/midibridge.mjs'),
+    import('@strudel/desktopbridge/oscbridge.mjs'),
+  ]);
+} else {
+  modules = modules.concat([import('@strudel.cycles/midi'), import('@strudel.cycles/osc')]);
+}
 
 const modulesLoading = evalScope(
   controls, // sadly, this cannot be exported from core direclty
+  settingPatterns,
   ...modules,
 );
 
@@ -63,11 +78,11 @@ async function initCode() {
   try {
     const initialUrl = window.location.href;
     const hash = initialUrl.split('?')[1]?.split('#')?.[0];
-    const codeParam = window.location.href.split('#')[1];
-    // looking like https://strudel.tidalcycles.org/?J01s5i1J0200 (fixed hash length)
+    const codeParam = window.location.href.split('#')[1] || '';
+    // looking like https://strudel.cc/?J01s5i1J0200 (fixed hash length)
     if (codeParam) {
-      // looking like https://strudel.tidalcycles.org/#ImMzIGUzIg%3D%3D (hash length depends on code length)
-      return atob(decodeURIComponent(codeParam || ''));
+      // looking like https://strudel.cc/#ImMzIGUzIg%3D%3D (hash length depends on code length)
+      return hash2code(codeParam);
     } else if (hash) {
       return supabase
         .from('code')
@@ -78,7 +93,7 @@ async function initCode() {
             console.warn('failed to load hash', err);
           }
           if (data.length) {
-            console.log('load hash from database', hash);
+            //console.log('load hash from database', hash);
             return data[0].code;
           }
         });
@@ -104,9 +119,21 @@ export function Repl({ embedded = false }) {
   const [view, setView] = useState(); // codemirror view
   const [lastShared, setLastShared] = useState();
   const [pending, setPending] = useState(true);
+  const {
+    theme,
+    keybindings,
+    fontSize,
+    fontFamily,
+    isLineNumbersDisplayed,
+    isAutoCompletionEnabled,
+    isTooltipEnabled,
+    isLineWrappingEnabled,
+    panelPosition,
+    isZen,
+  } = useSettings();
 
-  const { theme, keybindings, fontSize, fontFamily } = useSettings();
-
+  const paintOptions = useMemo(() => ({ fontFamily }), [fontFamily]);
+  const { setWidgets } = useWidgets(view);
   const { code, setCode, scheduler, evaluate, activateCode, isDirty, activeCode, pattern, started, stop, error } =
     useStrudel({
       initialCode: '// LOADING...',
@@ -118,28 +145,44 @@ export function Repl({ embedded = false }) {
         cleanupUi();
         cleanupDraw();
       },
-      afterEval: ({ code }) => {
+      afterEval: ({ code, meta }) => {
+        setMiniLocations(meta.miniLocations);
+        setWidgets(meta.widgets);
         setPending(false);
         setLatestCode(code);
-        window.location.hash = '#' + encodeURIComponent(btoa(code));
+        window.location.hash = '#' + code2hash(code);
       },
       onEvalError: (err) => {
         setPending(false);
       },
-      onToggle: (play) => !play && cleanupDraw(false),
+      onToggle: (play) => {
+        if (!play) {
+          cleanupDraw(false);
+          window.postMessage('strudel-stop');
+        } else {
+          window.postMessage('strudel-start');
+        }
+      },
       drawContext,
+      // drawTime: [0, 6],
+      paintOptions,
     });
 
   // init code
   useEffect(() => {
     initCode().then((decoded) => {
-      logger(
-        `Welcome to Strudel! ${
-          decoded ? `I have loaded the code from the URL.` : `A random code snippet named "${name}" has been loaded!`
-        } Press play or hit ctrl+enter to run it!`,
-        'highlight',
-      );
-      setCode(decoded || latestCode || randomTune);
+      let msg;
+      if (decoded) {
+        setCode(decoded);
+        msg = `I have loaded the code from the URL.`;
+      } else if (latestCode) {
+        setCode(latestCode);
+        msg = `Your last session has been loaded!`;
+      } /*  if(randomTune) */ else {
+        setCode(randomTune);
+        msg = `A random code snippet named "${name}" has been loaded!`;
+      }
+      logger(`Welcome to Strudel! ${msg} Press play or hit ctrl+enter to run it!`, 'highlight');
       setPending(false);
     });
   }, []);
@@ -157,7 +200,7 @@ export function Repl({ embedded = false }) {
             e.preventDefault();
             flash(view);
             await activateCode();
-          } else if (e.key === '.') {
+          } else if (e.key === '.' || e.code === 'Period') {
             stop();
             e.preventDefault();
           }
@@ -168,7 +211,7 @@ export function Repl({ embedded = false }) {
   );
 
   // highlighting
-  useHighlighting({
+  const { setMiniLocations } = useHighlighting({
     view,
     pattern,
     active: started && !activeCode?.includes('strudel disable-highlighting'),
@@ -182,7 +225,7 @@ export function Repl({ embedded = false }) {
   const handleChangeCode = useCallback(
     (c) => {
       setCode(c);
-      started && logger('[edit] code changed. hit ctrl+enter to update');
+      //started && logger('[edit] code changed. hit ctrl+enter to update');
     },
     [started],
   );
@@ -190,6 +233,7 @@ export function Repl({ embedded = false }) {
     // TODO: scroll to selected function in reference
     // console.log('selectino change', selection.ranges[0].from);
   }, []);
+
   const handleTogglePlay = async () => {
     await getAudioContext().resume(); // fixes no sound in ios webkit
     if (!started) {
@@ -228,7 +272,11 @@ export function Repl({ embedded = false }) {
     if (!error) {
       setLastShared(activeCode || code);
       // copy shareUrl to clipboard
-      await navigator.clipboard.writeText(shareUrl);
+      if (isTauri()) {
+        await writeText(shareUrl);
+      } else {
+        await navigator.clipboard.writeText(shareUrl);
+      }
       const message = `Link copied to clipboard: ${shareUrl}`;
       alert(message);
       // alert(message);
@@ -254,36 +302,23 @@ export function Repl({ embedded = false }) {
     handleShuffle,
     handleShare,
   };
+  const currentTheme = useMemo(() => themes[theme] || themes.strudelTheme, [theme]);
+  const handleViewChanged = useCallback((v) => {
+    setView(v);
+  }, []);
+
   return (
     // bg-gradient-to-t from-blue-900 to-slate-900
     // bg-gradient-to-t from-green-900 to-slate-900
     <ReplContext.Provider value={context}>
       <div
         className={cx(
-          'h-full flex flex-col',
-          //        'bg-gradient-to-t from-green-900 to-slate-900', //
+          'h-full flex flex-col relative',
+          // overflow-hidden
         )}
       >
         <Loader active={pending} />
         <Header context={context} />
-        <section className="grow flex text-gray-100 relative overflow-auto cursor-text pb-0" id="code">
-          <CodeMirror
-            theme={themes[theme] || themes.strudelTheme}
-            value={code}
-            keybindings={keybindings}
-            fontSize={fontSize}
-            fontFamily={fontFamily}
-            onChange={handleChangeCode}
-            onViewChanged={(v) => {
-              setView(v);
-              // window.editorView = v;
-            }}
-            onSelectionChange={handleSelectionChange}
-          />
-        </section>
-        {error && (
-          <div className="text-red-500 p-4 bg-lineHighlight animate-pulse">{error.message || 'Unknown Error :-/'}</div>
-        )}
         {isEmbedded && !started && (
           <button
             onClick={() => handleTogglePlay()}
@@ -293,7 +328,29 @@ export function Repl({ embedded = false }) {
             <span>play</span>
           </button>
         )}
-        {!isEmbedded && <Footer context={context} />}
+        <div className="grow flex relative overflow-hidden">
+          <section className={'text-gray-100 cursor-text pb-0 overflow-auto grow' + (isZen ? ' px-10' : '')} id="code">
+            <CodeMirror
+              theme={currentTheme}
+              value={code}
+              keybindings={keybindings}
+              isLineNumbersDisplayed={isLineNumbersDisplayed}
+              isAutoCompletionEnabled={isAutoCompletionEnabled}
+              isTooltipEnabled={isTooltipEnabled}
+              isLineWrappingEnabled={isLineWrappingEnabled}
+              fontSize={fontSize}
+              fontFamily={fontFamily}
+              onChange={handleChangeCode}
+              onViewChanged={handleViewChanged}
+              onSelectionChange={handleSelectionChange}
+            />
+          </section>
+          {panelPosition === 'right' && !isEmbedded && <Footer context={context} />}
+        </div>
+        {error && (
+          <div className="text-red-500 p-4 bg-lineHighlight animate-pulse">{error.message || 'Unknown Error :-/'}</div>
+        )}
+        {panelPosition === 'bottom' && !isEmbedded && <Footer context={context} />}
       </div>
     </ReplContext.Provider>
   );

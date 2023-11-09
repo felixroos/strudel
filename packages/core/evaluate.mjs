@@ -1,6 +1,6 @@
 /*
 evaluate.mjs - <short description TODO>
-Copyright (C) 2022 Strudel contributors - see <https://github.com/tidalcycles/strudel/blob/main/packages/eval/evaluate.mjs>
+Copyright (C) 2022 Strudel contributors - see <https://github.com/tidalcycles/strudel/blob/main/packages/core/evaluate.mjs>
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details. You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
@@ -37,8 +37,12 @@ function safeEval(str, options = {}) {
 }
 
 export const evaluate = async (code, transpiler) => {
+  let meta = {};
   if (transpiler) {
-    code = transpiler(code); // transform syntactically correct js code to semantically usable code
+    // transform syntactically correct js code to semantically usable code
+    const transpiled = transpiler(code);
+    code = transpiled.output;
+    meta = transpiled;
   }
   // if no transpiler is given, we expect a single instruction (!wrapExpression)
   const options = { wrapExpression: !!transpiler };
@@ -48,5 +52,5 @@ export const evaluate = async (code, transpiler) => {
     const message = `got "${typeof evaluated}" instead of pattern`;
     throw new Error(message + (typeof evaluated === 'function' ? ', did you forget to call a function?' : '.'));
   }
-  return { mode: 'javascript', pattern: evaluated };
+  return { mode: 'javascript', pattern: evaluated, meta };
 };

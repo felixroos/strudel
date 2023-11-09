@@ -1,6 +1,6 @@
 :root {
   --background: #222;
-  --lineBackground: #22222250;
+  --lineBackground: #22222299;
   --foreground: #fff;
   --caret: #ffcc00;
   --selection: rgba(128, 203, 196, 0.5);
@@ -23,4 +23,12 @@
 
 .cm-theme-light {
   width: 100%;
+}
+
+footer {
+  z-index: 0 !important;
+}
+
+.strudel-tooltip {
+  padding: 5px;
 }

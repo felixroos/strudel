@@ -4,4 +4,7 @@ packages:
   - "website/"
   - "iclc2023/slides/"
   - "packages/core/examples/vite-vanilla-repl"
+  - "packages/core/examples/vite-vanilla-repl-cm6"
   - "packages/react/examples/nano-repl"
+  - "packages/web/examples/repl-example"
+  - "packages/superdough/example"

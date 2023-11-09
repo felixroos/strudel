@@ -7,6 +7,19 @@ This program is free software: you can redistribute it and/or modify it under th
 import { Note, Interval, Scale } from '@tonaljs/tonal';
 import { register, _mod } from '@strudel.cycles/core';
 
+const octavesInterval = (octaves) => (octaves <= 0 ? -1 : 1) + octaves * 7 + 'P';
+
+function scaleStep(step, scale) {
+  scale = scale.replaceAll(':', ' ');
+  step = Math.ceil(step);
+  const { intervals, tonic } = Scale.get(scale);
+  const { pc, oct = 3 } = Note.get(tonic);
+  const octaveOffset = Math.floor(step / intervals.length);
+  const scaleStep = _mod(step, intervals.length);
+  const interval = Interval.add(intervals[scaleStep], octavesInterval(octaveOffset));
+  return Note.transpose(pc + oct, interval);
+}
+
 // transpose note inside scale by offset steps
 // function scaleOffset(scale: string, offset: number, note: string) {
 function scaleOffset(scale, offset, note) {
@@ -127,36 +140,35 @@ export const scaleTranspose = register('scaleTranspose', function (offset /* : n
  *
  * The root note defaults to octave 3, if no octave number is given.
  *
- * @memberof Pattern
  * @name scale
  * @param {string} scale Name of scale
  * @returns Pattern
  * @example
- * "0 2 4 6 4 2".scale("C2:major").note()
+ * n("0 2 4 6 4 2").scale("C:major")
  * @example
- * "0 2 4 6 4 2"
- * .scale("C2:<major minor>")
- * .note()
+ * n("[0,7] 4 [2,7] 4")
+ * .scale("C:<major minor>/2")
+ * .s("piano")
  * @example
- * "0 1 2 3 4 5 6 7".rev().scale("C2:<major minor>").note()
+ * n(rand.range(0,12).segment(8).round())
+ * .scale("C:ritusen")
  * .s("folkharp")
  */
 
 export const scale = register('scale', function (scale, pat) {
   // Supports ':' list syntax in mininotation
   if (Array.isArray(scale)) {
-    scale = scale.join(' ');
+    scale = scale.flat().join(' ');
   }
   return pat.withHap((hap) => {
     const isObject = typeof hap.value === 'object';
     let note = isObject ? hap.value.n : hap.value;
+    if (isObject) {
+      delete hap.value.n; // remove n so it won't cause trouble
+    }
     const asNumber = Number(note);
     if (!isNaN(asNumber)) {
-      // TODO: worth keeping for supporting ':' in (non-mininotation) strings?
-      scale = scale.replaceAll(':', ' ');
-      let [tonic, scaleName] = Scale.tokenize(scale);
-      const { pc, oct = 3 } = Note.get(tonic);
-      note = scaleOffset(pc + ' ' + scaleName, asNumber, pc + oct);
+      note = scaleStep(asNumber, scale);
     }
     return hap.withValue(() => (isObject ? { ...hap.value, note } : note)).setContext({ ...hap.context, scale });
   });

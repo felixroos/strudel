@@ -34,6 +34,7 @@ import strudelTheme from '@strudel.cycles/react/src/themes/strudel-theme';
 import bluescreen, { settings as bluescreenSettings } from '@strudel.cycles/react/src/themes/bluescreen';
 import blackscreen, { settings as blackscreenSettings } from '@strudel.cycles/react/src/themes/blackscreen';
 import whitescreen, { settings as whitescreenSettings } from '@strudel.cycles/react/src/themes/whitescreen';
+import teletext, { settings as teletextSettings } from '@strudel.cycles/react/src/themes/teletext';
 import algoboy, { settings as algoboySettings } from '@strudel.cycles/react/src/themes/algoboy';
 import terminal, { settings as terminalSettings } from '@strudel.cycles/react/src/themes/terminal';
 
@@ -42,6 +43,7 @@ export const themes = {
   bluescreen,
   blackscreen,
   whitescreen,
+  teletext,
   algoboy,
   terminal,
   abcdef,
@@ -80,7 +82,7 @@ export const themes = {
 export const settings = {
   strudelTheme: {
     background: '#222',
-    lineBackground: '#22222250',
+    lineBackground: '#22222299',
     foreground: '#fff',
     // foreground: '#75baff',
     caret: '#ffcc00',
@@ -95,11 +97,12 @@ export const settings = {
   bluescreen: bluescreenSettings,
   blackscreen: blackscreenSettings,
   whitescreen: whitescreenSettings,
+  teletext: teletextSettings,
   algoboy: algoboySettings,
   terminal: terminalSettings,
   abcdef: {
     background: '#0f0f0f',
-    lineBackground: '#0f0f0f50',
+    lineBackground: '#0f0f0f99',
     foreground: '#defdef',
     caret: '#00FF00',
     selection: '#515151',
@@ -110,7 +113,7 @@ export const settings = {
   },
   androidstudio: {
     background: '#282b2e',
-    lineBackground: '#282b2e50',
+    lineBackground: '#282b2e99',
     foreground: '#a9b7c6',
     caret: '#00FF00',
     selection: '#343739',
@@ -119,7 +122,7 @@ export const settings = {
   },
   atomone: {
     background: '#272C35',
-    lineBackground: '#272C3550',
+    lineBackground: '#272C3599',
     foreground: '#9d9b97',
     caret: '#797977',
     selection: '#ffffff30',
@@ -131,7 +134,7 @@ export const settings = {
   },
   aura: {
     background: '#21202e',
-    lineBackground: '#21202e50',
+    lineBackground: '#21202e99',
     foreground: '#edecee',
     caret: '#a277ff',
     selection: '#3d375e7f',
@@ -144,7 +147,7 @@ export const settings = {
   bbedit: {
     light: true,
     background: '#FFFFFF',
-    lineBackground: '#FFFFFF50',
+    lineBackground: '#FFFFFF99',
     foreground: '#000000',
     caret: '#FBAC52',
     selection: '#FFD420',
@@ -156,7 +159,7 @@ export const settings = {
   },
   bespin: {
     background: '#28211c',
-    lineBackground: '#28211c50',
+    lineBackground: '#28211c99',
     foreground: '#9d9b97',
     caret: '#797977',
     selection: '#36312e',
@@ -167,7 +170,7 @@ export const settings = {
   },
   darcula: {
     background: '#2B2B2B',
-    lineBackground: '#2B2B2B50',
+    lineBackground: '#2B2B2B99',
     foreground: '#f8f8f2',
     caret: '#FFFFFF',
     selection: 'rgba(255, 255, 255, 0.1)',
@@ -179,7 +182,7 @@ export const settings = {
   },
   dracula: {
     background: '#282a36',
-    lineBackground: '#282a3650',
+    lineBackground: '#282a3699',
     foreground: '#f8f8f2',
     caret: '#f8f8f0',
     selection: 'rgba(255, 255, 255, 0.1)',
@@ -192,7 +195,7 @@ export const settings = {
   duotoneLight: {
     light: true,
     background: '#faf8f5',
-    lineBackground: '#faf8f550',
+    lineBackground: '#faf8f599',
     foreground: '#b29762',
     caret: '#93abdc',
     selection: '#e3dcce',
@@ -204,7 +207,7 @@ export const settings = {
   },
   duotoneDark: {
     background: '#2a2734',
-    lineBackground: '#2a273450',
+    lineBackground: '#2a273499',
     foreground: '#6c6783',
     caret: '#ffad5c',
     selection: 'rgba(255, 255, 255, 0.1)',
@@ -215,7 +218,7 @@ export const settings = {
   eclipse: {
     light: true,
     background: '#fff',
-    lineBackground: '#ffffff50',
+    lineBackground: '#ffffff99',
     foreground: '#000',
     caret: '#FFFFFF',
     selection: '#d7d4f0',
@@ -228,7 +231,7 @@ export const settings = {
   githubLight: {
     light: true,
     background: '#fff',
-    lineBackground: '#ffffff50',
+    lineBackground: '#ffffff99',
     foreground: '#24292e',
     selection: '#BBDFFF',
     selectionMatch: '#BBDFFF',
@@ -237,7 +240,7 @@ export const settings = {
   },
   githubDark: {
     background: '#0d1117',
-    lineBackground: '#0d111750',
+    lineBackground: '#0d111799',
     foreground: '#c9d1d9',
     caret: '#c9d1d9',
     selection: '#003d73',
@@ -246,7 +249,7 @@ export const settings = {
   },
   gruvboxDark: {
     background: '#282828',
-    lineBackground: '#28282850',
+    lineBackground: '#28282899',
     foreground: '#ebdbb2',
     caret: '#ebdbb2',
     selection: '#bdae93',
@@ -258,7 +261,7 @@ export const settings = {
   gruvboxLight: {
     light: true,
     background: '#fbf1c7',
-    lineBackground: '#fbf1c750',
+    lineBackground: '#fbf1c799',
     foreground: '#3c3836',
     caret: '#af3a03',
     selection: '#ebdbb2',
@@ -270,7 +273,7 @@ export const settings = {
   },
   materialDark: {
     background: '#2e3235',
-    lineBackground: '#2e323550',
+    lineBackground: '#2e323599',
     foreground: '#bdbdbd',
     caret: '#a0a4ae',
     selection: '#d7d4f0',
@@ -283,7 +286,7 @@ export const settings = {
   materialLight: {
     light: true,
     background: '#FAFAFA',
-    lineBackground: '#FAFAFA50',
+    lineBackground: '#FAFAFA99',
     foreground: '#90A4AE',
     caret: '#272727',
     selection: '#80CBC440',
@@ -296,7 +299,7 @@ export const settings = {
   noctisLilac: {
     light: true,
     background: '#f2f1f8',
-    lineBackground: '#f2f1f850',
+    lineBackground: '#f2f1f899',
     foreground: '#0c006b',
     caret: '#5c49e9',
     selection: '#d5d1f2',
@@ -307,7 +310,7 @@ export const settings = {
   },
   nord: {
     background: '#2e3440',
-    lineBackground: '#2e344050',
+    lineBackground: '#2e344099',
     foreground: '#FFFFFF',
     caret: '#FFFFFF',
     selection: '#3b4252',
@@ -319,7 +322,7 @@ export const settings = {
   },
   okaidia: {
     background: '#272822',
-    lineBackground: '#27282250',
+    lineBackground: '#27282299',
     foreground: '#FFFFFF',
     caret: '#FFFFFF',
     selection: '#49483E',
@@ -331,7 +334,7 @@ export const settings = {
   solarizedLight: {
     light: true,
     background: '#fdf6e3',
-    lineBackground: '#fdf6e350',
+    lineBackground: '#fdf6e399',
     foreground: '#657b83',
     caret: '#586e75',
     selection: '#dfd9c8',
@@ -342,7 +345,7 @@ export const settings = {
   },
   solarizedDark: {
     background: '#002b36',
-    lineBackground: '#002b3650',
+    lineBackground: '#002b3699',
     foreground: '#93a1a1',
     caret: '#839496',
     selection: '#173541',
@@ -353,7 +356,7 @@ export const settings = {
   },
   sublime: {
     background: '#303841',
-    lineBackground: '#30384150',
+    lineBackground: '#30384199',
     foreground: '#FFFFFF',
     caret: '#FBAC52',
     selection: '#4C5964',
@@ -365,7 +368,7 @@ export const settings = {
   tokyoNightDay: {
     light: true,
     background: '#e1e2e7',
-    lineBackground: '#e1e2e750',
+    lineBackground: '#e1e2e799',
     foreground: '#3760bf',
     caret: '#3760bf',
     selection: '#99a7df',
@@ -377,7 +380,7 @@ export const settings = {
   },
   tokyoNightStorm: {
     background: '#24283b',
-    lineBackground: '#24283b50',
+    lineBackground: '#24283b99',
     foreground: '#7982a9',
     caret: '#c0caf5',
     selection: '#6f7bb630',
@@ -389,7 +392,7 @@ export const settings = {
   },
   tokyoNight: {
     background: '#1a1b26',
-    lineBackground: '#1a1b2650',
+    lineBackground: '#1a1b2699',
     foreground: '#787c99',
     caret: '#c0caf5',
     selection: '#515c7e40',
@@ -401,7 +404,7 @@ export const settings = {
   },
   vscodeDark: {
     background: '#1e1e1e',
-    lineBackground: '#1e1e1e50',
+    lineBackground: '#1e1e1e99',
     foreground: '#9cdcfe',
     caret: '#c6c6c6',
     selection: '#6199ff2f',
@@ -414,7 +417,7 @@ export const settings = {
   xcodeLight: {
     light: true,
     background: '#fff',
-    lineBackground: '#ffffff50',
+    lineBackground: '#ffffff99',
     foreground: '#3D3D3D',
     selection: '#BBDFFF',
     selectionMatch: '#BBDFFF',
@@ -424,7 +427,7 @@ export const settings = {
   },
   xcodeDark: {
     background: '#292A30',
-    lineBackground: '#292A3050',
+    lineBackground: '#292A3099',
     foreground: '#CECFD0',
     caret: '#fff',
     selection: '#727377',
@@ -468,4 +471,12 @@ function getCircularReplacer() {
 
 function stringifySafe(json) {
   return JSON.stringify(json, getCircularReplacer());
+}
+
+export function injectStyle(rule) {
+  const newStyle = document.createElement('style');
+  document.head.appendChild(newStyle);
+  const styleSheet = newStyle.sheet;
+  const ruleIndex = styleSheet.insertRule(rule, 0);
+  return () => styleSheet.deleteRule(ruleIndex);
 }

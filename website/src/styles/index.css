@@ -26,9 +26,13 @@
   font-family: 'FiraCode-SemiBold';
   src: url('/fonts/FiraCode/FiraCode-SemiBold.ttf');
 }
-
-.cm-gutters {
-  display: none !important;
+@font-face {
+  font-family: 'teletext';
+  src: url('/fonts/teletext/EuropeanTeletext.ttf');
+}
+@font-face {
+  font-family: 'mode7';
+  src: url('/fonts/mode7/MODE7GX3.TTF');
 }
 
 .prose > h1:not(:first-child) {

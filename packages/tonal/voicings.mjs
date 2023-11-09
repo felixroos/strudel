@@ -5,11 +5,79 @@ This program is free software: you can redistribute it and/or modify it under th
 */
 
 import { stack, register } from '@strudel.cycles/core';
+import { renderVoicing } from './tonleiter.mjs';
 import _voicings from 'chord-voicings';
-const { dictionaryVoicing, minTopNoteDiff, lefthand } = _voicings.default || _voicings; // parcel module resolution fuckup
+import { complex, simple } from './ireal.mjs';
+const { dictionaryVoicing, minTopNoteDiff } = _voicings.default || _voicings; // parcel module resolution fuckup
+
+const lefthand = {
+  m7: ['3m 5P 7m 9M', '7m 9M 10m 12P'],
+  7: ['3M 6M 7m 9M', '7m 9M 10M 13M'],
+  '^7': ['3M 5P 7M 9M', '7M 9M 10M 12P'],
+  69: ['3M 5P 6A 9M'],
+  m7b5: ['3m 5d 7m 8P', '7m 8P 10m 12d'],
+  '7b9': ['3M 6m 7m 9m', '7m 9m 10M 13m'],
+  '7b13': ['3M 6m 7m 9m', '7m 9m 10M 13m'],
+  o7: ['1P 3m 5d 6M', '5d 6M 8P 10m'],
+  '7#11': ['7m 9M 11A 13A'],
+  '7#9': ['3M 7m 9A'],
+  mM7: ['3m 5P 7M 9M', '7M 9M 10m 12P'],
+  m6: ['3m 5P 6M 9M', '6M 9M 10m 12P'],
+};
+
+const guidetones = {
+  m7: ['3m 7m', '7m 10m'],
+  m9: ['3m 7m', '7m 10m'],
+  7: ['3M 7m', '7m 10M'],
+  '^7': ['3M 7M', '7M 10M'],
+  '^9': ['3M 7M', '7M 10M'],
+  69: ['3M 6M'],
+  6: ['3M 6M', '6M 10M'],
+  m7b5: ['3m 7m', '7m 10m'],
+  '7b9': ['3M 7m', '7m 10M'],
+  '7b13': ['3M 7m', '7m 10M'],
+  o7: ['3m 6M', '6M 10m'],
+  '7#11': ['3M 7m', '7m 10M'],
+  '7#9': ['3M 7m', '7m 10M'],
+  mM7: ['3m 7M', '7M 10m'],
+  m6: ['3m 6M', '6M 10m'],
+};
+
+const triads = {
+  '': ['1P 3M 5P', '3M 5P 8P', '5P 8P 10M'],
+  M: ['1P 3M 5P', '3M 5P 8P', '5P 8P 10M'],
+  m: ['1P 3m 5P', '3m 5P 8P', '5P 8P 10m'],
+  o: ['1P 3m 5d', '3m 5d 8P', '5d 8P 10m'],
+  aug: ['1P 3m 5A', '3m 5A 8P', '5A 8P 10m'],
+};
+
+const defaultDictionary = {
+  // triads
+  '': ['1P 3M 5P', '3M 5P 8P', '5P 8P 10M'],
+  M: ['1P 3M 5P', '3M 5P 8P', '5P 8P 10M'],
+  m: ['1P 3m 5P', '3m 5P 8P', '5P 8P 10m'],
+  o: ['1P 3m 5d', '3m 5d 8P', '5d 8P 10m'],
+  aug: ['1P 3m 5A', '3m 5A 8P', '5A 8P 10m'],
+  // sevenths chords
+  m7: ['3m 5P 7m 9M', '7m 9M 10m 12P'],
+  7: ['3M 6M 7m 9M', '7m 9M 10M 13M'],
+  '^7': ['3M 5P 7M 9M', '7M 9M 10M 12P'],
+  69: ['3M 5P 6A 9M'],
+  m7b5: ['3m 5d 7m 8P', '7m 8P 10m 12d'],
+  '7b9': ['3M 6m 7m 9m', '7m 9m 10M 13m'],
+  '7b13': ['3M 6m 7m 9m', '7m 9m 10M 13m'],
+  o7: ['1P 3m 5d 6M', '5d 6M 8P 10m'],
+  '7#11': ['7m 9M 11A 13A'],
+  '7#9': ['3M 7m 9A'],
+  mM7: ['3m 5P 7M 9M', '7M 9M 10m 12P'],
+  m6: ['3m 5P 6M 9M', '6M 9M 10m 12P'],
+};
 
 export const voicingRegistry = {
-  lefthand: { dictionary: lefthand, range: ['F3', 'A4'] },
+  lefthand: { dictionary: lefthand, range: ['F3', 'A4'], mode: 'below', anchor: 'a4' },
+  triads: { dictionary: triads, mode: 'below', anchor: 'a4' },
+  guidetones: { dictionary: guidetones, mode: 'above', anchor: 'a4' },
+  default: { dictionary: defaultDictionary, mode: 'below', anchor: 'a4' },
 };
 export const setVoicingRange = (name, range) => addVoicings(name, voicingRegistry[name].dictionary, range);
 
@@ -38,6 +106,11 @@ export const addVoicings = (name, dictionary, range = ['F3', 'A4']) => {
   Object.assign(voicingRegistry, { [name]: { dictionary, range } });
 };
 
+// new call signature
+export const registerVoicings = (name, dictionary, options = {}) => {
+  Object.assign(voicingRegistry, { [name]: { dictionary, ...options } });
+};
+
 const getVoicing = (chord, dictionaryName, lastVoicing) => {
   const { dictionary, range } = voicingRegistry[dictionaryName];
   return dictionaryVoicing({
@@ -50,6 +123,7 @@ const getVoicing = (chord, dictionaryName, lastVoicing) => {
 };
 
 /**
+ * DEPRECATED: still works, but it is recommended you use .voicing instead (without s).
  * Turns chord symbols into voicings, using the smoothest voice leading possible.
  * Uses [chord-voicings package](https://github.com/felixroos/chord-voicings#chord-voicings).
  *
@@ -86,7 +160,76 @@ export const voicings = register('voicings', function (dictionary, pat) {
  */
 export const rootNotes = register('rootNotes', function (octave, pat) {
   return pat.fmap((value) => {
-    const root = value.match(/^([a-gA-G][b#]?).*$/)[1];
-    return root + octave;
+    const chord = value.chord || value;
+    const root = chord.match(/^([a-gA-G][b#]?).*$/)[1];
+    const note = root + octave;
+    return value.chord ? { note } : note;
   });
 });
+
+/**
+ * Turns chord symbols into voicings. You can use the following control params:
+ *
+ * - `chord`: Note, followed by chord symbol, e.g. C Am G7 Bb^7
+ * - `dict`: voicing dictionary to use, falls back to default dictionary
+ * - `anchor`: the note that is used to align the chord
+ * - `mode`: how the voicing is aligned to the anchor
+ *   - `below`: top note <= anchor
+ *   - `duck`: top note <= anchor, anchor excluded
+ *   - `above`: bottom note >= anchor
+ * - `offset`: whole number that shifts the voicing up or down to the next voicing
+ * - `n`: if set, the voicing is played like a scale. Overshooting numbers will be octaved
+ *
+ * All of the above controls are optional, except `chord`.
+ * If you pass a pattern of strings to voicing, they will be interpreted as chords.
+ *
+ * @name voicing
+ * @param {string} dictionary which voicing dictionary to use.
+ * @returns Pattern
+ * @example
+ * voicing("<C Am F G>")
+ * @example
+ * n("0 1 2 3 4 5 6 7").chord("<C Am F G>").voicing()
+ */
+export const voicing = register('voicing', function (pat) {
+  return pat
+    .fmap((value) => {
+      // destructure voicing controls out
+      value = typeof value === 'string' ? { chord: value } : value;
+      let { dictionary = 'default', chord, anchor, offset, mode, n, octaves, ...rest } = value;
+      dictionary =
+        typeof dictionary === 'string' ? voicingRegistry[dictionary] : { dictionary, mode: 'below', anchor: 'c5' };
+      let notes = renderVoicing({ ...dictionary, chord, anchor, offset, mode, n, octaves });
+
+      return stack(...notes)
+        .note()
+        .set(rest); // rest does not include voicing controls anymore!
+    })
+    .outerJoin();
+});
+
+export function voicingAlias(symbol, alias, setOrSets) {
+  setOrSets = !Array.isArray(setOrSets) ? [setOrSets] : setOrSets;
+  setOrSets.forEach((set) => {
+    set[alias] = set[symbol];
+  });
+}
+
+// no symbol = major chord
+voicingAlias('^', '', [simple, complex]);
+
+Object.keys(simple).forEach((symbol) => {
+  // add aliases for "-" === "m"
+  if (symbol.includes('-')) {
+    let alias = symbol.replace('-', 'm');
+    voicingAlias(symbol, alias, [complex, simple]);
+  }
+  // add aliases for "^" === "M"
+  if (symbol.includes('^')) {
+    let alias = symbol.replace('^', 'M');
+    voicingAlias(symbol, alias, [complex, simple]);
+  }
+});
+
+registerVoicings('ireal', simple);
+registerVoicings('ireal-ext', complex);

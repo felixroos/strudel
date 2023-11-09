@@ -1,6 +1,7 @@
 # @strudel.cycles/webaudio
 
 This package contains helpers to make music with strudel and the Web Audio API.
+It is a thin binding to [superdough](https://www.npmjs.com/package/superdough).
 
 ## Install
 
@@ -32,4 +33,4 @@ document.getElementById("stop").addEventListener("click", () => scheduler.stop()
 
 [Play with the example codesandbox](https://codesandbox.io/s/amazing-dawn-gclfwg?file=/src/index.js).
 
-Read more in the docs about [samples](https://strudel.tidalcycles.org/learn/samples/), [synths](https://strudel.tidalcycles.org/learn/synths/) and [effects](https://strudel.tidalcycles.org/learn/effects/).
+Read more in the docs about [samples](https://strudel.cc/learn/samples/), [synths](https://strudel.cc/learn/synths/) and [effects](https://strudel.cc/learn/effects/).

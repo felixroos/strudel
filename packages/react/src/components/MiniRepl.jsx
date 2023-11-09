@@ -18,18 +18,24 @@ export function MiniRepl({
   tune,
   hideOutsideView = false,
   enableKeyboard,
+  onTrigger,
   drawTime,
   punchcard,
+  punchcardLabels,
+  onPaint,
   canvasHeight = 200,
   fontSize = 18,
+  fontFamily,
   hideHeader = false,
   theme,
+  keybindings,
+  isLineNumbersDisplayed,
 }) {
   drawTime = drawTime || (punchcard ? [0, 4] : undefined);
   const evalOnMount = !!drawTime;
   const drawContext = useCallback(
-    !!drawTime ? (canvasId) => document.querySelector('#' + canvasId)?.getContext('2d') : null,
-    [drawTime],
+    punchcard ? (canvasId) => document.querySelector('#' + canvasId)?.getContext('2d') : null,
+    [punchcard],
   );
   const {
     code,
@@ -50,13 +56,22 @@ export function MiniRepl({
     initialCode: tune,
     defaultOutput: webaudioOutput,
     editPattern: (pat, id) => {
-      pat = pat.withContext((ctx) => ({ ...ctx, id }));
-      return punchcard ? pat.punchcard() : pat;
+      //pat = pat.withContext((ctx) => ({ ...ctx, id }));
+      if (onTrigger) {
+        pat = pat.onTrigger(onTrigger, false);
+      }
+      if (onPaint) {
+        pat = pat.onPaint(onPaint);
+      } else if (punchcard) {
+        pat = pat.punchcard({ labels: punchcardLabels });
+      }
+      return pat;
     },
     getTime,
     evalOnMount,
     drawContext,
     drawTime,
+    afterEval: ({ meta }) => setMiniLocations(meta.miniLocations),
   });
 
   const [view, setView] = useState();
@@ -70,7 +85,7 @@ export function MiniRepl({
     }
     return isVisible || wasVisible.current;
   }, [isVisible, hideOutsideView]);
-  useHighlighting({
+  const { setMiniLocations } = useHighlighting({
     view,
     pattern,
     active: started && !activeCode?.includes('strudel disable-highlighting'),
@@ -87,7 +102,7 @@ export function MiniRepl({
               e.preventDefault();
               flash(view);
               await activateCode();
-            } else if (e.key === '.') {
+            } else if (e.key === '.' || e.code === 'Period') {
               stop();
               e.preventDefault();
             }
@@ -140,11 +155,20 @@ export function MiniRepl({
       )}
       <div className="overflow-auto relative">
         {show && (
-          <CodeMirror6 value={code} onChange={setCode} onViewChanged={setView} theme={theme} fontSize={fontSize} />
+          <CodeMirror6
+            value={code}
+            onChange={setCode}
+            onViewChanged={setView}
+            theme={theme}
+            fontFamily={fontFamily}
+            fontSize={fontSize}
+            keybindings={keybindings}
+            isLineNumbersDisplayed={isLineNumbersDisplayed}
+          />
         )}
         {error && <div className="text-right p-1 text-md text-red-200">{error.message}</div>}
       </div>
-      {drawTime && (
+      {punchcard && (
         <canvas
           id={canvasId}
           className="w-full pointer-events-none"
