@@ -42,7 +42,7 @@ const snippets = [
 function SyntaxComparison() {
   return (
     <>
-      <h1>Haskell -&gt; JavaScript</h1>
+      <h1>comparing tidal &amp; strudel syntax</h1>
       <Stepper
         steps={snippets
           .map(([hs, js, label]) => (
@@ -64,7 +64,7 @@ function SyntaxComparison() {
               </div>
             </div>
           ))
-          .concat([<>Fluent Interface: Just chain all the things!</>])}
+          .concat([<>Fluent Interface: Just chain all the things! If you know hydra, this will look very familiar</>])}
       />
     </>
   );

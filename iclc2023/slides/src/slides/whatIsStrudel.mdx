@@ -2,19 +2,23 @@ import { SlideRepl } from '../SlideRepl.jsx';
 
 # What is Strudel
 
-- TidalCycles faithfully ported to JavaScript
+- the "official" JavaScript port of the popular music live coding language TidalCycles
 - zero-install live coding environment for the browser
 - free & open source, modular, hackable, sharable, embeddable:
 
 <SlideRepl
   hideHeader
   fontSize={24}
-  tune={`// froos - freakuency - 2023/03/29
+  tune={`await samples('shabda/speech:hello,basel,codes');
 stack(
   stack(
     s("bd, ~ <rim cp>,~ hh*2").off(1/8, x=>x.speed(2).gain(.5)).fast(2),
     s("oh*6").end(.01).speed(.5).room(.5).fast("1 2")
-  ).bank('RolandTR909'),
+  ).bank('RolandTR909')
+  .hush()
+  ,
+  //
+  s("<hello [basel codes]>").delay(.5).speed(rand.range(.5,1)),
   //
   note("[c a f e](<3 5>,8,<0 1>)".add("0,.1").sub(24)).s('sawtooth').lpf(500),
   //
