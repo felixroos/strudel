@@ -12,7 +12,7 @@ import { SlideRepl } from '../SlideRepl.jsx';
   tune={`await samples('shabda/speech:hello,basel,codes');
 stack(
   stack(
-    s("bd, ~ <rim cp>,~ hh*2").off(1/8, x=>x.speed(2).gain(.5)).fast(2),
+    s("bd, ~ <rim cp>,~ hh*2").off(1/8, set(speed(2).gain(.5))).fast(2),
     s("oh*6").end(.01).speed(.5).room(.5).fast("1 2")
   ).bank('RolandTR909')
   .hush()
@@ -20,9 +20,10 @@ stack(
   //
   s("<hello [basel codes]>").delay(.5).speed(rand.range(.5,1)),
   //
-  note("[c a f e](<3 5>,8,<0 1>)".add("0,.1").sub(24)).s('sawtooth').lpf(500),
+  note("[c a f e](<3 5>,8,<0 1>)".add("0,.1").sub(24))
+  .s('sawtooth').lpf(600).lpenv(-2).lpa(.1),
   //
-  "[~ <Cm7 Fm7 Bb7 Db7>]*2".voicings('lefthand').note().legato(.2)
+  "[~ <Cm7 Fm7 Bb7 Db7>]*2".voicings('lefthand').note().clip(.2)
   .echoWith(6, .1, (p,n)=>p.add(note(n*.6)))
   .lpf(sine.range(300,1000).slow(8)).lpq(6)
   .add(note(perlin.range(0,.8))).s('gm_epiano2')
