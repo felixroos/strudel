@@ -24,6 +24,7 @@ console.log('load done!');
 const order = [
   'cover',
   'whatIsStrudel',
+  'me',
   'history',
   'hs2js',
 
