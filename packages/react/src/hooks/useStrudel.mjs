@@ -20,6 +20,8 @@ function useStrudel({
   drawTime = [-2, 2],
   paintOptions = {},
 }) {
+  const id = useMemo(() => s4(), []);
+  canvasId = canvasId || `canvas-${id}`;
   // scheduler
   const [schedulerError, setSchedulerError] = useState();
   const [evalError, setEvalError] = useState();
@@ -32,7 +34,7 @@ function useStrudel({
   const shouldPaint = useCallback((pat) => !!pat?.context?.onPaint, []);
 
   // TODO: make sure this hook reruns when scheduler.started changes
-  const { scheduler, evaluate, start, stop, pause, setCps, id } = useMemo(
+  const { scheduler, evaluate, start, stop, pause, setCps } = useMemo(
     () =>
       repl({
         interval,
@@ -160,3 +162,9 @@ function useStrudel({
 }
 
 export default useStrudel;
+
+function s4() {
+  return Math.floor((1 + Math.random()) * 0x10000)
+    .toString(16)
+    .substring(1);
+}

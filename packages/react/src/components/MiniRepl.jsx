@@ -20,6 +20,7 @@ export function MiniRepl({
   enableKeyboard,
   onTrigger,
   drawTime,
+  spiral,
   punchcard,
   punchcardLabels,
   onPaint,
@@ -31,11 +32,12 @@ export function MiniRepl({
   keybindings,
   isLineNumbersDisplayed,
 }) {
-  drawTime = drawTime || (punchcard ? [0, 4] : undefined);
+  const shouldPaint = punchcard || spiral;
+  drawTime = drawTime || (shouldPaint ? [0, 4] : undefined);
   const evalOnMount = !!drawTime;
   const drawContext = useCallback(
-    punchcard ? (canvasId) => document.querySelector('#' + canvasId)?.getContext('2d') : null,
-    [punchcard],
+    shouldPaint ? (canvasId) => document.querySelector('#' + canvasId)?.getContext('2d') : null,
+    [shouldPaint],
   );
   const {
     code,
@@ -52,6 +54,7 @@ export function MiniRepl({
     stop,
     canvasId,
     id: replId,
+    log: logEnabled,
   } = useStrudel({
     initialCode: tune,
     defaultOutput: webaudioOutput,
@@ -64,6 +67,8 @@ export function MiniRepl({
         pat = pat.onPaint(onPaint);
       } else if (punchcard) {
         pat = pat.punchcard({ labels: punchcardLabels });
+      } else if (spiral) {
+        pat = pat.spiral(spiral);
       }
       return pat;
     },
@@ -168,7 +173,7 @@ export function MiniRepl({
         )}
         {error && <div className="text-right p-1 text-md text-red-200">{error.message}</div>}
       </div>
-      {punchcard && (
+      {shouldPaint && (
         <canvas
           id={canvasId}
           className="w-full pointer-events-none"
@@ -180,7 +185,7 @@ export function MiniRepl({
           }}
         ></canvas>
       )}
-      {!!log.length && (
+      {logEnabled && !!log.length && (
         <div className="bg-gray-800 rounded-md p-2">
           {log.map(({ message }, i) => (
             <div key={i}>{message}</div>
