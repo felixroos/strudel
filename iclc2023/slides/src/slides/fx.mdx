@@ -1,0 +1,49 @@
+import { SlideRepl } from '../SlideRepl.jsx';
+
+
+# audio effects
+
+- filters + reverb + stereo effects:
+
+<SlideRepl
+  hideHeader
+  canvasHeight={200}
+  fontSize={24}
+  log
+  tune={`note("[c a f e](3,8)".sub(24))
+  .sometimes(add(note(12)))
+  .s("sawtooth")
+  .lpf(sine.range(300,4000).slow(16))
+  .lpa(0.005).lpd(.1).lps(.2).lpr(0)
+  .lpq(12).ftype('24db').lpenv(4)
+  .release(.25)
+  .room(1)
+  .juxBy(.5,rev)
+  .gain(.5)`}
+/>
+
+- delay with multiple effect sends (orbits):
+
+<SlideRepl
+  hideHeader
+  canvasHeight={200}
+  fontSize={24}
+  log
+  tune={`stack(
+  s("bd <sd cp>")
+  .delay(.5)
+  .delaytime(.33)
+  .delayfeedback(.6)
+  .orbit(1)
+  ,
+  s("hh*2")
+  .delay(.8)
+  .delaytime(.08)
+  .delayfeedback(.7)
+  .orbit(2)
+).sometimes(set(speed("-1")))`}
+/>
+
++ many more: adsr envelopes, panning, waveshaping, compressor...
+
+<div className="h-[600px]"/>

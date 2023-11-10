@@ -28,28 +28,39 @@ const order = [
   'hs2js',
 
   'usage',
-  'swatch',
+  //'swatch',
   'repl',
+  'structure',
   //'repl-features',
+
+  'synth',
+  'sampler',
+  'fx',
+
+  // tonal stuff ??
+  // crazy pattern fx ??
+  // mini notation
+
   'viz',
 
-  'replflow',
+  //'replflow',
 
   // User Code
-  'transpilation',
-  'mininotation',
+  //'transpilation',
+  // 'mininotation',
   // 'mini-comparison', // remove?
   // Patterns
-  'patterns-events', // remove?
+  //'patterns-events', // remove?
   // scheduler?
+
   // Output
-  'events-audio', // remove?
-  'outputs',
+  // 'events-audio', // remove?
+  // 'outputs',
   // 'csound', // remove?
   //
   // pattern alignment?
-  'bad',
-  'good',
+  //'bad',
+  //'good',
   'future',
   'end',
 ];
@@ -92,7 +103,7 @@ function Slides() {
         <div
           key={i}
           className={cx(
-            `bg-slate-900 w-full h-full flex justify-center absolute top-0 transition-all ease-in-out duration-500 overflow-auto`,
+            `w-full h-full flex justify-center absolute top-0 transition-all ease-in-out duration-500 overflow-auto`,
             i < activeIndex && '-translate-x-full',
             i > activeIndex && 'translate-x-full',
           )}

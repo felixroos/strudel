@@ -1,6 +1,6 @@
 import { SlideRepl } from '../SlideRepl.jsx';
 
-# REPL: Visual Feedback
+# visual feedback
 
 Highlighting + Piano Roll
 
@@ -12,9 +12,64 @@ Highlighting + Piano Roll
   tune={`// Steve Reich - Piano Phase (1967) 
 note("E4 F#4 B4 C#5 D5 F#4 E4 C#5 B4 F#4 D5 C#5")
   .layer(
-    x=>x.color('#00ff0050').pan(0).fast(1), // left speaker
-    x=>x.color('#ff00ff50').pan(1).fast(1.01) // right speaker
+    x=>x.color('#00ff0080').pan(0).fast(1), // left speaker
+    x=>x.color('#ff00ff80').pan(1).fast(1.01) // right speaker
   )
-  .slow(2).room(.5)
+  .slow(2).room(.5).s("piano").clip(1.2)
+  //.pianoroll() 
   `}
 />
+
+spiral:
+
+<SlideRepl
+  hideHeader
+  spiral={{size:60,cap:'round'}}
+  canvasHeight={600}
+  drawTime={[-2,2]}
+  fontSize={24}
+  tune={`stack(
+  s("bd*2").color('cyan'),
+  s("~ cp").color('magenta'),
+  s("[~ hh]*2").color('yellow')
+).bank('RolandTR909')`}
+/>
+
+scope:
+
+<SlideRepl
+  hideHeader
+  fontSize={24}
+  tune={`await samples('github:felixroos/estuary-samples');
+stack(
+  note("[<c eb f [g eb]>]").sub(note("12")).clip(1).s("flbass")
+  ,
+  run(4).add.mix("<4 5 <6 3>> 0@3").n().clip(4)
+  .chord("<Cm Eb F G>").offset("<0 -1 -2 -1>/4").voicing()
+  .s("gm_epiano1:1")
+  .sustain("<0 1>/16").decay(.1)
+  .room(1).delay("<.5 0>/16")
+)
+.fft(6).scope({
+  color: 'cyan',
+  smear: .95,
+  align: 1,
+  thickness: 10
+})`}
+/>
+
+
+hydra:
+
+<SlideRepl
+  hideHeader
+  fontSize={24}
+  tune={`await initHydra()
+let pattern = "3 4 5 [6 7]*2"
+shape(H(pattern)).out(o0)
+n(pattern).scale("A:minor").s("piano").clip(1.2).room(1)`}
+/>
+
+
+<div className="h-[800px]"/>
+

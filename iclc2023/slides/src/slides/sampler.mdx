@@ -1,0 +1,79 @@
+import { SlideRepl } from '../SlideRepl.jsx';
+
+
+# superdough sampler
+
+loadable samples:
+
+<SlideRepl
+  hideHeader
+  canvasHeight={200}
+  fontSize={24}
+  log
+  tune={`await samples('github:Bubobubobubobubo/dough-fox')
+stack( 
+  s("flazer/5").note("f2").room(2).lpf(800),
+  s("fdarkkick:1*<2!4 4>").shape(.5),
+  s("<~ fmisc:1 ~ fmisc:1 ~>*2").room("<0 .5>"),
+  s("foh*4").gain(saw).room(.25),
+  s("fwood(5,8)").gain(rand).room(.5).degrade()
+)`}
+/>
+
+sample chopping:
+
+<SlideRepl
+  hideHeader
+  canvasHeight={200}
+  fontSize={24}
+  log
+  tune={`await samples('github:tidalcycles/dirt-samples/master')
+stack(
+  s("bd").late("<0.01 .251>"),
+  s("breaks165:1/2").fit()
+  .chop(4).sometimesBy(.4, ply("2"))
+  .sometimesBy(.1, ply("4")).release(.01)
+  .gain(1.5).sometimes(mul(speed("1.05"))).cut(1)
+)
+.reset("<x@6 [x*[8 [8 [16 32]]]]@2>".late(2))
+.hurry(1.25)`}
+/>
+
+melodic samples:
+
+<SlideRepl
+  hideHeader
+  canvasHeight={200}
+  fontSize={24}
+  log
+  tune={`n("0 4 2").chord("<Fm <Cm C>>/2").voicing()
+.inside(2, jux(rev)).fast(.75)
+.s('piano') // <----- piano samples`}
+/>
+
+soundfonts:
+
+
+<SlideRepl
+  hideHeader
+  canvasHeight={200}
+  fontSize={24}
+  log
+  tune={`stack(
+  note("{c eb <g a bb a> eb}%3*<1@3 2>".add(12))
+  .s("gm_electric_guitar_muted:0")
+  .lpf(cosine.range(200,8000).slow(16)).pan(sine.slow(8))
+  ,
+  note("~ [[c4 <g3 a3 bb3 a3> eb3] ~@4]".add(12))
+  .s("gm_electric_guitar_clean:0").release(.5).gain(.35)
+  .bpf(perlin.range(1000,5000)).shape(.5)
+  ,
+  note("<[{c2*2 g2 [eb2 eb3]}%2 ~] [eb2 ~](3,8)>")
+  .s("gm_slap_bass_1:1")
+  .off(.25, add(note(12))).lpf(800)
+).sub(note("<5@16 7@8>"))
+.fast(4/5).room(.75)`}
+/>
+
+
+<div className="h-[600px]"/>
