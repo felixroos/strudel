@@ -1,0 +1,38 @@
+
+await samples('bubo:Waveforms')
+await samples('github:yaxu/spicule/master')
+await samples('github:yaxu/clean-breaks/master')
+
+let scales = "<A1:minor!24 E1:mixolydian!8>"
+
+setcps(.75)
+
+stack(
+  n("<0 -1 -2 -1>/2(<3 5>,8,<0 1>/4)".add(2))
+  .scale(scales)
+  .n(run(4)).sometimesBy("0!3 .325", add(note("12")))
+  .s("<wt_stereo>")//.ply("<4 8>")
+  .lpf(perlin.range(400,2000))
+  .lpa(.1).lpenv(-4).shape(.3)
+  .sometimes(ply(2))
+  .hush()
+  ,
+  n(run("<8 4>"))
+  .chord("<Gm7 <Dm7 Ab^7>>/2")
+  .dict('ireal-ext')
+  .voicing().clip(4)
+  .room(.5)
+  .ds("<.01 .08>:<0 .1 .2>").s("wt_stereo")
+  .lpf(sine.range(600,2000).slow(32))
+  .vib("4:.2")
+).add(note(perlin.range(0,.5).slow(8)))
+  .stack(
+    s("bd,~ rim")
+    .bank('RolandTR707').speed(.8)
+    ,
+    s("movement/4").fit().chop(16)
+    .rarely(ply("2")).cut(1)
+  )
+.hsla(sine.slow(128), .5, .4, .2)
+.size(6)
+.punchcard({vertical:1,smear:1,fold:1,playheadColor:'transparent'})

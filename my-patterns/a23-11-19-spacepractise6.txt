@@ -1,0 +1,51 @@
+await samples('bubo:Waveforms')
+await samples('github:yaxu/spicule/master')
+await samples('github:yaxu/clean-breaks/master')
+
+setcps(.5)
+
+stack(
+  stack(
+    n(run(8)).s("jazz"),
+    //n(run(4)).s("bd9").color('orchid'),
+    //n(run(8)).s("clean").speed(.5)
+  ).iter(4).chunk(4, hurry(2))
+  .stack(
+    s("bd9(3,8)")
+  )
+  //.lpf(100)
+  //.hush()
+  //.hpf(500)
+  ,
+  stack(
+  note("<f1(3,8) ~>").s("wt_stereo")
+  .lpf(800).lpa(.1).lpenv(-4),
+  chord("<~ Fm7>").voicing().s("wt_stereo")
+  .lpf(800)
+  .ds(".1:0").delay(.5).room(.5),
+  n(run(16)).ds(".1:0").scale("F4:minor")
+  .jux(rev).s("wt_stereo")
+  .lpf(sine.range(10,200).slow(32))
+  .lpa(.1).lpenv(-2)
+  .room(.75).vib(4).vibmod(.2)
+    //.hush()
+  ).add(note(perlin.range(0,.5)))
+  ,
+  s("arc").fit().chop(16)
+  .ds(".1:0")
+  //.iter(4)
+  //.chunk(8, hurry(2))
+  .shape(.3).almostNever(ply("4")).cut(1)
+  
+)
+  .hsla(sine.slow(4), 1, .5, 1)
+  .lastOf(4,rev())
+  //.rarely(jux(rev))
+  .reset("<x@7 x(5,8)>")
+  //.delay(".5:.1:.6")
+.size(6)
+//.ds(".025:0")
+//.mul(speed(-2))
+.fft(3)
+.scope({pos:1,smear:.95,thickness:20,color:'#00ffff80'})
+.punchcard({vertical:1,smear:1,fold:1,playheadColor:'transparent',fill:0,labels:0})

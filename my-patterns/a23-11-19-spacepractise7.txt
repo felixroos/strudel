@@ -1,0 +1,60 @@
+await samples('bubo:Waveforms')
+await samples('github:yaxu/spicule/master')
+await samples('github:yaxu/clean-breaks/master')
+await samples('shabda/speech/en-GB/f:space,cats,in,outer')
+
+setcps(.5)
+
+
+n("<0 1 2 3 4>/2")
+  .off(1/8, add(n(7)))
+  .hush()
+  .stack(
+    //n("<8 9 10 11 12>*3".add(5)).ds(".05:0").delay(.5),
+    n("<-5(3,8) <[~@3 -4] [-2*3 -3*2]>>")
+  )
+  .scale("F2:hirajoshi")
+  .s("sawtooth")
+  .lpf(sine.range(300,1000).slow(8))
+  .lpa(.2).lpenv(-3)
+  .clip(1).shape(.25).ftype('24db').lpq(4)
+  .vib(.5).vibmod(.1)
+  .room(.2).stack(
+    chord("<Fm Bbm>/4")
+    .layer(
+      x=>n(run(9).fast(8/9)).add(1).ds(".1:0")
+        .set(x).jux(rev),
+      x=>x.ds(".1:0").struct("~ x*<1 2>"),
+    )
+    .voicing()
+    .s("gm_epiano1:1")
+    .room(.5)
+    .add(note(saw.range(-.25,.25)))
+    .lpf(sine.range(200,2000).slow(64))
+    
+  )
+  .stack(
+    stack(
+    n(run(8).slow(2)).s("clean")//.ds(".1:0")
+    //.lpf(1000)
+    .gain(.5).speed(rand.range(.5,.8))
+    .iter(4).lpf(2000)
+    //.hpf(2000)
+    ,
+    n(run(8)).s("jazz")//.ds(".1:0")
+    //.lpf(1200)
+    //.hpf(2000)
+    ,
+    s("bd9(3,8) bd9*2"),
+    s("arc/2").fit().chop(16)
+    .sometimes(ply(2)).cut(1)
+    .ds(".1:0")
+    )
+    //.lpf(1000)
+    //.ds(".1:0")
+    //.jux(rev).mul(gain(.5))
+    
+  )
+  .size(8)
+  .hsl(sine.slow(4),.5,.5)
+.punchcard({vertical:1,fold:1,fill:0})

@@ -1,0 +1,31 @@
+
+await samples('github:yaxu/clean-breaks/master')
+
+setcps(.75)
+
+stack(
+  note("<A1!24 E1!8>(3,8)/2").s("gm_acoustic_bass")
+  .sometimes(add(note(12)))
+  ,
+  n(run("<8!3 <12 16>>").sub(2)).slow(4)
+  .chord("<Am7!24 E7!8>")
+  .dict('ireal')
+  .voicing()
+  .s("gm_epiano1:1,piano").clip(1)
+  .vib("8:.15")
+  .lpq(4)
+  .ds(".1:0.8")
+  .room(.75).gain(.2)
+  .juxBy(.5, rev)
+  
+).add(note(perlin.range(0,.5).slow(8)))
+  .stack(
+    s("bd,~ rim")
+    .bank('RolandTR707').speed(.8)
+    ,
+    s("newday/4").fit().chop(16)
+    .rarely(ply("2")).cut(1)
+  )
+.hsla(sine.slow(128), .5, .2, .2)
+.size(6)
+.punchcard({vertical:1,smear:1,fold:1,playheadColor:'transparent'})

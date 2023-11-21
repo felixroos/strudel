@@ -1,0 +1,21 @@
+await samples('bubo:waveforms')
+
+stack(
+  n("<0 5 2 [1 2]>*2").clip(2),
+  n("<-4 -7 -9 -7>/4")
+)
+  .scale("A3:<minor!24 hirajoshi!8>")
+  .sometimes(ply("2"))
+  .jux(slow(3))
+  .lpf(sine.range(200,1000).slow(32))
+  .lpenv(perlin.range(-2,-.2).rarely(sub("3")))
+  .lpa(sine.range(.1,.2).slow(24))
+  .s("wt_stereo:<0 1 2>")
+  .vib(slider(2,0,8,1))
+  .vibmod(slider(0.158))
+  //.add(note(perlin.range(0,.25).slow(3)))
+  .shape(.5)
+  .room(1)
+  .size(8)
+  .postgain(.25)
+  .scope()

@@ -1,0 +1,27 @@
+await samples('bubo:Waveforms')
+await samples('github:yaxu/spicule/master')
+
+let scales = "<G1:minor>/32"
+
+stack(
+  n("<0 -1 -2 -1>/2").scale(scales).room(.5)
+  .s("<wt_stereo>").ply("<4 8>")
+  .lpf(800).lpa(.1).lpenv(-2)
+  ,
+  n("<8 9 10>(3,8)/2").add("<0 1 2 3 2 1>/8")
+  .add(n(16))
+  .off(1/8,add(n(2)))
+  .scale(scales)
+  .shape(.2)
+  .sometimes(add(note(-12)))
+  .room(1).delay(.5)
+  .s("sine").fm(2).jux(late(1))
+  .lpf(perlin.range(500,2000)).lpa(.1).lpenv(-3)
+  .ftype('24db')
+  .release(sine.range(.1,1).slow(32))
+  .color('#0000ff20')
+  .gain(sine.range(.5,.1).slow(8))
+).add(note(perlin.range(0,.25)))
+.vib("1:.1")
+.size(6)
+.punchcard({smear:1})
