@@ -1,0 +1,87 @@
+
+
+await samples('github:yaxu/clean-breaks/master')
+
+setcps(1.5)
+
+
+let lead = 
+
+  n("[<[10 8 6 5]*4 [12 10 8 7]*4 [9 8 6 5]*4 [9  7  5 4]*4>]/4")
+  .off(1/4, x=>x.add("<-5 >"))
+    .off(1/8, x=>x.add("<-7 >"))
+
+  .scale("<G3:dorian>")
+  .s("[sawtooth]")
+  //.ds(".1:0")
+  .lpa(.1).lpenv(-3)
+  .room(.5)
+  .vib(1).vibmod(.1)
+  // .release("<.4!4 .6 .6>")
+  //.crush(4)
+  //.sometimes(add(note(12)))
+  //.ds(".2:0")
+  //.delay(.5)
+.lpf(perlin.range(1000,1500).slow(2))
+.slow(1)
+//.superimpose(x=>x.iter(2)).mul(gain(.4))
+.gain(.7).slow(3).delay(.75).room(2)
+
+
+stack(
+  s("amen/<8>")
+  .fit()
+  .chop(32)
+  //.ds(".2:0").cut(1)
+  .clip(.5).release(.1)
+  .rarely(ply(3))
+  .lastOf(8, x=>x.segment(8).speed(saw.add(1).mul(2)))
+  .shape(.4)
+  .gain(.7)
+  //.lpf(sine.range(500,3000).slow(8))
+  .reset("<x@7 x(<3 5>,8)>")
+  .room(.1)//.cut(1)
+  //.juxBy(.25, rev).mul({speed:-1})
+  //.hush()
+  ,
+  s("bd(3,8)")
+  .late("<0 .25>")
+  .bank('RolandTR909').speed(.8)
+  //.hush()
+  ,
+  s("~ sd").room(.2).ds(".1:0").speed(.8)
+  //.lastOf(8, x=>x.ply(6).end(.1).speed(saw.add(1)))
+  .hush()
+  ,
+  stack(
+  n("<0!3 <5 3 2>>(<2!3 4>,8)")
+  .scale("G1:minor")
+  .s("gm_synth_bass_1")
+  .lpf(perlin.range(600,2000).slow(2))
+  .lpa(.1).lpenv(4)
+  .sometimesBy("0 .5", x=>x.add(note(12)))
+  .release(.4)
+  //.hush()
+  ,
+  chord("<Gm9>/8")
+  .dict('ireal-ext')
+  .voicing()
+  .s("sawtooth")
+  .lpf(2000).room(1).lpa(.05).lpenv(2)
+  .vib(2).vibmod(.25)
+  .segment("<2!3 4>")
+  .clip(.25).delay(.5)
+  //.jux(rev)
+  .late(.5)
+  .release(.1)
+  //.sub(note(12))
+  ).add.mix(note("<0!3 [1 2 3 4*2]>"))
+)
+  .outside(4,
+           lastOf(4,x=>x.ds(".1:0").slow(4).juxBy(.5, rev).fast(4))
+          )
+//.add(note(12)).hpf(3000).hpq(8)
+.slow(2)
+//.bpf(2500).bpq(4)//.delay(.5)
+.lastOf(4, ply(4))
+.mask("<0!4 1!4>")
