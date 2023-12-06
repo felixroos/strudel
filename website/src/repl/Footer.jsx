@@ -7,11 +7,14 @@ import React, { useMemo, useCallback, useLayoutEffect, useRef, useState } from '
 import { Reference } from './Reference';
 import { themes } from './themes.mjs';
 import { useSettings, settingsMap, setActiveFooter, defaultSettings } from '../settings.mjs';
-import { getAudioContext, soundMap } from '@strudel.cycles/webaudio';
+import { getAudioContext, soundMap, connectToDestination } from '@strudel.cycles/webaudio';
 import { useStore } from '@nanostores/react';
 import { FilesTab } from './FilesTab';
 
 const TAURI = window.__TAURI__;
+
+const { BASE_URL } = import.meta.env;
+const baseNoTrailing = BASE_URL.endsWith('/') ? BASE_URL.slice(0, -1) : BASE_URL;
 
 export function Footer({ context }) {
   const footerContent = useRef();
@@ -154,7 +157,7 @@ function WelcomeTab() {
       </p>
       <p>
         To learn more about what this all means, check out the{' '}
-        <a href="./workshop/getting-started" target="_blank">
+        <a href={`${baseNoTrailing}/workshop/getting-started/`} target="_blank">
           interactive tutorial
         </a>
         . Also feel free to join the{' '}
@@ -271,7 +274,7 @@ function SoundsTab() {
               const onended = () => trigRef.current?.node?.disconnect();
               trigRef.current = Promise.resolve(onTrigger(time, params, onended));
               trigRef.current.then((ref) => {
-                ref?.node.connect(ctx.destination);
+                connectToDestination(ref?.node);
               });
             }}
           >
@@ -384,6 +387,7 @@ function SettingsTab({ scheduler }) {
     theme,
     keybindings,
     isLineNumbersDisplayed,
+    isActiveLineHighlighted,
     isAutoCompletionEnabled,
     isTooltipEnabled,
     isLineWrappingEnabled,
@@ -452,6 +456,11 @@ function SettingsTab({ scheduler }) {
           label="Display line numbers"
           onChange={(cbEvent) => settingsMap.setKey('isLineNumbersDisplayed', cbEvent.target.checked)}
           value={isLineNumbersDisplayed}
+        />
+        <Checkbox
+          label="Highlight active line"
+          onChange={(cbEvent) => settingsMap.setKey('isActiveLineHighlighted', cbEvent.target.checked)}
+          value={isActiveLineHighlighted}
         />
         <Checkbox
           label="Enable auto-completion"

@@ -27,26 +27,14 @@ export function getSound(s) {
 export const resetLoadedSounds = () => soundMap.set({});
 
 let audioContext;
+
 export const getAudioContext = () => {
   if (!audioContext) {
     audioContext = new AudioContext();
+    const maxChannelCount = audioContext.destination.maxChannelCount;
+    audioContext.destination.channelCount = maxChannelCount;
   }
   return audioContext;
-};
-
-let destination;
-const getDestination = () => {
-  const ctx = getAudioContext();
-  if (!destination) {
-    destination = ctx.createGain();
-    destination.connect(ctx.destination);
-  }
-  return destination;
-};
-
-export const panic = () => {
-  getDestination().gain.linearRampToValueAtTime(0, getAudioContext().currentTime + 0.01);
-  destination = null;
 };
 
 let workletsLoading;
@@ -95,6 +83,39 @@ export async function initAudioOnFirstClick(options) {
 let delays = {};
 const maxfeedback = 0.98;
 
+let channelMerger, destinationGain;
+
+// input: AudioNode, channels: ?Array<int>
+export const connectToDestination = (input, channels = [0, 1]) => {
+  const ctx = getAudioContext();
+  if (channelMerger == null) {
+    channelMerger = new ChannelMergerNode(ctx, { numberOfInputs: ctx.destination.channelCount });
+    destinationGain = new GainNode(ctx);
+    channelMerger.connect(destinationGain);
+    destinationGain.connect(ctx.destination);
+  }
+  //This upmix can be removed if correct channel counts are set throughout the app,
+  // and then strudel could theoretically support surround sound audio files
+  const stereoMix = new StereoPannerNode(ctx);
+  input.connect(stereoMix);
+
+  const splitter = new ChannelSplitterNode(ctx, {
+    numberOfOutputs: stereoMix.channelCount,
+  });
+  stereoMix.connect(splitter);
+  channels.forEach((ch, i) => {
+    splitter.connect(channelMerger, i % stereoMix.channelCount, clamp(ch, 0, ctx.destination.channelCount - 1));
+  });
+};
+
+export const panic = () => {
+  if (destinationGain == null) {
+    return;
+  }
+  destinationGain.gain.linearRampToValueAtTime(0, getAudioContext().currentTime + 0.01);
+  destinationGain = null;
+};
+
 function getDelay(orbit, delaytime, delayfeedback, t) {
   if (delayfeedback > maxfeedback) {
     //logger(`delayfeedback was clamped to ${maxfeedback} to save your ears`);
@@ -104,12 +125,54 @@ function getDelay(orbit, delaytime, delayfeedback, t) {
     const ac = getAudioContext();
     const dly = ac.createFeedbackDelay(1, delaytime, delayfeedback);
     dly.start?.(t); // for some reason, this throws when audion extension is installed..
-    dly.connect(getDestination());
+    connectToDestination(dly, [0, 1]);
     delays[orbit] = dly;
   }
   delays[orbit].delayTime.value !== delaytime && delays[orbit].delayTime.setValueAtTime(delaytime, t);
   delays[orbit].feedback.value !== delayfeedback && delays[orbit].feedback.setValueAtTime(delayfeedback, t);
   return delays[orbit];
+}
+
+// each orbit will have its own lfo
+const phaserLFOs = {};
+function getPhaser(orbit, t, speed = 1, depth = 0.5, centerFrequency = 1000, sweep = 2000) {
+  //gain
+  const ac = getAudioContext();
+  const lfoGain = ac.createGain();
+  lfoGain.gain.value = sweep;
+
+  //LFO
+  if (phaserLFOs[orbit] == null) {
+    phaserLFOs[orbit] = ac.createOscillator();
+    phaserLFOs[orbit].frequency.value = speed;
+    phaserLFOs[orbit].type = 'sine';
+    phaserLFOs[orbit].start();
+  }
+
+  phaserLFOs[orbit].connect(lfoGain);
+  if (phaserLFOs[orbit].frequency.value != speed) {
+    phaserLFOs[orbit].frequency.setValueAtTime(speed, t);
+  }
+
+  //filters
+  const numStages = 2; //num of filters in series
+  let fOffset = 0;
+  const filterChain = [];
+  for (let i = 0; i < numStages; i++) {
+    const filter = ac.createBiquadFilter();
+    filter.type = 'notch';
+    filter.gain.value = 1;
+    filter.frequency.value = centerFrequency + fOffset;
+    filter.Q.value = 2 - Math.min(Math.max(depth * 2, 0), 1.9);
+
+    lfoGain.connect(filter.detune);
+    fOffset += 282;
+    if (i > 0) {
+      filterChain[i - 1].connect(filter);
+    }
+    filterChain.push(filter);
+  }
+  return filterChain[filterChain.length - 1];
 }
 
 let reverbs = {};
@@ -121,7 +184,7 @@ function getReverb(orbit, duration, fade, lp, dim, ir) {
   if (!reverbs[orbit]) {
     const ac = getAudioContext();
     const reverb = ac.createReverb(duration, fade, lp, dim, ir);
-    reverb.connect(getDestination());
+    connectToDestination(reverb, [0, 1]);
     reverbs[orbit] = reverb;
   }
   if (
@@ -199,6 +262,7 @@ export const superdough = async (value, deadline, hapDuration) => {
     source,
     gain = 0.8,
     postgain = 1,
+    density = 0.03,
     // filters
     ftype = '12db',
     fanchor = 0.5,
@@ -226,6 +290,12 @@ export const superdough = async (value, deadline, hapDuration) => {
     bpsustain = 1,
     bprelease = 0.01,
     bandq = 1,
+    channels = [1, 2],
+    //phaser
+    phaser,
+    phaserdepth = 0.75,
+    phasersweep,
+    phasercenter,
     //
     coarse,
     crush,
@@ -252,6 +322,10 @@ export const superdough = async (value, deadline, hapDuration) => {
     compressorAttack,
     compressorRelease,
   } = value;
+
+  //music programs/audio gear usually increments inputs/outputs from 1, so imitate that behavior
+  channels = (Array.isArray(channels) ? channels : [channels]).map((ch) => ch - 1);
+
   gain *= velocity; // legacy fix for velocity
   let toDisconnect = []; // audio nodes that will be disconnected when the source has ended
   const onended = () => {
@@ -260,6 +334,7 @@ export const superdough = async (value, deadline, hapDuration) => {
   if (bank && s) {
     s = `${bank}_${s}`;
   }
+
   // get source AudioNode
   let sourceNode;
   if (source) {
@@ -377,11 +452,16 @@ export const superdough = async (value, deadline, hapDuration) => {
     panner.pan.value = 2 * pan - 1;
     chain.push(panner);
   }
+  // phaser
+  if (phaser !== undefined && phaserdepth > 0) {
+    const phaserFX = getPhaser(orbit, t, phaser, phaserdepth, phasercenter, phasersweep);
+    chain.push(phaserFX);
+  }
 
   // last gain
-  const post = gainNode(postgain);
+  const post = new GainNode(ac, { gain: postgain });
   chain.push(post);
-  post.connect(getDestination());
+  connectToDestination(post, channels);
 
   // delay
   let delaySend;
