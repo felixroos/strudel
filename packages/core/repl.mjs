@@ -66,7 +66,6 @@ export function repl({
     pattern = editPattern?.(pattern) || pattern;
     scheduler.setPattern(pattern, autostart);
   };
-  setTime(() => scheduler.now()); // TODO: refactor?
 
   const stop = () => scheduler.stop();
   const start = () => scheduler.start();
@@ -78,6 +77,7 @@ export function repl({
     allTransform = transform;
     return silence;
   };
+  const now = () => scheduler.now();
 
   // set pattern methods that use this repl via closure
   const injectPatternMethods = () => {
@@ -128,6 +128,7 @@ export function repl({
     try {
       updateState({ code, pending: true });
       await injectPatternMethods();
+      setTime(now);
       await beforeEval?.({ code });
       shouldHush && hush();
       let { pattern, meta } = await _evaluate(code, transpiler);
