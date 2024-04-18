@@ -133,7 +133,8 @@ Pattern.prototype.fscope = function (config = {}) {
  * s("sawtooth").scope()
  */
 let latestColor = {};
-Pattern.prototype.tscope = function (config = {}) {
+
+export function tScope(config = {}) {
   let id = config.id ?? 1;
   return this.analyze(id).draw(
     (haps) => {
@@ -144,6 +145,7 @@ Pattern.prototype.tscope = function (config = {}) {
     },
     { id },
   );
-};
+}
 
+Pattern.prototype.tscope = tScope;
 Pattern.prototype.scope = Pattern.prototype.tscope;

@@ -36,7 +36,7 @@ const getValue = (e) => {
   return value;
 };
 
-Pattern.prototype.pianoroll = function (options = {}) {
+export function pianorollMethod(options = {}) {
   let { cycles = 4, playhead = 0.5, overscan = 0, hideNegative = false, ctx = getDrawContext(), id = 1 } = options;
 
   let from = -cycles * playhead;
@@ -58,7 +58,9 @@ Pattern.prototype.pianoroll = function (options = {}) {
     },
   );
   return this;
-};
+}
+
+Pattern.prototype.pianoroll = pianorollMethod;
 
 // this function allows drawing a pianoroll without ties to Pattern.prototype
 // it will probably replace the above in the future
