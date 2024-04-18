@@ -13,24 +13,39 @@ import AstroPWA from '@vite-pwa/astro';
 
 const site = `https://strudel.cc/`; // root url without a path
 const base = '/'; // base path of the strudel site
+const baseNoTrailing = base.endsWith('/') ? base.slice(0, -1) : base;
 
-// this rehype plugin converts relative anchor links to absolute ones
-// it wokrs by prepending the absolute page path to anchor links
-// example: #gain -> /learn/effects/#gain
+// this rehype plugin fixes relative links
+// it works by prepending the base + page path to anchor links
+// and by prepending the base path to other relative links starting with /
 // this is necessary when using a base href like <base href={base} />
-// in this setup, relative anchor links will always link to base, instead of the current page
-function absoluteAnchors() {
+// examples with base as "mybase":
+//   #gain -> /mybase/learn/effects/#gain
+//   /some/page -> /mybase/some/page
+function relativeURLFix() {
   return (tree, file) => {
     const chunks = file.history[0].split('/src/pages/'); // file.history[0] is the file path
     const path = chunks[chunks.length - 1].slice(0, -4); // only path inside src/pages, without .mdx
     return rehypeUrls((url) => {
-      if (!url.href.startsWith('#')) {
+      let newHref = baseNoTrailing;
+      if (url.href.startsWith('#')) {
+        // special case: a relative anchor link to the current page
+        newHref += `/${path}/${url.href}`;
+      } else if (url.href.startsWith('/')) {
+        // any other relative url starting with /
+        newHref += url.pathname;
+        if (url.pathname.indexOf('.') == -1) {
+          // append trailing slash to resource only if there is no file extension
+          newHref += url.pathname.endsWith('/') ? '' : '/';
+        }
+        newHref += url.search || '';
+        newHref += url.hash || '';
+      } else {
+        // leave this URL alone
         return;
       }
-      const baseWithSlash = base.endsWith('/') ? base : base + '/';
-      const absoluteUrl = baseWithSlash + path + url.href;
-      // console.log(url.href + ' -> ', absoluteUrl);
-      return absoluteUrl;
+      // console.log(url.href + ' -> ', newHref);
+      return newHref;
     })(tree);
   };
 }
@@ -40,7 +55,7 @@ const options = {
     remarkToc,
     // E.g. `remark-frontmatter`
   ],
-  rehypePlugins: [rehypeSlug, [rehypeAutolinkHeadings, { behavior: 'append' }], absoluteAnchors],
+  rehypePlugins: [rehypeSlug, [rehypeAutolinkHeadings, { behavior: 'append' }], relativeURLFix],
 };
 
 // https://astro.build/config
@@ -54,7 +69,7 @@ export default defineConfig({
       registerType: 'autoUpdate',
       injectRegister: 'auto',
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,json,wav,mp3,ogg}'],
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,json,wav,mp3,ogg,ttf,woff2,TTF,otf}'],
         runtimeCaching: [
           {
             urlPattern: ({ url }) =>
@@ -82,7 +97,7 @@ export default defineConfig({
         enabled: false,
       },
       manifest: {
-        includeAssets: ['favicon.ico', 'icons/apple-icon-180.png', 'favicon.svg'],
+        includeAssets: ['favicon.ico', 'icons/apple-icon-180.png'],
         name: 'Strudel REPL',
         short_name: 'Strudel',
         description:
@@ -122,7 +137,7 @@ export default defineConfig({
   vite: {
     ssr: {
       // Example: Force a broken package to skip SSR processing, if needed
-      external: ['fraction.js'], // https://github.com/infusion/Fraction.js/issues/51
+      // external: ['fraction.js'], // https://github.com/infusion/Fraction.js/issues/51
     },
   },
 });

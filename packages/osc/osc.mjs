@@ -6,7 +6,7 @@ This program is free software: you can redistribute it and/or modify it under th
 
 import OSC from 'osc-js';
 
-import { logger, parseNumeral, Pattern } from '@strudel.cycles/core';
+import { logger, parseNumeral, Pattern } from '@strudel/core';
 
 let connection; // Promise<OSC>
 function connect() {
@@ -37,7 +37,7 @@ function connect() {
 /**
  *
  * Sends each hap as an OSC message, which can be picked up by SuperCollider or any other OSC-enabled software.
- * For more info, read [MIDI & OSC in the docs](https://strudel.cc/learn/input-output)
+ * For more info, read [MIDI & OSC in the docs](https://strudel.cc/learn/input-output/)
  *
  * @name osc
  * @memberof Pattern

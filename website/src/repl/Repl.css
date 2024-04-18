@@ -24,8 +24,11 @@
 
 #code .cm-scroller {
   padding-top: 10px !important;
-  padding-bottom: 50vh;
+  height: 100%;
   font-family: inherit;
+}
+#code .cm-content {
+  padding-bottom: 50vh;
 }
 #code .cm-line > * {
   background: var(--lineBackground);
@@ -56,4 +59,13 @@
 
 #code .cm-foldGutter {
   display: none !important;
+}
+
+#code .cm-focused {
+  outline: none;
+}
+
+#code .cm-matchingBracket {
+  text-decoration: underline 0.18rem;
+  text-underline-offset: 0.22rem;
 }

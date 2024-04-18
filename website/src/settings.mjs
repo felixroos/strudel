@@ -1,42 +1,68 @@
 import { persistentMap } from '@nanostores/persistent';
 import { useStore } from '@nanostores/react';
-import { register } from '@strudel.cycles/core';
+import { register } from '@strudel/core';
+
+export const defaultAudioDeviceName = 'System Standard';
 
 export const defaultSettings = {
   activeFooter: 'intro',
   keybindings: 'codemirror',
+  isBracketMatchingEnabled: true,
+  isBracketClosingEnabled: true,
   isLineNumbersDisplayed: true,
+  isActiveLineHighlighted: true,
   isAutoCompletionEnabled: false,
   isTooltipEnabled: false,
+  isFlashEnabled: true,
+  isSyncEnabled: false,
   isLineWrappingEnabled: false,
+  isPatternHighlightingEnabled: true,
   theme: 'strudelTheme',
   fontFamily: 'monospace',
   fontSize: 18,
   latestCode: '',
   isZen: false,
   soundsFilter: 'all',
-  panelPosition: 'bottom',
+  patternFilter: 'community',
+  panelPosition: 'right',
+  userPatterns: '{}',
+  audioDeviceName: defaultAudioDeviceName,
 };
 
 export const settingsMap = persistentMap('strudel-settings', defaultSettings);
 
+const parseBoolean = (booleanlike) => ([true, 'true'].includes(booleanlike) ? true : false);
+
 export function useSettings() {
   const state = useStore(settingsMap);
+
+  const userPatterns = JSON.parse(state.userPatterns);
+  Object.keys(userPatterns).forEach((key) => {
+    const data = userPatterns[key];
+    data.id = data.id ?? key;
+    userPatterns[key] = data;
+  });
   return {
     ...state,
-    isZen: [true, 'true'].includes(state.isZen) ? true : false,
-    isLineNumbersDisplayed: [true, 'true'].includes(state.isLineNumbersDisplayed) ? true : false,
-    isAutoCompletionEnabled: [true, 'true'].includes(state.isAutoCompletionEnabled) ? true : false,
-    isTooltipEnabled: [true, 'true'].includes(state.isTooltipEnabled) ? true : false,
-    isLineWrappingEnabled: [true, 'true'].includes(state.isLineWrappingEnabled) ? true : false,
+    isZen: parseBoolean(state.isZen),
+    isBracketMatchingEnabled: parseBoolean(state.isBracketMatchingEnabled),
+    isBracketClosingEnabled: parseBoolean(state.isBracketClosingEnabled),
+    isLineNumbersDisplayed: parseBoolean(state.isLineNumbersDisplayed),
+    isActiveLineHighlighted: parseBoolean(state.isActiveLineHighlighted),
+    isAutoCompletionEnabled: parseBoolean(state.isAutoCompletionEnabled),
+    isPatternHighlightingEnabled: parseBoolean(state.isPatternHighlightingEnabled),
+    isTooltipEnabled: parseBoolean(state.isTooltipEnabled),
+    isLineWrappingEnabled: parseBoolean(state.isLineWrappingEnabled),
+    isFlashEnabled: parseBoolean(state.isFlashEnabled),
+    isSyncEnabled: parseBoolean(state.isSyncEnabled),
     fontSize: Number(state.fontSize),
-    panelPosition: state.activeFooter !== '' ? state.panelPosition : 'bottom',
+    panelPosition: state.activeFooter !== '' ? state.panelPosition : 'bottom', // <-- keep this 'bottom' where it is!
+    userPatterns: userPatterns,
   };
 }
 
 export const setActiveFooter = (tab) => settingsMap.setKey('activeFooter', tab);
 
-export const setLatestCode = (code) => settingsMap.setKey('latestCode', code);
 export const setIsZen = (active) => settingsMap.setKey('isZen', !!active);
 
 const patternSetting = (key) =>

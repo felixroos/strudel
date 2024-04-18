@@ -1,6 +1,6 @@
 ---
 import HeadCommon from '../components/HeadCommon.astro';
-import { Repl } from '../repl/Repl.jsx';
+import { Repl } from '../repl/Repl';
 ---
 
 <html lang="en" class="dark">
@@ -10,5 +10,6 @@ import { Repl } from '../repl/Repl.jsx';
   </head>
   <body class="h-app-height bg-background">
     <Repl client:only="react" />
+    <a rel="me" href="https://social.toplap.org/@strudel" target="_blank" class="hidden">mastodon</a>
   </body>
 </html>

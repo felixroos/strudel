@@ -1,7 +1,7 @@
-import useEvent from '@strudel.cycles/react/src/hooks/useEvent.mjs';
-import useFrame from '@strudel.cycles/react/src/hooks/useFrame.mjs';
-import { getAudioContext } from '@strudel.cycles/webaudio';
-import { midi2note } from '@strudel.cycles/core';
+import useEvent from '@src/useEvent.mjs';
+import useFrame from '@src/useFrame.mjs';
+import { getAudioContext } from '@strudel/webaudio';
+import { midi2note } from '@strudel/core';
 import { useState, useRef, useEffect } from 'react';
 import Claviature from '@components/Claviature';
 

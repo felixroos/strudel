@@ -1,3 +1,5 @@
+import { logger } from './logger.mjs';
+
 // currently duplicate with core util.mjs to skip dependency
 // TODO: add separate util module?
 
@@ -50,4 +52,19 @@ export const valueToMidi = (value, fallbackValue) => {
     throw new Error('valueToMidi: expected freq or note to be set');
   }
   return fallbackValue;
+};
+
+export function nanFallback(value, fallback = 0, silent) {
+  if (isNaN(Number(value))) {
+    !silent && logger(`"${value}" is not a number, falling back to ${fallback}`, 'warning');
+    return fallback;
+  }
+  return value;
+}
+// modulo that works with negative numbers e.g. _mod(-1, 3) = 2. Works on numbers (rather than patterns of numbers, as @mod@ from pattern.mjs does)
+export const _mod = (n, m) => ((n % m) + m) % m;
+
+// round to nearest int, negative numbers will output a subtracted index
+export const getSoundIndex = (n, numSounds) => {
+  return _mod(Math.round(nanFallback(n, 0)), numSounds);
 };

@@ -3,28 +3,28 @@ import { pwaInfo } from 'virtual:pwa-info';
 import '../styles/index.css';
 
 const { BASE_URL } = import.meta.env;
-const base = BASE_URL;
+const baseNoTrailing = BASE_URL.endsWith('/') ? BASE_URL.slice(0, -1) : BASE_URL;
 ---
 
 <!-- Global Metadata -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width" />
 <meta name="generator" content={Astro.generator} />
-
-<link rel="icon" type="image/svg+xml" href="favicon.ico" />
+<link rel="alternate" type="application/rss+xml" title={`RSS Feed for strudel.cc`} href="/rss.xml" />
+<link rel="icon" type="image/svg+xml" href={`${baseNoTrailing}/favicon.ico`} />
 
 <meta
   name="description"
   content="Strudel is a music live coding environment for the browser, porting the TidalCycles pattern language to JavaScript."
 />
-<link rel="icon" href="/favicon.ico" />
-<link rel="apple-touch-icon" href="/icons/apple-icon-180.png" sizes="180x180" />
+<link rel="icon" href={`${baseNoTrailing}/favicon.ico`} />
+<link rel="apple-touch-icon" href={`${baseNoTrailing}/icons/apple-icon-180.png`} sizes="180x180" />
 <meta name="theme-color" content="#222222" />
 
-<base href={base} />
+<base href={BASE_URL} />
 
 <!-- Scrollable a11y code helper -->
-<script src="./make-scrollable-code-focusable.js" is:inline></script>
+<script {`${baseNoTrailing}/make-scrollable-code-focusable.js`} is:inline></script>
 
 <script src="/src/pwa.ts"></script>
 <!-- this does not work for some reason: -->
@@ -46,41 +46,9 @@ const base = BASE_URL;
 {pwaInfo && <Fragment set:html={pwaInfo.webManifest.linkTag} />}
 
 <script>
-  import { settings, injectStyle } from '../repl/themes.mjs';
-  import { settingsMap } from '../settings.mjs';
-  import { listenKeys } from 'nanostores';
-  const themeStyle = document.createElement('style');
-  themeStyle.id = 'strudel-theme';
-  document.head.append(themeStyle);
+  import { initTheme, codemirrorSettings } from '@strudel/codemirror';
 
-  let resetThemeStyle;
-  function activateTheme(name) {
-    if (!settings[name]) {
-      console.warn('theme', name, 'has no settings.. defaulting to strudelTheme settings');
-    }
-    const themeSettings = settings[name] || settings.strudelTheme;
-    // set css variables
-    themeStyle.innerHTML = `:root {
-      ${Object.entries(themeSettings)
-        // important to override fallback
-        .map(([key, value]) => `--${key}: ${value} !important;`)
-        .join('\n')}
-    }`;
-    // tailwind dark mode
-    if (themeSettings.light) {
-      document.documentElement.classList.remove('dark');
-    } else {
-      document.documentElement.classList.add('dark');
-    }
-    resetThemeStyle?.();
-    resetThemeStyle = undefined;
-    if (themeSettings.customStyle) {
-      resetThemeStyle = injectStyle(themeSettings.customStyle);
-    }
-  }
-
-  activateTheme(settingsMap.get().theme);
-  listenKeys(settingsMap, ['theme'], ({ theme }) => activateTheme(theme));
+  initTheme(codemirrorSettings.get().theme);
 
   // https://medium.com/quick-code/100vh-problem-with-ios-safari-92ab23c852a8
   const appHeight = () => {
