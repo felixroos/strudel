@@ -15,9 +15,9 @@ note("E4 F#4 B4 C#5 D5 F#4 E4 C#5 B4 F#4 D5 C#5")
     x=>x.color('#00ff0080').pan(0).fast(1), // left speaker
     x=>x.color('#ff00ff80').pan(1).fast(1.01) // right speaker
   )
-  .slow(2).room(.5).s("piano").clip(1.2)
-  //.pianoroll() 
-  `}
+  .room(.5).s("piano").clip(1.2)
+  .pianoroll()
+`}
 />
 
 spiral:
@@ -27,12 +27,96 @@ spiral:
   spiral={{size:60,cap:'round'}}
   canvasHeight={600}
   drawTime={[-2,2]}
-  fontSize={24}
-  tune={`stack(
-  s("bd*2").color('cyan'),
-  s("~ cp").color('magenta'),
-  s("[~ hh]*2").color('yellow')
-).bank('RolandTR909')`}
+  fontSize={12}
+  tune={`// "Korvai experiment" 
+// @by yaxu 
+// @license CC-BY-SA
+// Based on composition by B C Manjunath
+// Mridangam drum samples (c) Arthur Carabott 2022,
+//    performer Harishankar V Menon
+ 
+samples('github:yaxu/mrid/main'); samples('github:yaxu/spicule/master')
+setcps(0.7/4);
+// change to true to add gaps
+const karve = false;
+// ta
+// "dhi ta dhi na thom"
+const phrasesnokarve = ["dhi ta dhi na thom".color("pink"),
+                        "dhi thom thom dhi".color("red"),
+                        "dhi tha dhi".color("purple"),
+                        "tha dhi".color("blue"),
+                        "dhi".color("lightblue"),
+                        nothing]
+const phraseskarve = ["dhi - - - -".color("pink"),
+                      "dhi - - -".color("red"),
+                      "dhi - -".color("purple"),
+                      "dhi -".color("blue"),
+                      "dhi".color("lightblue"),
+                      nothing]
+ 
+const phrases = karve ? phraseskarve : phrasesnokarve;
+const phrasesrev = phrases.slice().reverse();
+const tdgnt = "dhi ta dhi na thom";
+const three = stepcat(tdgnt,tdgnt,tdgnt).color("brown")
+ 
+const a = stepcat(phrases,
+          "[dhin, thom] ~".color("yellow"),
+          phrases,
+          "[dhin, thom] ~".color("yellow"),
+          phrases,
+          "[dhin, thom] ~".color("yellow"),
+         );
+const b = stepcat(phrasesrev,
+          "[dhin, thom] ~".color("yellow"),
+          phrasesrev,
+          "[dhin, thom] ~".color("yellow"),
+          phrasesrev,
+          "[dhin, thom] ~".color("yellow"),
+         );
+const c = stepcat(phrases,
+          "[dhin, thom] ~".color("yellow"),
+         ).fast(3);
+ 
+const d = stepcat(phrasesrev,
+          "[dhin, thom] ~".color("yellow"),
+         ).fast(3);
+const e = stepcat(
+            stepcat(phrases,
+                    "[dhin, thom] ~".color("yellow")),
+            stepcat(phrasesrev,
+                    "[dhin, thom] ~".color("yellow")),
+            stepcat(phrases,
+                    "[dhin, thom] ~".color("yellow")),
+         );
+const f = stepcat(
+            stepcat(phrasesrev,
+                    "[dhin, thom] ~".color("yellow")),
+            stepcat(phrases,
+                    "[dhin, thom] ~".color("yellow")),
+            stepcat(phrasesrev,
+                    "[dhin, thom] ~".color("yellow")),
+         );
+const g = stepcat(phrases,
+          "[dhin, thom] ~".color("yellow"),
+          phrasesrev,
+          "[dhin, thom] ~".color("yellow"),
+          phrases,
+          "[dhin, thom] ~".color("yellow"),
+         );
+const h = stepcat(phrasesrev,
+          "[dhin, thom] ~".color("yellow"),
+          phrases,
+          "[dhin, thom] ~".color("yellow"),
+          phrasesrev,
+          "[dhin, thom] ~".color("yellow"),
+         );
+const mora = stepcat(three, silence, three, silence, three);
+ 
+p1: sound(stepcat(
+  a, mora, b, mora, c, mora, d, mora, e, mora, f, mora, g, mora, h, mora
+).spiral({colorizeInactive: true, from: 0, to:4,size:50})).toTactus(32)
+    
+p2: s("clap hh!3 clap - clap -").n(2).color("white green white green").legato(0.125)`}
 />
 
 scope:
@@ -40,19 +124,18 @@ scope:
 <SlideRepl
   hideHeader
   fontSize={24}
-  tune={`await samples('github:felixroos/estuary-samples');
-stack(
-  note("[<c eb f [g eb]>]").sub(note("12")).clip(1).s("flbass")
+  canvasHeight={200}
+  tune={`stack(
+  note("[<c eb f [g eb]>]").sub(note("12"))
+  .clip(1).s("sawtooth").lpf(400).lpd(.2).lpenv(2)
   ,
   run(4).add.mix("<4 5 <6 3>> 0@3").n().clip(4)
   .chord("<Cm Eb F G>").offset("<0 -1 -2 -1>/4").voicing()
-  .s("gm_epiano1:1")
-  .sustain("<0 1>/16").decay(.1)
-  .room(1).delay("<.5 0>/16")
-)
+  .s("sine").fm(5.1).fmh(1.005).lpf(600)
+  .decay(.2).room(1).delay(.5)
+).color('cyan')
 .fft(6).scope({
-  color: 'cyan',
-  smear: .95,
+  smear: .9,
   align: 1,
   thickness: 10
 })`}
