@@ -1,5 +1,5 @@
-import { registerSynthSounds, samples } from '@strudel.cycles/webaudio';
-import { registerSoundfonts } from '@strudel.cycles/soundfonts';
+import { registerSynthSounds, samples } from '@strudel/webaudio';
+import { registerSoundfonts } from '@strudel/soundfonts';
 
 export async function prebake() {
   const ds = 'https://raw.githubusercontent.com/felixroos/dough-samples/main/';

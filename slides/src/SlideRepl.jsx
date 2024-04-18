@@ -1,20 +1,19 @@
-import { evalScope, controls } from '@strudel.cycles/core';
-import { initAudioOnFirstClick } from '@strudel.cycles/webaudio';
-import { MiniRepl as _MiniRepl } from '@strudel.cycles/react';
+import { evalScope, controls } from '@strudel/core';
+import { initAudioOnFirstClick } from '@strudel/webaudio';
 import { prebake } from './prebake';
 import { atomone } from '@uiw/codemirror-themes-all';
-import blackscreen from '@strudel.cycles/react/src/themes/blackscreen';
+// import blackscreen from '@strudel/codemirror/themes/blackscreen';
 
 if (typeof window !== 'undefined') {
   await evalScope(
     controls,
-    import('@strudel.cycles/core'),
-    import('@strudel.cycles/tonal'),
-    import('@strudel.cycles/mini'),
-    import('@strudel.cycles/webaudio'),
-    import('@strudel.cycles/soundfonts'),
+    import('@strudel/core'),
+    import('@strudel/tonal'),
+    import('@strudel/mini'),
+    import('@strudel/webaudio'),
+    import('@strudel/soundfonts'),
     import('@strudel/hydra'),
-    import('@strudel.cycles/csound'),
+    import('@strudel/csound'),
   );
 }
 
@@ -37,7 +36,8 @@ export function SlideRepl({
 }) {
   return (
     <div className="not-prose rounded-xl overflow-hidden">
-      <_MiniRepl
+      TBD mini repl
+      {/* <_MiniRepl
         hideHeader={hideHeader}
         tune={tune}
         hideOutsideView={true}
@@ -50,7 +50,7 @@ export function SlideRepl({
         scope={scope}
         spiral={spiral}
         // theme={themes[theme]}
-      />
+      /> */}
     </div>
   );
 }

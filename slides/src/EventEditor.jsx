@@ -1,13 +1,9 @@
-import { useState, useCallback } from 'react';
-import { atomone } from '@uiw/codemirror-themes-all';
-import { CodeMirror, flash, useKeydown } from '@strudel.cycles/react';
-import { initAudioOnFirstClick, webaudioOutput } from '@strudel.cycles/webaudio';
-import { TimeSpan } from '@strudel.cycles/core';
+import { initAudioOnFirstClick } from '@strudel/webaudio';
 
 const initAudio = initAudioOnFirstClick();
 
 function EventEditor({ code: initialCode }) {
-  const [code, setCode] = useState(initialCode);
+  /*   const [code, setCode] = useState(initialCode);
   const [view, setView] = useState();
   useKeydown(
     useCallback(
@@ -15,10 +11,6 @@ function EventEditor({ code: initialCode }) {
         if (view?.hasFocus) {
           if (e.ctrlKey || e.altKey) {
             if (e.code === 'Enter') {
-              /* if (getAudioContext().state !== 'running') {
-              alert('please click play to initialize the audio. you can use shortcuts after that!');
-              return;
-            } */
               e.preventDefault();
               flash(view);
               let json = JSON.parse(code);
@@ -40,7 +32,8 @@ function EventEditor({ code: initialCode }) {
       [code, view],
     ),
   );
-  return <CodeMirror value={code} onChange={setCode} theme={atomone} onViewChanged={(v) => setView(v)} fontSize={32} />;
+  return <CodeMirror value={code} onChange={setCode} theme={atomone} onViewChanged={(v) => setView(v)} fontSize={32} />; */
+  return <p>TBD</p>;
 }
 
 export default EventEditor;

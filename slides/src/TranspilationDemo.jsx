@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { atomone } from '@uiw/codemirror-themes-all';
-import { CodeMirror, flash, useKeydown } from '@strudel.cycles/react';
-import { transpiler } from '@strudel.cycles/transpiler';
+// import { CodeMirror, flash, useKeydown } from '@strudel/react';
+import { transpiler } from '@strudel/transpiler';
 import Highlight from './Highlight';
 import Stepper from './Stepper';
 import escodegen from 'escodegen';
@@ -16,7 +16,7 @@ function getTranspiled(code) {
 }
 
 function TranspilationEditor({ code: initialCode }) {
-  const [code, setCode] = useState(initialCode);
+  /* const [code, setCode] = useState(initialCode);
   const [transpiled, setTranspiled] = useState(getTranspiled(initialCode));
   const [view, setView] = useState();
   useKeydown(
@@ -25,10 +25,6 @@ function TranspilationEditor({ code: initialCode }) {
         if (view?.hasFocus) {
           if (e.ctrlKey || e.altKey) {
             if (e.code === 'Enter') {
-              /* if (getAudioContext().state !== 'running') {
-              alert('please click play to initialize the audio. you can use shortcuts after that!');
-              return;
-            } */
               e.preventDefault();
               flash(view);
               const t = getTranspiled(code);
@@ -58,7 +54,8 @@ function TranspilationEditor({ code: initialCode }) {
       <span>⬇️ transpiles to</span>
       <Highlight language="javascript" code={transpiled} />
     </div>
-  );
+  ); */
+  return <p>TBD TranspilationDemo</p>;
 }
 
 function TranspilationDemo() {
