@@ -11,8 +11,8 @@ const snippets = [
     'Patterns Transformations',
   ],
   [
-    `speed "1 2 3" + "4 5" # s "bd"`,
-    ['speed("1 2 3".add("4 5")).s("bd")', '"1 2 3".add("4 5").speed().s("bd")'],
+    `speed "1 2 3" + "1 2" # s "bd"`,
+    ['speed("1 2 3".add("1 2")).s("bd")', '"1 2 3".add("1 2").speed().s("bd")'],
     'Pattern Arithmetic',
   ],
   [
@@ -53,10 +53,10 @@ function SyntaxComparison() {
                   <img src="./img/haskell.png" className="h-10 mt-2" />
                   <Highlight language="haskell" code={hs} />
                 </div>
-                <div>
+                <div className="space-y-2">
                   {js.map((c, j) => (
-                    <div className="flex space-x-4" key={j}>
-                      <img src="./img/js.jpg" className={`h-10 mt-2`} />
+                    <div className="flex space-x-4 items-center" key={j}>
+                      <img src="./img/js.jpg" className={`h-10`} />
                       <SlideRepl tune={c} hideHeader />
                     </div>
                   ))}

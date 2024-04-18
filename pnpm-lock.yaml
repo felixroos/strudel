@@ -521,6 +521,9 @@ importers:
       '@nanostores/react':
         specifier: ^0.5.0
         version: 0.5.0(nanostores@0.8.1)(react@18.2.0)
+      '@strudel/codemirror':
+        specifier: workspace:*
+        version: link:../packages/codemirror
       '@strudel/core':
         specifier: workspace:*
         version: link:../packages/core

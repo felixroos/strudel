@@ -1,6 +1,5 @@
 import { SlideRepl } from '../SlideRepl.jsx';
 
-
 # superdough synth
 
 Subtractive:
@@ -8,25 +7,25 @@ Subtractive:
 <SlideRepl
   hideHeader
   fontSize={24}
-  tune={`note("<c eb g bb d>*2") // melody
+  canvasHeight={100}
+  tune={`note("<c eb g bb d>*4") // melody
   .s("sawtooth").lpf(600) // waveform + filter
-  .lpa(.3).lpenv(2) // filter envelope
-  .add(note("0,.1")) // 2 detuned voices
-  .vib("4:.2") // vibrato
-  .room(1) // reverb
-  .stack(note("c2")).clip(2) // add bass + prolong notes
-  .scope() // viz`}
+  //.lpa(.3).lpenv(2) // filter envelope
+  //.vib("4:.2") // vibrato
+  //.room(1) // reverb
+  //.stack(note("c2")).clip(2) // add bass + prolong notes
+  .scope()`}
 />
-
 
 FM:
 
 <SlideRepl
   hideHeader
   fontSize={24}
-  tune={`note("<c eb g bb d>(<3 5>,8)").jux(rev)
+  canvasHeight={100}
+  tune={`note("<c eb g bb d>(<3 5>,8)*2").jux(rev)
   .s("sine")
-  .fm("<4 8 2>*4").fmh("2 4").ds(".1:0")
+  .fm("<4 8 2>*4").fmh("2 4").dec(.1)
   .lpf(500).lpa(.1).lpenv(-4)
   .room(.5).delay(.5)
   .scope()`}
@@ -37,11 +36,12 @@ Wavetable:
 <SlideRepl
   hideHeader
   fontSize={24}
+  canvasHeight={100}
   tune={`await samples('bubo:waveforms')
-n(run(8).add(0)).s("wt_dbass").note("c2")
-.lpf(perlin.range(200,2000).slow(8))
+n(run(8).fast(2)).s("wt_dbass").note("c2")
+.lpf(perlin.range(200,2000).slow(4))
 .lpenv(-3).lpa(.1).room(.5)
 .scope()`}
 />
 
-<div className="h-[600px]"/>
+<div className="h-[600px]" />

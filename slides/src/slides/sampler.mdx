@@ -1,6 +1,5 @@
 import { SlideRepl } from '../SlideRepl.jsx';
 
-
 # superdough sampler
 
 loadable samples:
@@ -11,13 +10,14 @@ loadable samples:
   fontSize={24}
   log
   tune={`await samples('github:Bubobubobubobubo/dough-fox')
-stack( 
-  s("flazer/5").note("f2").room(2).lpf(800),
-  s("fdarkkick:1*<2!4 4>").shape(.5),
-  s("<~ fmisc:1 ~ fmisc:1 ~>*2").room("<0 .5>"),
-  s("foh*4").gain(saw).room(.25),
-  s("fwood(5,8)").gain(rand).room(.5).degrade()
-)`}
+ 
+p1: s("flazer/5").note("f2").room(2).lpf(800)
+p2: s("fdarkkick:1*<2!4 4>").shape(.5)
+p3: s("<~ fmisc:1 ~ fmisc:1 ~>*2").room("<0 .5>")
+p4: s("foh\*4").gain(saw).room(.25)
+p5: s("fwood(5,8)").gain(rand).room(.5).degrade()
+ 
+all(x=>x.fast(2).scope())`}
 />
 
 sample chopping:
@@ -27,16 +27,19 @@ sample chopping:
   canvasHeight={200}
   fontSize={24}
   log
-  tune={`await samples('github:tidalcycles/dirt-samples/master')
-stack(
-  s("bd").late("<0.01 .251>"),
-  s("breaks165:1/2").fit()
-  .chop(4).sometimesBy(.4, ply("2"))
-  .sometimesBy(.1, ply("4")).release(.01)
-  .gain(1.5).sometimes(mul(speed("1.05"))).cut(1)
-)
-.reset("<x@6 [x*[8 [8 [16 32]]]]@2>".late(2))
-.hurry(1.25)`}
+  tune={`await samples('github:yaxu/clean-breaks')
+ 
+p1: s("bd - [- bd] -")
+p2: s("- sd - sd")
+p3: s("mechanicalman").fit()
+  .chop(8).sometimesBy(.4, ply("2"))
+  .sometimesBy(.1, ply("2")).release(.01)
+  .sometimes(mul(speed("1.05"))).cut(1)
+
+all(x=>x
+.reset("<x@7 [x\*[4 [8 16]]]>".late(1))
+.hurry(1.25).scope()
+)`}
 />
 
 melodic samples:
@@ -46,34 +49,43 @@ melodic samples:
   canvasHeight={200}
   fontSize={24}
   log
-  tune={`n("0 4 2").chord("<Fm <Cm C>>/2").voicing()
-.inside(2, jux(rev)).fast(.75)
-.s('piano') // <----- piano samples`}
+  tune={`n("0 2 3 4 5").chord("<Fm7 <Cm7 E7#11>>/2")
+.voicing()
+.inside(2, jux(rev))
+.s('piano') // <----- piano samples
+.pianoroll()`}
 />
 
 soundfonts:
-
 
 <SlideRepl
   hideHeader
   canvasHeight={200}
   fontSize={24}
   log
-  tune={`stack(
-  note("{c eb <g a bb a> eb}%3*<1@3 2>".add(12))
+  tune={`p1:
+note("{c eb <g a bb a> eb}%3*<1@3 2>".add(12))
   .s("gm_electric_guitar_muted:0")
   .lpf(cosine.range(200,8000).slow(16)).pan(sine.slow(8))
-  ,
+  .color('yellow')
+ 
+p2:
   note("~ [[c4 <g3 a3 bb3 a3> eb3] ~@4]".add(12))
-  .s("gm_electric_guitar_clean:0").release(.5).gain(.35)
-  .bpf(perlin.range(1000,5000)).shape(.5)
-  ,
+  .s("gm_electric_guitar_clean:0").release(.5)
+  .postgain(.5).bpf(perlin.range(1000,5000)).shape(.5)
+  .clip(2).color('magenta')
+ 
+p3:
   note("<[{c2*2 g2 [eb2 eb3]}%2 ~] [eb2 ~](3,8)>")
   .s("gm_slap_bass_1:1")
   .off(.25, add(note(12))).lpf(800)
-).sub(note("<5@16 7@8>"))
-.fast(4/5).room(.75)`}
+  .color('cyan')
+  
+all(x=>x
+  .sub(note("<5@16 7@8>"))
+  .fast(8/5).room(.75)
+  .pianoroll()
+)`}
 />
 
-
-<div className="h-[600px]"/>
+<div className="h-[600px]" />

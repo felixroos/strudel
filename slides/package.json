@@ -16,6 +16,7 @@
     "@strudel/soundfonts": "workspace:*",
     "@strudel/tonal": "workspace:*",
     "@strudel/hydra": "workspace:*",
+    "@strudel/codemirror": "workspace:*",
     "@strudel/csound": "workspace:*",
     "@strudel/webaudio": "workspace:*",
     "@uiw/codemirror-themes-all": "^4.19.8",

@@ -19,3 +19,7 @@
 img {
   @apply rounded-xl overflow-hidden;
 }
+
+.cm-focused {
+  outline: none !important;
+}
