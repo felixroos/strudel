@@ -23,7 +23,8 @@ p3: "[~ <Cm7 Fm7 Bb7 Db7>]*2".voicings('lefthand').note().clip(.2)
   .add(note(perlin.range(0,.8))).s('gm_epiano2')
   .mask("<0 1>")
  
-p4: s("riffin/2").fit().chop(16).sometimes(ply("2")).dec(.3)`}
+p4: s("riffin/2").fit().chop(16).sometimes(ply("2")).dec(.3)
+.mask("<0@4 1@16>")`}
 />
 
 <div className="h-[600px]"/>

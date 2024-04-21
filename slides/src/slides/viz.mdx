@@ -7,7 +7,6 @@ Highlighting + Piano Roll
 <SlideRepl
   hideHeader
   punchcard
-  canvasHeight={300}
   fontSize={24}
   tune={`// Steve Reich - Piano Phase (1967) 
 note("E4 F#4 B4 C#5 D5 F#4 E4 C#5 B4 F#4 D5 C#5")
@@ -16,7 +15,7 @@ note("E4 F#4 B4 C#5 D5 F#4 E4 C#5 B4 F#4 D5 C#5")
     x=>x.color('#ff00ff80').pan(1).fast(1.01) // right speaker
   )
   .room(.5).s("piano").clip(1.2)
-  .pianoroll()
+  ._pianoroll({height:200,width:800})
 `}
 />
 
@@ -25,7 +24,6 @@ spiral:
 <SlideRepl
   hideHeader
   spiral={{size:60,cap:'round'}}
-  canvasHeight={600}
   drawTime={[-2,2]}
   fontSize={12}
   tune={`// "Korvai experiment" 
@@ -114,7 +112,7 @@ const mora = stepcat(three, silence, three, silence, three);
  
 p1: sound(stepcat(
   a, mora, b, mora, c, mora, d, mora, e, mora, f, mora, g, mora, h, mora
-).spiral({colorizeInactive: true, from: 0, to:4,size:50})).toTactus(32)
+).toTactus(32)._spiral({colorizeInactive: true, from: 0, to:4,size:500}))
     
 p2: s("clap hh!3 clap - clap -").n(2).color("white green white green").legato(0.125)`}
 />
@@ -124,7 +122,6 @@ scope:
 <SlideRepl
   hideHeader
   fontSize={24}
-  canvasHeight={200}
   tune={`stack(
   note("[<c eb f [g eb]>]").sub(note("12"))
   .clip(1).s("sawtooth").lpf(400).lpd(.2).lpenv(2)
@@ -134,10 +131,10 @@ scope:
   .s("sine").fm(5.1).fmh(1.005).lpf(600)
   .decay(.2).room(1).delay(.5)
 ).color('cyan')
-.fft(6).scope({
-  smear: .9,
+.fft(6)._scope({
   align: 1,
-  thickness: 10
+  thickness: 10,
+  height:200,width:800
 })`}
 />
 

@@ -37,6 +37,14 @@ const snippets = [
     ],
     'Patterns all the way down',
   ],
+  [
+    `d1 $ s "bd sd cp mt`,
+    [
+      `sound("bd sd cp mt").d1`,
+      `d1: sound("bd sd cp mt")`
+    ],
+    'outputs',
+  ],
 ];
 
 function SyntaxComparison() {
