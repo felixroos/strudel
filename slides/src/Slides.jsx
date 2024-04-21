@@ -28,9 +28,17 @@ const order = [
   'history',
   'hs2js',
 
-  'usage',
-  //'swatch',
+  'usage',  
   'repl',
+
+  'legacy1',
+  'legacy2',
+  'legacy3',
+  'legacy4',
+  'legacy5',
+
+  //'swatch',
+
   'structure',
   //'repl-features',
 

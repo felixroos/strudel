@@ -41,7 +41,9 @@ const snippets = [
     `d1 $ s "bd sd cp mt`,
     [
       `sound("bd sd cp mt").d1`,
-      `d1: sound("bd sd cp mt")`
+      `d1: sound("bd sd cp mt")`,
+`$: sound("bd sd cp mt")
+$: sound("[- hh]*4")`
     ],
     'outputs',
   ],
