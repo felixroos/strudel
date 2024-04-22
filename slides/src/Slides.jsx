@@ -31,11 +31,13 @@ const order = [
   'usage',  
   'repl',
 
+  'past',
   'legacy1',
   'legacy2',
   'legacy3',
   'legacy4',
   'legacy5',
+  'superdough',
 
   //'swatch',
 
@@ -50,6 +52,7 @@ const order = [
   // crazy pattern fx ??
   // mini notation
 
+  'viz_intro',
   'viz',
 
   //'replflow',
