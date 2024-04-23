@@ -1,0 +1,24 @@
+import { SlideRepl } from '../SlideRepl.jsx';
+
+# Writing DSP* with AudioWorklets
+
+<SlideRepl
+tune={`setcps(1)
+await dough\`
+let f
+let trigger = (value) => f = value.freq
+let saw = (x, t) => ((x * t % 1) - 0.5) * 2
+let dsp = t => (saw(f, t) + saw(f+1, t))/16
+\`
+freq("55 [66 110]").dough()
+`}
+hideHeader
+/>
+
+\*dsp = dough signal processing
+
+- trigger = gets called for each event
+- dsp function gets called for each sample at time t (in seconds), think bytebeat / floatbeat
+
+- [doughbeat](https://github.com/felixroos/doughbeat) -> single-html-file floatbeat editor with audioworklet
+- [doughbat](https://github.com/felixroos/doughbat) -> doughbeat but with assemblyscript compiled on-the-fly to wasm 

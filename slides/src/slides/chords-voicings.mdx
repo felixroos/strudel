@@ -1,0 +1,38 @@
+import { SlideRepl } from '../SlideRepl.jsx';
+
+# chord symbols vs voicings
+
+```js
+{
+  m7: ['3 7 10 14', '10 14 15 19'],
+  7: ['4 9 10 14', '10 14 16 21'],
+  '^7': ['4 7 10 14', '10 14 16 19'],
+}
+```
+
+Example: 
+
+```
+Cm7 = C3 (48) + m7 ([3, 7, 10, 14] or [10, 14, 15, 19])
+= [48+3, 48+7, 48+10, 48+14] or [48+10, 48+14, 48+15, 48+19]
+= [51, 55, 58, 62] or [58, 62, 63, 67]
+```
+
+<SlideRepl
+  fontSize={24}
+  tune={`
+  addVoicings('paris', {
+  m7: ['3 7 10 14', '10 14 15 19'],
+  7: ['4 9 10 14', '10 14 16 21'],
+  '^7': ['4 7 10 14', '10 14 16 19'],
+})
+  chord("<Dm7 G7 C^7@2>").dict('paris').voicing()
+    .stack(note("<D2 G2 C2@2>")).room(.5).vib("4:.1")
+  ._pitchwheel({mode:'polygon'})
+  ._pianoroll()
+  `}
+/>
+
+
+
+all ireal voicings: https://f5lv24.csb.app/

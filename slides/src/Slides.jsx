@@ -29,14 +29,18 @@ const order = [
   'hs2js',
 
   'usage',  
+  'flok',  
   'repl',
 
-  'past',
+/*   'past',
   'legacy1',
   'legacy2',
   'legacy3',
   'legacy4',
-  'legacy5',
+  'legacy5', */
+
+  'viz_intro',
+  'viz',
   'superdough',
 
   //'swatch',
@@ -52,8 +56,15 @@ const order = [
   // crazy pattern fx ??
   // mini notation
 
-  'viz_intro',
-  'viz',
+  'dsp_intro',
+  'dsp',
+  'dsp2',
+  'csound', // remove?
+  'faust',
+
+  /* 'chords_intro',
+  'chords',
+  'chords-voicings', */
 
   //'replflow',
 
@@ -68,7 +79,6 @@ const order = [
   // Output
   // 'events-audio', // remove?
   // 'outputs',
-  // 'csound', // remove?
   //
   // pattern alignment?
   //'bad',

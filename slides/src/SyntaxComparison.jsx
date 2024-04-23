@@ -74,7 +74,7 @@ function SyntaxComparison() {
               </div>
             </div>
           ))
-          .concat([<>Fluent Interface: Just chain all the things! If you know hydra, this will look very familiar</>])}
+          .concat([<>TLDR: Just chain all the things! If you know hydra, this will look very familiar.</>])}
       />
     </>
   );

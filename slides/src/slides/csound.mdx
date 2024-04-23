@@ -2,12 +2,10 @@ import { SlideRepl } from '../SlideRepl.jsx';
 
 # CSound Example
 
-## Loading ORC instruments
-
 <SlideRepl
   tune={`// livecode.orc by Steven Yi
 await loadOrc('github:kunstmusik/csound-live-code/master/livecode.orc')
-
+setcps(1)
 stack(
 note("<C^7 A7 Dm7 Fm7>/2".voicings('lefthand'))
 .cutoff(sine.range(500,2000).round().slow(16))
@@ -21,7 +19,7 @@ note("0 7 [4 3] 2".fast(2/3)
 .slow(2).scale('A4 minor'))
 .legato(.25).csound('SynHarp'),
 
-s("bd*2,[~ hh]*2,~ cp").bank('RolandTR909')
+s("bd*2,[~ hh]*2,~ cp")
 )`}
 hideHeader
 />
@@ -53,7 +51,7 @@ instr CoolSynth
     out(asig, asig)
 
 endin\`
-
+setcps(1)
 "<0 2 [4 6](3,4,2) 3\*2>"
 .off(1/4, add(2))
 .off(1/2, add(6))
@@ -63,3 +61,13 @@ endin\`
 .csound('CoolSynth')`}
 hideHeader
 />
+
+Pros:
+
+- dynamic, timed voice allocation
+- fast dsp
+
+Cons:
+
+- csound syntax feels a bit arcane
+- unwieldy way of passing params

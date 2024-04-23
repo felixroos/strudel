@@ -1,0 +1,18 @@
+import { SlideRepl } from '../SlideRepl.jsx';
+
+# sequencing vs dsp
+
+"tidal is a sequencer":
+
+<SlideRepl
+  fontSize={24}
+  tune={`freq("<55 110 66>").s("sine")
+  .echoWith(16, .01, (x,n)=>x.mul(freq(n+1)).gain(1-n*0.1))
+  //             ^ change that to 0.1 or higher
+  .postgain(.25)._pianoroll({height:400})._scope()
+`}
+/>
+
+- we need cheap / dynamic voice allocation (UGen Style)
+- each event spawns a new voice with any possible combination of parameters (not just note + velocity like MIDI)
+- Web Audio API: *fire and forget* mentality is good, but nodes are too high level -> AudioWorklet
