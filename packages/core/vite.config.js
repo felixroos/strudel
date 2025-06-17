@@ -4,12 +4,13 @@ import { resolve } from 'path';
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: './',
   plugins: [],
   build: {
     lib: {
       entry: resolve(__dirname, 'index.mjs'),
-      formats: ['es', 'cjs'],
-      fileName: (ext) => ({ es: 'index.mjs', cjs: 'index.js' }[ext]),
+      formats: ['es'],
+      fileName: (ext) => ({ es: 'index.mjs' })[ext],
     },
     rollupOptions: {
       external: [...Object.keys(dependencies)],

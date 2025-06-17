@@ -57,6 +57,9 @@ const visibleMiniLocations = StateField.define({
         // this is why we need to find a way to update the existing decorations, showing the ones that have an active range
         const haps = new Map();
         for (let hap of e.value.haps) {
+          if (!hap.context?.locations || !hap.whole) {
+            continue;
+          }
           for (let { start, end } of hap.context.locations) {
             let id = `${start}:${end}`;
             if (!haps.has(id) || haps.get(id).whole.begin.lt(hap.whole.begin)) {
@@ -64,7 +67,6 @@ const visibleMiniLocations = StateField.define({
             }
           }
         }
-
         visible = { atTime: e.value.atTime, haps };
       }
     }
@@ -90,7 +92,8 @@ const miniLocationHighlights = EditorView.decorations.compute([miniLocations, vi
 
     if (haps.has(id)) {
       const hap = haps.get(id);
-      const color = hap.context.color ?? 'var(--foreground)';
+      const color = hap.value?.color ?? 'var(--foreground)';
+      const style = hap.value?.markcss || `outline: solid 2px ${color}`;
       // Get explicit channels for color values
       /* 
       const swatch = document.createElement('div');
@@ -112,7 +115,7 @@ const miniLocationHighlights = EditorView.decorations.compute([miniLocations, vi
         to,
         Decoration.mark({
           // attributes: { style: `outline: solid 2px rgba(${channels.join(', ')})` },
-          attributes: { style: `outline: solid 2px ${color}` },
+          attributes: { style },
         }),
       );
     }
@@ -124,3 +127,12 @@ const miniLocationHighlights = EditorView.decorations.compute([miniLocations, vi
 });
 
 export const highlightExtension = [miniLocations, visibleMiniLocations, miniLocationHighlights];
+
+export const isPatternHighlightingEnabled = (on, config) => {
+  on &&
+    config &&
+    setTimeout(() => {
+      updateMiniLocations(config.editor, config.miniLocations);
+    }, 100);
+  return on ? highlightExtension : [];
+};

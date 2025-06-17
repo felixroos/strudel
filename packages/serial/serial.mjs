@@ -4,25 +4,25 @@ Copyright (C) 2022 Strudel contributors - see <https://github.com/tidalcycles/st
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details. You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import { Pattern, isPattern } from '@strudel.cycles/core';
+import { Pattern, isPattern } from '@strudel/core';
 
-var writeMessage;
+var writeMessagers = {};
 var choosing = false;
 
-export async function getWriter(br = 38400) {
+export async function getWriter(name, br) {
   if (choosing) {
     return;
   }
   choosing = true;
-  if (writeMessage) {
-    return writeMessage;
+  if (name in writeMessagers) {
+    return writeMessagers[name];
   }
   if ('serial' in navigator) {
     const port = await navigator.serial.requestPort();
     await port.open({ baudRate: br });
     const encoder = new TextEncoder();
     const writer = port.writable.getWriter();
-    writeMessage = function (message, chk) {
+    writeMessagers[name] = function (message, chk) {
       const encoded = encoder.encode(message);
       if (!chk) {
         writer.write(encoded);
@@ -63,12 +63,12 @@ function crc16(data) {
   return crc & 0xffff;
 }
 
-Pattern.prototype.serial = function (br = 38400, sendcrc = false, singlecharids = false) {
+Pattern.prototype.serial = function (br = 115200, sendcrc = false, singlecharids = false, name = 'default') {
   return this.withHap((hap) => {
-    if (!writeMessage) {
-      getWriter(br);
+    if (!(name in writeMessagers)) {
+      getWriter(name, br);
     }
-    const onTrigger = (time, hap, currentTime) => {
+    const onTrigger = (t_deprecate, hap, currentTime, cps, targetTime) => {
       var message = '';
       var chk = 0;
       if (typeof hap.value === 'object') {
@@ -105,10 +105,10 @@ Pattern.prototype.serial = function (br = 38400, sendcrc = false, singlecharids 
       } else {
         message = hap.value;
       }
-      const offset = (time - currentTime + latency) * 1000;
+      const offset = (targetTime - currentTime + latency) * 1000;
 
       window.setTimeout(function () {
-        writeMessage(message, chk);
+        writeMessagers[name](message, chk);
       }, offset);
     };
     return hap.setContext({ ...hap.context, onTrigger, dominantTrigger: true });

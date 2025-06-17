@@ -1,15 +1,15 @@
 {
-  "name": "@strudel.cycles/core",
-  "version": "0.8.2",
+  "name": "@strudel/core",
+  "version": "1.2.2",
   "description": "Port of Tidal Cycles to JavaScript",
   "main": "index.mjs",
   "type": "module",
   "publishConfig": {
-    "main": "dist/index.js",
-    "module": "dist/index.mjs"
+    "main": "dist/index.mjs"
   },
   "scripts": {
     "test": "vitest run",
+    "bench": "vitest bench",
     "build": "vite build",
     "prepublishOnly": "pnpm build"
   },
@@ -29,13 +29,13 @@
   "bugs": {
     "url": "https://github.com/tidalcycles/strudel/issues"
   },
-  "homepage": "https://strudel.tidalcycles.org",
+  "homepage": "https://strudel.cc",
   "dependencies": {
-    "fraction.js": "^4.2.0"
+    "fraction.js": "^5.2.1"
   },
   "gitHead": "0e26d4e741500f5bae35b023608f062a794905c2",
   "devDependencies": {
-    "vite": "^4.3.3",
-    "vitest": "^0.33.0"
+    "vite": "^6.0.11",
+    "vitest": "^3.0.4"
   }
 }

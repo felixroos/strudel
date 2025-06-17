@@ -96,45 +96,30 @@ If you find a tidal control that's not on the list, please tell!
 ## Sound
 
 Tidal is commonly paired with Superdirt / Supercollider for sound generation.
-While Strudel also has a way of [communicating with Superdirt](./learn/input-output),
+While Strudel also has a way of [communicating with Superdirt](/learn/input-output/),
 it aims to provide a standalone live coding environment that runs entirely in the browser.
 
 ### Audio Effects
 
 Many of SuperDirt's effects have been reimplemented in Strudel, using the Web Audio API.
-You can find a [list of available effects here](./learn/effects).
+You can find a [list of available effects here](/learn/effects/).
 
 ### Sampler
 
-Strudel's sampler supports [a subset](http://127.0.0.1:3000/learn/samples) of Superdirt's sampler.
+Strudel's sampler supports [a subset](/learn/samples) of Superdirt's sampler.
 Also, samples are always loaded from a URL rather than from the disk, although [that might be possible in the future](https://github.com/tidalcycles/strudel/issues/118).
 
 ## Evaluation
 
 The Strudel REPL does not support [block based evaluation](https://github.com/tidalcycles/strudel/issues/34) yet.
-You can use the following "workaround" to create multiple patterns that can be turned on and off:
+You can use labeled statements and `_` to mute:
 
-```
-let a = note("c a f e")
+<MiniRepl
+  client:visible
+tune={`$: n("[0 .. 8]*8/9").scale("C:minor:pentatonic")
 
-let b = s("bd sd")
-
-stack(
-  a,
-  // b
-)
-```
-
-Alternatively, you could write everything as one `stack` and use `.hush()` to silence a pattern:
-
-```
-stack(
-  note("c a f e"),
-  s("bd sd").hush()
-)
-```
-
-Note that strudel will always use the last statement in your code as the pattern for querying
+\_$: s("bd\*4").bank('RolandTR909')`}
+/>
 
 ## Tempo
 

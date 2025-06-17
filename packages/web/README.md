@@ -7,19 +7,16 @@ This package provides an easy to use bundle of multiple strudel packages for the
 Save this code as a `.html` file and double click it:
 
 ```html
-<!DOCTYPE html>
+<!doctype html>
+<script src="https://unpkg.com/@strudel/web@1.0.3"></script>
 <button id="play">play</button>
 <button id="stop">stop</button>
-<script type="module">
-  import { initStrudel } from 'https://cdn.skypack.dev/@strudel/web@0.8.2';
-
+<script>
   initStrudel();
-  document.getElementById('play').addEventListener('click', () => note('<c a f e>(3,8)').play());
+  document.getElementById('play').addEventListener('click', () => note('<c a f e>(3,8)').jux(rev).play());
   document.getElementById('stop').addEventListener('click', () => hush());
 </script>
 ```
-
-With the help of [skypack](https://www.skypack.dev/), you don't need a bundler nor a server.
 
 As soon as you call `initStrudel()`, all strudel functions are made available.
 In this case, we are using the `note` function to create a pattern.
@@ -43,7 +40,7 @@ By default, no external samples are loaded, but you can add them like this:
 
 ```js
 initStrudel({
-  prebake: () => samples('github:tidalcycles/Dirt-Samples/master'),
+  prebake: () => samples('github:tidalcycles/dirt-samples'),
 });
 
 document.getElementById('play').addEventListener('click', 
@@ -51,7 +48,7 @@ document.getElementById('play').addEventListener('click',
 )
 ```
 
-You can learn [more about the `samples` function here](https://strudel.tidalcycles.org/learn/samples#loading-custom-samples).
+You can learn [more about the `samples` function here](https://strudel.cc/learn/samples#loading-custom-samples).
 
 ### Evaluating Code
 
@@ -72,10 +69,16 @@ document.getElementById('play').addEventListener('stop',
 
 ### Double vs Single Quotes
 
-There is a tiny difference between the [Strudel REPL](https://strudel.tidalcycles.org/) and `@strudel/web`.
+There is a tiny difference between the [Strudel REPL](https://strudel.cc/) and `@strudel/web`.
 In the REPL you can use 'single quotes' for regular JS strings and "double quotes" for mini notation patterns.
 In `@strudel/web`, it does not matter which types of quotes you're using.
-There will probably be an escapte hatch for that in the future.
+
+This difference means that you cannot call pattern methods on raw strings, for example `"1 2 3".slow(2)`.
+To make it work you can either:
+
+1. Use the `evaluate` function, which behaves exactly like the Strudel REPL, interpreting double quoted strings as mini notation.
+2. wrap the string with `m`: `m("1 2 3").slow(2)`
+3. wrap the string in a control function: `n("1 2 3").slow(2)` depending on your context.
 
 ## More Examples
 

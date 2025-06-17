@@ -11,7 +11,9 @@ export const flashField = StateField.define({
       for (let e of tr.effects) {
         if (e.is(setFlash)) {
           if (e.value && tr.newDoc.length > 0) {
-            const mark = Decoration.mark({ attributes: { style: `background-color: #FFCA2880` } });
+            const mark = Decoration.mark({
+              attributes: { style: `background-color: rgba(255,255,255, .4); filter: invert(10%)` },
+            });
             flash = Decoration.set([mark.range(0, tr.newDoc.length)]);
           } else {
             flash = Decoration.set([]);
@@ -33,3 +35,5 @@ export const flash = (view, ms = 200) => {
     view.dispatch({ effects: setFlash.of(false) });
   }, ms);
 };
+
+export const isFlashEnabled = (on) => (on ? flashField : []);

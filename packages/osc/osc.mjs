@@ -5,7 +5,8 @@ This program is free software: you can redistribute it and/or modify it under th
 */
 
 import OSC from 'osc-js';
-import { logger, parseNumeral, Pattern } from '@strudel.cycles/core';
+
+import { logger, parseNumeral, Pattern, isNote, noteToMidi, ClockCollator } from '@strudel/core';
 
 let connection; // Promise<OSC>
 function connect() {
@@ -33,38 +34,53 @@ function connect() {
   return connection;
 }
 
-const latency = 0.1;
-let startedAt = -1;
+export function parseControlsFromHap(hap, cps) {
+  hap.ensureObjectValue();
+  const cycle = hap.wholeOrPart().begin.valueOf();
+  const delta = hap.duration.valueOf() / cps;
+  const controls = Object.assign({}, { cps, cycle, delta }, hap.value);
+  // make sure n and note are numbers
+  controls.n && (controls.n = parseNumeral(controls.n));
+  if (typeof controls.note !== 'undefined') {
+    if (isNote(controls.note)) {
+      controls.midinote = noteToMidi(controls.note, controls.octave || 3);
+    } else {
+      controls.note = parseNumeral(controls.note);
+    }
+  }
+  controls.bank && (controls.s = controls.bank + controls.s);
+  controls.roomsize && (controls.size = parseNumeral(controls.roomsize));
+  // speed adjustment for CPS is handled on the DSP side in superdirt and pattern side in Strudel,
+  // so we need to undo the adjustment before sending the message to superdirt.
+  controls.unit === 'c' && controls.speed != null && (controls.speed = controls.speed / cps);
+  const channels = controls.channels;
+  channels != undefined && (controls.channels = JSON.stringify(channels));
+  return controls;
+}
+
+const collator = new ClockCollator({});
+
+export async function oscTrigger(t_deprecate, hap, currentTime, cps = 1, targetTime) {
+  const osc = await connect();
+  const controls = parseControlsFromHap(hap, cps);
+  const keyvals = Object.entries(controls).flat();
+
+  const ts = Math.round(collator.calculateTimestamp(currentTime, targetTime) * 1000);
+  const message = new OSC.Message('/dirt/play', ...keyvals);
+  const bundle = new OSC.Bundle([message], ts);
+  bundle.timestamp(ts); // workaround for https://github.com/adzialocha/osc-js/issues/60
+  osc.send(bundle);
+}
 
 /**
  *
  * Sends each hap as an OSC message, which can be picked up by SuperCollider or any other OSC-enabled software.
- * For more info, read [MIDI & OSC in the docs](https://strudel.tidalcycles.org/learn/input-output)
+ * For more info, read [MIDI & OSC in the docs](https://strudel.cc/learn/input-output/)
  *
  * @name osc
  * @memberof Pattern
  * @returns Pattern
  */
 Pattern.prototype.osc = function () {
-  return this.onTrigger(async (time, hap, currentTime, cps = 1) => {
-    hap.ensureObjectValue();
-    const osc = await connect();
-    const cycle = hap.wholeOrPart().begin.valueOf();
-    const delta = hap.duration.valueOf();
-    // time should be audio time of onset
-    // currentTime should be current time of audio context (slightly before time)
-    if (startedAt < 0) {
-      startedAt = Date.now() - currentTime * 1000;
-    }
-    const controls = Object.assign({}, { cps, cycle, delta }, hap.value);
-    // make sure n and note are numbers
-    controls.n && (controls.n = parseNumeral(controls.n));
-    controls.note && (controls.note = parseNumeral(controls.note));
-    const keyvals = Object.entries(controls).flat();
-    const ts = Math.floor(startedAt + (time + latency) * 1000);
-    const message = new OSC.Message('/dirt/play', ...keyvals);
-    const bundle = new OSC.Bundle([message], ts);
-    bundle.timestamp(ts); // workaround for https://github.com/adzialocha/osc-js/issues/60
-    osc.send(bundle);
-  });
+  return this.onTrigger(oscTrigger);
 };

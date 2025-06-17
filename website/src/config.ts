@@ -6,7 +6,7 @@ export const SITE = {
 
 export const OPEN_GRAPH = {
   image: {
-    src: 'https://strudel.tidalcycles.org/icon.png',
+    src: 'https://strudel.cc/icon.png',
     alt: 'Strudel Logo',
   },
 };
@@ -54,8 +54,14 @@ export const SIDEBAR: Sidebar = {
     ],
   },
   en: {
+    Presentation: [
+      { text: 'What is Strudel?', link: 'workshop/getting-started' },
+      { text: 'Showcase', link: 'intro/showcase' },
+      { text: 'Blog', link: 'blog' },
+      /* { text: 'Community Bakery', link: 'bakery' }, */
+    ],
     Workshop: [
-      { text: 'Getting Started', link: 'workshop/getting-started' },
+      // { text: 'Getting Started', link: 'workshop/getting-started' },
       { text: 'First Sounds', link: 'workshop/first-sounds' },
       { text: 'First Notes', link: 'workshop/first-notes' },
       { text: 'First Effects', link: 'workshop/first-effects' },
@@ -70,14 +76,16 @@ export const SIDEBAR: Sidebar = {
       { text: 'MIDI & OSC', link: 'learn/input-output' },
     ],
     More: [
+      { text: 'Recipes', link: 'recipes/recipes' },
       { text: 'Mini-Notation', link: 'learn/mini-notation' },
-      { text: 'Coding syntax', link: 'learn/code' },
+      { text: 'Visual Feedback', link: 'learn/visual-feedback' },
       { text: 'Offline', link: 'learn/pwa' },
       { text: 'Patterns', link: 'technical-manual/patterns' },
-      { text: 'Pattern Alignment', link: 'technical-manual/alignment' },
-      { text: 'Strudel vs Tidal', link: 'learn/strudel-vs-tidal' },
       { text: 'Music metadata', link: 'learn/metadata' },
       { text: 'CSound', link: 'learn/csound' },
+      { text: 'Hydra', link: 'learn/hydra' },
+      { text: 'Input Devices', link: 'learn/input-devices' },
+      { text: 'Device Motion', link: 'learn/devicemotion' },
     ],
     'Pattern Functions': [
       { text: 'Introduction', link: 'functions/intro' },
@@ -85,15 +93,25 @@ export const SIDEBAR: Sidebar = {
       { text: 'Time Modifiers', link: 'learn/time-modifiers' },
       { text: 'Control Parameters', link: 'functions/value-modifiers' },
       { text: 'Signals', link: 'learn/signals' },
+      { text: 'Random Modifiers', link: 'learn/random-modifiers' },
       { text: 'Conditional Modifiers', link: 'learn/conditional-modifiers' },
       { text: 'Accumulation', link: 'learn/accumulation' },
       { text: 'Tonal Functions', link: 'learn/tonal' },
+      { text: 'Stepwise Functions', link: 'learn/stepwise' },
     ],
-    Understand: [{ text: 'Pitch', link: 'understand/pitch' }],
+    Understand: [
+      { text: 'Coding syntax', link: 'learn/code' },
+      { text: 'Pitch', link: 'understand/pitch' },
+      { text: 'Cycles', link: 'understand/cycles' },
+      { text: 'Voicings', link: 'understand/voicings' },
+      { text: 'Pattern Alignment', link: 'technical-manual/alignment' },
+      { text: 'Strudel vs Tidal', link: 'learn/strudel-vs-tidal' },
+    ],
     Development: [
+      { text: 'Strudel in your Project', link: 'technical-manual/project-start' },
+      { text: 'Packages', link: 'technical-manual/packages' },
       { text: 'REPL', link: 'technical-manual/repl' },
       { text: 'Sounds', link: 'technical-manual/sounds' },
-      { text: 'Packages', link: 'technical-manual/packages' },
       { text: 'Docs', link: 'technical-manual/docs' },
       { text: 'Testing', link: 'technical-manual/testing' },
       // { text: 'Internals', link: 'technical-manual/internals' },

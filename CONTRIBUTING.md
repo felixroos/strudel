@@ -13,7 +13,7 @@ To get in touch with the contributors, either
 ## Ask a Question
 
 If you have any questions about strudel, make sure you've glanced through the
-[docs](https://strudel.tidalcycles.org/learn/) to find out if it answers your question.
+[docs](https://strudel.cc/learn/) to find out if it answers your question.
 If not, use one of the Communication Channels above!
 
 Don't be afraid to ask! Your question might be of great value for other people too.
@@ -31,7 +31,7 @@ Use one of the Communication Channels listed above.
 
 ## Improve the Docs
 
-If you find some weak spots in the [docs](https://strudel.tidalcycles.org/workshop/getting-started/),
+If you find some weak spots in the [docs](https://strudel.cc/workshop/getting-started/),
 you can edit each file directly on github via the "Edit this page" link located in the right sidebar.
 
 ## Propose a Feature
@@ -66,7 +66,7 @@ To get the project up and running for development, make sure you have installed:
 
 - [git](https://git-scm.com/)
 - [node](https://nodejs.org/en/) >= 18
-- [pnpm](https://pnpm.io/) (`npm i pnpm -g`)
+- [pnpm](https://pnpm.io/) (`curl -fsSL https://get.pnpm.io/install.sh | env PNPM_VERSION=8.11.0 sh -`)
 
 then, do the following:
 
@@ -83,7 +83,7 @@ Please report any problems you've had with the setup instructions!
 
 To make sure the code changes only where it should, we are using prettier to unify the code style.
 
-- You can format all files at once by running `pnpm prettier` from the project root
+- You can format all files at once by running `pnpm codeformat` from the project root
 - Run `pnpm format-check` from the project root to check if all files are well formatted
 
 If you use VSCode, you can
@@ -114,7 +114,7 @@ You can run the same check with `pnpm check`
 ## Package Workflow
 
 The project is split into multiple [packages](https://github.com/tidalcycles/strudel/tree/main/packages) with independent versioning.
-When you run `pnpm i` on the root folder, [pnpm workspaces](https://pnpm.io/workspaces) will install all dependencies of all subpackages. This will allow any js file to import `@strudel.cycles/<package-name>` to get the local version,
+When you run `pnpm i` on the root folder, [pnpm workspaces](https://pnpm.io/workspaces) will install all dependencies of all subpackages. This will allow any js file to import `@strudel/<package-name>` to get the local version,
 allowing to develop multiple packages at the same time.
 
 ## Package Publishing
@@ -130,20 +130,26 @@ npx lerna version --no-private
 # publish all packages inside /packages using pnpm! don't use lerna to publish!!
 pnpm --filter "./packages/**" publish --dry-run
 
-# the last command was only a dry-run, make sure everything looks ok, if yes, run the same command without flag
+# the last command was only a dry-run. if everything looks ok, run this:
+
+pnpm --filter "./packages/**" publish --access public
 ```
 
 To manually publish a single package, increase the version in the `package.json`, then run `pnpm publish`.
 Important: Always publish with `pnpm`, as `npm` does not support overriding main files in `publishConfig`, which is done in all the packages.
 
-### New Packages
 
-To add a new package, you have to publish it manually the first time, using:
-
+## useful commands
 ```sh
-cd packages/<package-name> && pnpm publish --access public
-```
+#regenerate the test snapshots (ex: when updating or creating new pattern functions)
+pnpm snapshot 
 
+#start the OSC server
+pnpm run osc
+
+#build the standalone version
+pnpm tauri build
+```
 ## Have Fun
 
 Remember to have fun, and that this project is driven by the passion of volunteers!

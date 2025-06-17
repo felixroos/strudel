@@ -1,28 +1,35 @@
-import { Pattern, noteToMidi, valueToMidi } from '@strudel.cycles/core';
-import { registerSynthSounds, samples } from '@strudel.cycles/webaudio';
+import { Pattern, noteToMidi, valueToMidi } from '@strudel/core';
+import { aliasBank, registerSynthSounds, registerZZFXSounds, samples } from '@strudel/webaudio';
+import { registerSamplesFromDB } from './idbutils.mjs';
 import './piano.mjs';
 import './files.mjs';
+
+const { BASE_URL } = import.meta.env;
+const baseNoTrailing = BASE_URL.endsWith('/') ? BASE_URL.slice(0, -1) : BASE_URL;
 
 export async function prebake() {
   // https://archive.org/details/SalamanderGrandPianoV3
   // License: CC-by http://creativecommons.org/licenses/by/3.0/ Author: Alexander Holm
   await Promise.all([
     registerSynthSounds(),
+    registerZZFXSounds(),
+    registerSamplesFromDB(),
     //registerSoundfonts(),
-    // need dynamic import here, because importing @strudel.cycles/soundfonts fails on server:
-    // => getting "window is not defined", as soon as "@strudel.cycles/soundfonts" is imported statically
+    // need dynamic import here, because importing @strudel/soundfonts fails on server:
+    // => getting "window is not defined", as soon as "@strudel/soundfonts" is imported statically
     // seems to be a problem with soundfont2
-    import('@strudel.cycles/soundfonts').then(({ registerSoundfonts }) => registerSoundfonts()),
-    samples(`./piano.json`, `./piano/`, { prebake: true }),
+    import('@strudel/soundfonts').then(({ registerSoundfonts }) => registerSoundfonts()),
+    samples(`${baseNoTrailing}/piano.json`, undefined, { prebake: true }),
     // https://github.com/sgossner/VCSL/
     // https://api.github.com/repositories/126427031/contents/
     // LICENSE: CC0 general-purpose
-    samples(`./vcsl.json`, 'github:sgossner/VCSL/master/', { prebake: true }),
-    samples(`./tidal-drum-machines.json`, 'github:ritchse/tidal-drum-machines/main/machines/', {
+    samples(`${baseNoTrailing}/vcsl.json`, 'github:sgossner/VCSL/master/', { prebake: true }),
+    samples(`${baseNoTrailing}/tidal-drum-machines.json`, 'github:ritchse/tidal-drum-machines/main/machines/', {
       prebake: true,
       tag: 'drum-machines',
     }),
-    samples(`./EmuSP12.json`, `./EmuSP12/`, { prebake: true, tag: 'drum-machines' }),
+    samples(`${baseNoTrailing}/EmuSP12.json`, undefined, { prebake: true, tag: 'drum-machines' }),
+    samples(`${baseNoTrailing}/mridangam.json`, undefined, { prebake: true, tag: 'drum-machines' }),
     samples(
       {
         casio: ['casio/high.wav', 'casio/low.wav', 'casio/noise.wav'],
@@ -108,11 +115,38 @@ export async function prebake() {
           'numbers/7.wav',
           'numbers/8.wav',
         ],
+        num: [
+          'num/00.wav',
+          'num/01.wav',
+          'num/02.wav',
+          'num/03.wav',
+          'num/04.wav',
+          'num/05.wav',
+          'num/06.wav',
+          'num/07.wav',
+          'num/08.wav',
+          'num/09.wav',
+          'num/10.wav',
+          'num/11.wav',
+          'num/12.wav',
+          'num/13.wav',
+          'num/14.wav',
+          'num/15.wav',
+          'num/16.wav',
+          'num/17.wav',
+          'num/18.wav',
+          'num/19.wav',
+          'num/20.wav',
+        ],
       },
-      'github:tidalcycles/Dirt-Samples/master/',
+      'github:tidalcycles/dirt-samples',
+      {
+        prebake: true,
+      },
     ),
   ]);
-  // await samples('github:tidalcycles/Dirt-Samples/master');
+
+  aliasBank(`${baseNoTrailing}/tidal-drum-machines-alias.json`);
 }
 
 const maxPan = noteToMidi('C8');

@@ -34,6 +34,7 @@ module.exports = {
       },
       spacing: {
         'app-height': 'var(--app-height)',
+        'app-width': 'var(--app-width)',
       },
       typography(theme) {
         return {
@@ -44,6 +45,29 @@ module.exports = {
               },
               'code::after': {
                 content: 'none',
+              },
+              color: 'var(--foreground)',
+              a: {
+                color: 'var(--foreground)',
+              },
+              h1: {
+                color: 'var(--foreground)',
+              },
+              h2: {
+                color: 'var(--foreground)',
+              },
+              h3: {
+                color: 'var(--foreground)',
+              },
+              h4: {
+                color: 'var(--foreground)',
+              },
+              pre: {
+                color: 'var(--foreground)',
+                background: 'var(--background)',
+              },
+              code: {
+                color: 'var(--foreground)',
               },
             },
           },

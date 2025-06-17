@@ -5,7 +5,8 @@ This program is free software: you can redistribute it and/or modify it under th
 */
 
 import { getLeafLocation, getLeafLocations, mini, mini2ast } from '../mini.mjs';
-import '@strudel.cycles/core/euclid.mjs';
+import '@strudel/core/euclid.mjs';
+import { Fraction } from '@strudel/core/index.mjs';
 import { describe, expect, it } from 'vitest';
 
 describe('mini', () => {
@@ -73,6 +74,10 @@ describe('mini', () => {
     expect(minS('a!3 b')).toEqual(['a: 0 - 1/4', 'a: 1/4 - 1/2', 'a: 1/2 - 3/4', 'b: 3/4 - 1']);
     expect(minS('[<a b c>]!3 d')).toEqual(minS('<a b c> <a b c> <a b c> d'));
   });
+  it('supports replication via repeated !', () => {
+    expect(minS('a ! ! b')).toEqual(['a: 0 - 1/4', 'a: 1/4 - 1/2', 'a: 1/2 - 3/4', 'b: 3/4 - 1']);
+    expect(minS('[<a b c>]!! d')).toEqual(minS('<a b c> <a b c> <a b c> d'));
+  });
   it('supports euclidean rhythms', () => {
     expect(minS('a(3, 8)')).toEqual(['a: 0 - 1/8', 'a: 3/8 - 1/2', 'a: 3/4 - 7/8']);
   });
@@ -112,6 +117,9 @@ describe('mini', () => {
     checkEuclid([9, 16], 'x ~ x x ~ x ~ x ~ x x ~ x ~ x ~');
     checkEuclid([11, 24], 'x ~ ~ x ~ x ~ x ~ x ~ x ~ ~ x ~ x ~ x ~ x ~ x ~');
     checkEuclid([13, 24], 'x ~ x x ~ x ~ x ~ x ~ x ~ x x ~ x ~ x ~ x ~ x ~');
+  });
+  it('supports the - alias for ~', () => {
+    expect(minS('a - b [- c]')).toEqual(minS('a ~ b [~ c]'));
   });
   it('supports the ? operator', () => {
     expect(
@@ -183,6 +191,33 @@ describe('mini', () => {
   });
   it('supports lists', () => {
     expect(minV('a:b c:d:[e:f] g')).toEqual([['a', 'b'], ['c', 'd', ['e', 'f']], 'g']);
+  });
+  it('supports ranges', () => {
+    expect(minV('0 .. 4')).toEqual([0, 1, 2, 3, 4]);
+  });
+  it('supports patterned ranges', () => {
+    expect(minS('[<0 1> .. <2 4>]*2')).toEqual(minS('[0 1 2] [1 2 3 4]'));
+  });
+  it('supports the . operator', () => {
+    expect(minS('a . b c')).toEqual(minS('a [b c]'));
+    expect(minS('a . b c . [d e f . g h]')).toEqual(minS('a [b c] [[d e f] [g h]]'));
+  });
+  it('supports the _ operator', () => {
+    expect(minS('a _ b _ _')).toEqual(minS('a@2 b@3'));
+  });
+  it('_ and @ are almost interchangeable', () => {
+    expect(minS('a @ b @ @')).toEqual(minS('a _2 b _3'));
+  });
+  it('supports ^ step marking', () => {
+    expect(mini('a [^b c]')._steps).toEqual(Fraction(4));
+    expect(mini('[^b c]!3')._steps).toEqual(Fraction(6));
+    expect(mini('[a b c] [d [e f]]')._steps).toEqual(Fraction(2));
+    expect(mini('^[a b c] [d [e f]]')._steps).toEqual(Fraction(2));
+    expect(mini('[a b c] [d [^e f]]')._steps).toEqual(Fraction(8));
+    expect(mini('[a b c] [^d [e f]]')._steps).toEqual(Fraction(4));
+    expect(mini('[^a b c] [^d [e f]]')._steps).toEqual(Fraction(12));
+    expect(mini('[^a b c] [d [^e f]]')._steps).toEqual(Fraction(24));
+    expect(mini('[^a b c d e]')._steps).toEqual(Fraction(5));
   });
 });
 

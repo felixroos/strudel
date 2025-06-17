@@ -1,6 +1,20 @@
-import { noteToMidi, freqToMidi } from '@strudel.cycles/core';
-import { getAudioContext, registerSound, getEnvelope } from '@strudel.cycles/webaudio';
+import { noteToMidi, freqToMidi, getSoundIndex } from '@strudel/core';
+import {
+  getAudioContext,
+  registerSound,
+  getParamADSR,
+  getADSRValues,
+  getPitchEnvelope,
+  getVibratoOscillator,
+} from '@strudel/webaudio';
 import gm from './gm.mjs';
+
+let defaultSoundfontUrl = 'https://felixroos.github.io/webaudiofontdata/sound';
+let soundfontUrl = defaultSoundfontUrl;
+
+export function setSoundfontUrl(value) {
+  soundfontUrl = value;
+}
 
 let loadCache = {};
 async function loadFont(name) {
@@ -9,7 +23,7 @@ async function loadFont(name) {
   }
   const load = async () => {
     // TODO: make soundfont source configurable
-    const url = `https://felixroos.github.io/webaudiofontdata/sound/${name}.js`;
+    const url = `${soundfontUrl}/${name}.js`;
     const preset = await fetch(url).then((res) => res.text());
     let [_, data] = preset.split('={');
     return eval('{' + data);
@@ -130,24 +144,39 @@ export function registerSoundfonts() {
     registerSound(
       name,
       async (time, value, onended) => {
-        const { n = 0 } = value;
-        const { attack = 0.001, decay = 0.001, sustain = 1, release = 0.001 } = value;
-        const font = fonts[n % fonts.length];
+        const [attack, decay, sustain, release] = getADSRValues([
+          value.attack,
+          value.decay,
+          value.sustain,
+          value.release,
+        ]);
+
+        const { duration } = value;
+        const n = getSoundIndex(value.n, fonts.length);
+        const font = fonts[n];
         const ctx = getAudioContext();
         const bufferSource = await getFontBufferSource(font, value, ctx);
         bufferSource.start(time);
-        const { node: envelope, stop: releaseEnvelope } = getEnvelope(attack, decay, sustain, release, 0.3, time);
-        bufferSource.connect(envelope);
-        const stop = (releaseTime) => {
-          bufferSource.stop(releaseTime + release);
-          releaseEnvelope(releaseTime);
-        };
+        const envGain = ctx.createGain();
+        const node = bufferSource.connect(envGain);
+        const holdEnd = time + duration;
+        getParamADSR(node.gain, attack, decay, sustain, release, 0, 0.3, time, holdEnd, 'linear');
+        let envEnd = holdEnd + release + 0.01;
+
+        // vibrato
+        let vibratoOscillator = getVibratoOscillator(bufferSource.detune, value, time);
+        // pitch envelope
+        getPitchEnvelope(bufferSource.detune, value, time, holdEnd);
+
+        bufferSource.stop(envEnd);
+        const stop = (releaseTime) => {};
         bufferSource.onended = () => {
           bufferSource.disconnect();
-          envelope.disconnect();
+          vibratoOscillator?.stop();
+          node.disconnect();
           onended();
         };
-        return { node: envelope, stop };
+        return { node, stop };
       },
       { type: 'soundfont', prebake: true, fonts },
     );
